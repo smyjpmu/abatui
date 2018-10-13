@@ -1,7 +1,8 @@
 #!/bin/bash
 
+#bash install_arch.sh wizard && bash install_arch.sh install
 
-
+GNUGPL="\
 #    this script is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -14,9 +15,10 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this script.  If not, see <https://www.gnu.org/licenses/>.
+"
+whiptail --msgbox "$GNUGPL" --title "GNU General Public License" 20 78
 
-
-#Change the following variables to your liking
+#Default variables
 BOOTLOADER_ID="Arch"
 TARGET_DRIVE="/dev/sda"
 ENCRYPT_DRIVE=false
@@ -32,7 +34,6 @@ KEYMAP="us"
 SETTINGS_FILE="install_settings"
 SSD=false
 source $SETTINGS_FILE
-
 
 help () {
 	echo "help:"
@@ -311,7 +312,7 @@ install_arch () {
 	arch-chroot /mnt ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
 	arch-chroot /mnt hwclock --systohc
 
-	echo "-==Configureing Locale==-"
+	echo "-==Configuring Locale==-"
 	echo "$LOCALE" >> /mnt/etc/locale.gen
 	arch-chroot /mnt locale-gen
 	echo "LANG=$(echo $LOCALE | cut -d' ' -f1)" >> /mnt/etc/locale.conf
