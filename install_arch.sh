@@ -16,19 +16,19 @@ GNUGPL="\
 #    You should have received a copy of the GNU General Public License
 #    along with this script.  If not, see <https://www.gnu.org/licenses/>.
 "
-whiptail --msgbox "$GNUGPL" --title "GNU General Public License" 20 78
+
 
 #Default variables
 BOOTLOADER_ID="Arch"
 TARGET_DRIVE="/dev/sda"
 ENCRYPT_DRIVE=false
 HOSTNAME="arch"
-EXTRAUSER="Joe"
-INTERFACE="XFCE" #options: XFCE, KDE, GNOME, I3WM, NODEORWM
-DISPLAYMANAGER="LIGHTDM" #options: LIGHTDM, SDDM, GDM, NODM
+EXTRAUSER="noname"
+INTERFACE="I3WM" #options: XFCE, KDE, GNOME, I3WM, NODEORWM
+DISPLAYMANAGER="NODM" #options: LIGHTDM, SDDM, GDM, NODM
 NVME=false
 COUNTRY="US"
-TIMEZONE="US/Central"
+TIMEZONE="Canada/Eastern"
 LOCALE="en_US.UTF-8 UTF-8"
 KEYMAP="us"
 SETTINGS_FILE="install_settings"
@@ -47,6 +47,7 @@ help () {
 
 wizard () {
 	> $SETTINGS_FILE
+	whiptail --msgbox "$GNUGPL" --title "GNU General Public License" 20 78
 	NEW_BOOTLOADER_ID=$(whiptail --inputbox "done=[ENTER], default=($BOOTLOADER_ID)" 40 60 --title "bootloader id" 3>&1 1>&2 2>&3)
 	if [ -n "$NEW_BOOTLOADER_ID" ]; then
 	  echo "BOOTLOADER_ID=\"$NEW_BOOTLOADER_ID\"" >> $SETTINGS_FILE
@@ -256,13 +257,13 @@ install_arch () {
 	fi
 
 	if [ "$DISPLAYMANAGER" == "LIGHTDM" ]; then
-		DM="LIGHTDM"
+		DM="$LIGHTDM"
 	elif [ "$DISPLAYMANAGER" == "SDDM" ]; then
-		DM="SDDM"
+		DM="$SDDM"
 	elif [ "$DISPLAYMANAGER" == "GDM" ]; then
-		DM="GDM"
+		DM="$GDM"
 	elif [ "$DISPLAYMANAGER" == "NODM" ]; then
-		DM="NODM"
+		DM="$NODM"
 	fi
 
 	PACKAGES="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vim which xfsprogs \
