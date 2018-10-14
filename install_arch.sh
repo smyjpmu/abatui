@@ -270,7 +270,7 @@ install_arch () {
 	$DM\
 	$NVIDIA \
 	$AMD \
-	mesa lib32-mesa \
+	mesa \
 	xorg-server \
 	powerline-fonts \
 	os-prober
