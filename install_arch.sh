@@ -336,7 +336,7 @@ install_arch () {
 
 	echo "-==Installing GRUB==-"
 	arch-chroot /mnt mkinitcpio -p linux
-	arch-chroot /mnt grub-install $(if $EFI; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=${BOOTLOADER_ID}"; else echo "--target=i386-pc"; fi) --recheck $(if !$EFI; else echo "$TARGET_DRIVE"; fi)
+	arch-chroot /mnt grub-install $(if $EFI; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=${BOOTLOADER_ID}"; else echo "--target=i386-pc"; fi) --recheck $(if !$EFI; then echo "$TARGET_DRIVE"; fi)
 	echo "-==creating GRUB configuration==-"
 	arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
