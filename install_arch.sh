@@ -221,14 +221,14 @@ install_arch () {
 
 	if $(lspci | grep -i "VGA compatible controller: NVIDIA Corporation" > /dev/null 2>&1); then
 		echo "nVIDIA GPU found, nvidia drivers will be installed"
-		NVIDIA="nvidia nvidia-utils lib32-nvidia-utils nvidia-settings"
+		NVIDIA="nvidia nvidia-utils nvidia-settings" #lib32-nvidia-utils
 	else
 		NVIDIA=""
 	fi
 
 	if $(lspci | grep -i "VGA compatible controller: Advanced Micro Devices" > /dev/null 2>&1); then
 		echo "AMD GPU found, amdgpu drivers will be installed"
-		AMD="xf86-video-amdgpu vulkan-radeon libva-mesa-driver lib32-libva-mesa-driver"
+		AMD="xf86-video-amdgpu vulkan-radeon libva-mesa-driver" #lib32-libva-mesa-driver
 	else
 		AMD=""
 	fi
@@ -236,7 +236,7 @@ install_arch () {
 	GNOME="terminator pavucontrol baobab eog evince file-roller gdm gedit gnome-backgrounds gnome-calculator gnome-color-manager gnome-control-center gnome-disk-utility gnome-font-viewer gnome-getting-started-docs gnome-keyring gnome-menus gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-themes-extra gnome-user-docs gnome-user-share grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus orca rygel sushi tracker tracker-miners vino xdg-user-dirs-gtk yelp"
 	XFCE="terminator pavucontrol lightdm lightdm-gtk-greeter file-roller thunar thunar-volman xfce4-appfinder xfce4-panel xfce4-session xfce4-settings xfdesktop xfwm4 xfwm4-themes xfce4-pulseaudio-plugin xfce4-whiskermenu-plugin exo garcon gtk-xfce-engine"
 	KDE="terminator pavucontrol phonon-qt5-gstreamer appstream-0.12.2-1 appstream-qt-0.12.2-1 archlinux-appstream-data-20180821-1 attica-5.50.0-1 baloo-5.50.0-1 bluedevil-1:5.13.5-1 bluez-qt-5.50.0-1 breeze-5.13.5-1 breeze-gtk-5.13.5-1 breeze-icons-5.50.0-1 convertlit-1.8-8 discover-5.13.5-1 drkonqi-5.13.5-1 ebook-tools-0.2.2-4 editorconfig-core-c-0.12.2-1 frameworkintegration-5.50.0-1 gdb-8.2-2 gdb-common-8.2-2 guile2.0-2.0.14-1 kactivities-5.50.0-1 kactivities-stats-5.50.0-1 kactivitymanagerd-5.13.5-1 karchive-5.50.0-1 kauth-5.50.0-1 kbookmarks-5.50.0-1 kcmutils-5.50.0-1 kcodecs-5.50.0-1 kcompletion-5.50.0-1 kconfig-5.50.0-1 kconfigwidgets-5.50.0-1 kcoreaddons-5.50.0-1 kcrash-5.50.0-1 kdbusaddons-5.50.0-1 kde-cli-tools-5.13.5-1 kdeclarative-5.50.0-1 kdecoration-5.13.5-1 kded-5.50.0-1 kdelibs4support-5.50.0-1 kdeplasma-addons-5.13.5-1 kdesu-5.50.0-1 kemoticons-5.50.0-1 kfilemetadata-5.50.0-1 kgamma5-5.13.5-1 kglobalaccel-5.50.0-1 kguiaddons-5.50.0-1 kholidays-1:5.50.0-1 khotkeys-5.13.5-1 ki18n-5.50.0-1 kiconthemes-5.50.0-1 kidletime-5.50.0-1 kinfocenter-5.13.5-1 kinit-5.50.0-1 kio-5.50.0-1 kirigami2-5.50.0-1 kitemmodels-5.50.0-1 kitemviews-5.50.0-1 kjobwidgets-5.50.0-1 kjs-5.50.0-1 kjsembed-5.50.0-1 kmenuedit-5.13.5-1 knetattach-5.13.5-1 knewstuff-5.50.0-1 knotifications-5.50.0-1 knotifyconfig-5.50.0-1 kpackage-5.50.0-1 kparts-5.50.0-1 kpeople-5.50.0-1 kpty-5.50.0-1 krunner-5.50.0-1 kscreen-5.13.5-1 kscreenlocker-5.13.5-1 kservice-5.50.0-1 ksshaskpass-5.13.5-1 ksysguard-5.13.5-1 ktexteditor-5.50.0-1 ktextwidgets-5.50.0-1 kunitconversion-5.50.0-1 kwallet-5.50.0-1 kwallet-pam-5.13.5-1 kwayland-5.50.0-1 kwayland-integration-5.13.5-1 kwidgetsaddons-5.50.0-1 kwin-5.13.5-2 kwindowsystem-5.50.0-1 kwrited-5.13.5-1 kxmlgui-5.50.0-1 kxmlrpcclient-5.50.0-1 libdbusmenu-qt5-0.9.3+16.04.20160218-1 libdmtx-0.7.4-6 libgit2-1:0.27.4-1 libkscreen-5.13.5-1 libksysguard-5.13.5-1 libmbim-1.16.2-1 libqalculate-2.6.2-1 libqmi-1.20.2-1 libutempter-1.1.6-3 libxres-1.2.0-1 libzip-1.5.1-1 media-player-info-23-1 milou-5.13.5-1 modemmanager-1.8.2-1 modemmanager-qt-5.50.0-1 networkmanager-qt-5.50.0-1 oxygen-5.13.5-1 phonon-qt5-4.10.1-2 phonon-qt5-gstreamer-4.9.0-5 plasma-browser-integration-5.13.5-1 plasma-desktop-5.13.5-1 plasma-framework-5.50.0-1 plasma-integration-5.13.5-1 plasma-nm-5.13.5-1 plasma-pa-5.13.5-1 plasma-sdk-5.13.5-1 plasma-vault-5.13.5-1 plasma-workspace-5.13.5-2 plasma-workspace-wallpapers-5.13.5-1 polkit-kde-agent-5.13.5-1 polkit-qt5-0.112.0+git20180107-2 poppler-qt5-0.67.0-1 powerdevil-5.13.5-1 ppp-2.4.7-4 prison-5.50.0-1 qca-2.1.3-1 qqc2-desktop-style-5.50.0-1 qrencode-4.0.2-1 qt5-declarative-5.11.2-1 qt5-graphicaleffects-5.11.2-1 qt5-location-5.11.2-1 qt5-multimedia-5.11.2-1 qt5-quickcontrols-5.11.2-1 qt5-quickcontrols2-5.11.2-1 qt5-script-5.11.2-1 qt5-sensors-5.11.2-1 qt5-speech-5.11.2-1 qt5-tools-5.11.2-1 qt5-webchannel-5.11.2-1 qt5-webkit-5.212.0alpha2-20 qt5-xmlpatterns-5.11.2-1 sddm-0.18.0-1 sddm-kcm-5.13.5-1 socat-1.7.3.2-2 solid-5.50.0-1 sonnet-5.50.0-1 syntax-highlighting-5.50.0-1 systemsettings-5.13.5-1 threadweaver-5.50.0-1 ttf-hack-3.003-1 user-manager-5.13.5-1 xcb-util-cursor-0.1.3-1 xdg-desktop-portal-kde-5.13.5-1 xorg-xauth-1.0.10-1 xorg-xmessage-1.0.5-1 xorg-xprop-1.2.3-1 xorg-xsetroot-1.1.2-1 plasma-meta-5.13-1"
-	I3WM="libev-4.24-1  xcb-util-cursor-0.1.3-1  xcb-util-xrm-1.3-1 yajl-2.1.0-2  i3-gaps-4.15.0.1-2 lightdm lightdm-gtk-greeter libxdg-basedir-1.2.0-4 rofi-1.5.1-1 mc libcue-2.2.1-1  libdiscid-0.6.2-1  cmus-2.7.1-9 pcurses neofetch rxvt-unicode-terminfo-9.22-7  rxvt-unicode-9.22-7"
+	I3WM="libev  xcb-util-cursor  xcb-util-xrm yajl  i3-gaps lightdm lightdm-gtk-greeter libxdg-basedir rofi mc libcue  libdiscid  cmus pcurses neofetch rxvt-unicode-terminfo rxvt-unicode"
 	NODEORWM="" #leave empty
 
 	LIGHTDM="lightdm lightdm-gtk-greeter"
@@ -299,6 +299,7 @@ install_arch () {
 	pacstrap /mnt ${PACKAGES}
 
 	cp $0 /mnt/root/
+	chmod 777 /mnt/root/$0
 
 	if $ENCRYPT_DRIVE; then
 		echo "-==configuring mkinitcpio.conf and grub config for encryption==-"
@@ -336,12 +337,14 @@ install_arch () {
 
 	echo "-==Installing GRUB==-"
 	arch-chroot /mnt mkinitcpio -p linux
-	arch-chroot /mnt grub-install $(if $EFI; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=${BOOTLOADER_ID}"; else echo "--target=i386-pc"; fi) --recheck $(if !$EFI; echo "$TARGET_DRIVE"; fi)
+	arch-chroot /mnt grub-install $(if $EFI; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=${BOOTLOADER_ID}"; else echo "--target=i386-pc"; fi) --recheck $(if !$EFI; else echo "$TARGET_DRIVE"; fi)
 	echo "-==creating GRUB configuration==-"
 	arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 	arch-chroot /mnt systemctl enable NetworkManager
-	arch-chroot /mnt systemctl enable $DISPLAYMANAGER
+	if [ !$DISPLAYMANAGER = "NODM" ]; then
+		arch-chroot /mnt systemctl enable $DISPLAYMANAGER
+	fi
 	arch-chroot /mnt systemctl enable ntpd
 	echo "-==Setting password for root user==-"
 	arch-chroot /mnt /root/$0 password $ROOTPASSWD root
