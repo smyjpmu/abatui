@@ -16,7 +16,7 @@ GNUGPL="\
 #    You should have received a copy of the GNU General Public License
 #    along with this script.  If not, see <https://www.gnu.org/licenses/>.
 "
-
+whiptail --msgbox "$GNUGPL" --title "GNU General Public License" 20 78
 
 #Default variables
 BOOTLOADER_ID="Arch"
@@ -47,7 +47,6 @@ help () {
 
 wizard () {
 	> $SETTINGS_FILE
-	whiptail --msgbox "$GNUGPL" --title "GNU General Public License" 20 78
 	NEW_BOOTLOADER_ID=$(whiptail --inputbox "done=[ENTER], default=($BOOTLOADER_ID)" 40 60 --title "bootloader id" 3>&1 1>&2 2>&3)
 	if [ -n "$NEW_BOOTLOADER_ID" ]; then
 	  echo "BOOTLOADER_ID=\"$NEW_BOOTLOADER_ID\"" >> $SETTINGS_FILE
