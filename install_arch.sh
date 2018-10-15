@@ -268,148 +268,147 @@ install_arch () {
 		AMD=""
 	fi
 
-	##################################################
-	############## DE/WM & DM Packages ###############
+##################################################
+############## DE/WM & DM Packages ###############
+GNOME="apache appstream-glib apr apr-util augeas brltty bubblewrap cdrtools celt celt0.5.1 ceph-libs cifs-utils clutter clutter-gst clutter-gtk cogl colord-sane cups-pk-helper dleyna-connector-dbus dleyna-core dleyna-renderer dleyna-server dotconf espeak evolution evolution-data-server faac folks freerdp frei0r-plugins gamin gavl gcab geocode-glib gfbgraph gjs glusterfs gmime3 gnome-autoar gnome-bluetooth gnome-desktop gnome-online-accounts gnome-online-minersgom gperftools grilo gsound gspell gssdp gst-plugins-bad gtk-vnc gtkspell3 gupnp gupnp-av gupnp-dlna js60 ladspa ldb leveldb libao libbs2b libbsd libcacard libchamplain libcryptui libcue libdazzle libdc1394 libdmapsharing libdvdnav libdvdread libfdk-aac libgdata libgdm libgee libgepub libgme libgovirt libgrss libgsf libgtop libgweather libgxps libieee1284 libiptcdata liblouis libmediaart libmms libmp4v2 libmusicbrainz5 libnautilus-extension libnfs libnice liboauth libofa libosinfo libpackagekit-glib libpeas libphonenumber libpst libpwquality libquvi libquvi-scripts libspeechd libsrtp libstemmer libsynctex liburcu libvirt libvirt-glib libvncserver libwbclient libytnef libzapojit lua52 lua52-bitop lua52-expat lua52-lpeg lua52-luajson lua52-socket mjpegtools mod_dnssd mtools nautilus-sendto net-snmp netcf numactl oath-toolkit osinfo-db phodav pipewire portaudio pulseaudio-alsa pulseaudio-bluetooth python-atspi python-xdg qemu rpcbind rtmpdump sane sbc seabios shared-color-targets smbclient spandsp speech-dispatcher spice spice-gtk srt t1lib talloc tcl telepathy-glib tevent totem-plparser usbredir vde2 virglrenderer wildmidi yajl zip zvbi baobab cheese eog epiphany evince file-rollergdm gedit gnome-backgroundsgnome-boxes gnome-calculator gnome-calendar gnome-charactersgnome-clocks gnome-color-managergnome-contacts gnome-control-center gnome-dictionary gnome-disk-utility gnome-documents gnome-font-viewergnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-software gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orcarygel simple-scan sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp appstream-glib bind-tools bubblewrap cdrdao cdrtools clutter clutter-gtk cogl ctags dvd+rw-tools evolution-data-server flatpak gcab gedit geocode-glib geoip geoip-database gjs gnome-autoar gnome-desktop gnome-online-accounts gnome-settings-daemon gspell gtksourceview4 gtkspell3 idnkit ipython js60 jsonrpc-glib libao libcryptui libdazzle libgdata libgee libgit2 libgit2-glib libgnome-games-support libgsf libgtop libgweather libnautilus-extension liboauth libpeas-1.22.0-3 libphonenumber libpst libquvi libquvi-scripts libstemmer libytnef lua52 lua52-bitop lua52-expat lua52-lpeg lua52-luajson lua52-socket nautilus ostree pipewire pulseaudio-alsa python-astroid python-atspi python-babel python-decorator python-docutils python-imagesize python-isort python-jedi python-jinja python-lazy-object-proxy python-mccabe python-parso python-pickleshare python-prompt_toolkit python-pycodestyle python-pyflakes python-pylint python-pytz python-simplejson python-snowballstemmer python-sphinx python-sphinx-alabaster-theme python-sphinx_rtd_theme python-sphinxcontrib-websupport python-sqlalchemy python-traitlets python-wcwidth python-whoosh python-wrapt qqwing ruby-dbus sbc telepathy-glib telepathy-idle telepathy-logger telepathy-mission-control template-glib totem-plparser tracker whois xdg-dbus-proxy xdg-desktop-portal xdg-desktop-portal-gtk yelp accerciser brasero dconf-editor devhelp evolution five-or-more four-in-a-row gedit-code-assistance gnome-builder gnome-chess gnome-code-assistance gnome-devel-docs gnome-klotski gnome-mahjongg gnome-mines gnome-multi-writer gnome-nettool gnome-nibbles gnome-recipes gnome-robots gnome-sound-recorder gnome-sudoku gnome-taquin gnome-tetravex gnome-tweaks gnome-usage gnome-weather hitori iagno lightsoff nautilus-sendto polari quadrapassel swell-foop sysprof tali"
 
-	GNOME="apache appstream-glib apr apr-util augeas brltty bubblewrap cdrtools celt celt0.5.1 ceph-libs cifs-utils clutter clutter-gst clutter-gtk cogl colord-sane cups-pk-helper dleyna-connector-dbus dleyna-core dleyna-renderer dleyna-server dotconf espeak evolution evolution-data-server faac folks freerdp frei0r-plugins gamin gavl gcab geocode-glib gfbgraph gjs glusterfs gmime3 gnome-autoar gnome-bluetooth gnome-desktop gnome-online-accounts gnome-online-minersgom gperftools grilo gsound gspell gssdp gst-plugins-bad gtk-vnc gtkspell3 gupnp gupnp-av gupnp-dlna js60 ladspa ldb leveldb libao libbs2b libbsd libcacard libchamplain libcryptui libcue libdazzle libdc1394 libdmapsharing libdvdnav libdvdread libfdk-aac libgdata libgdm libgee libgepub libgme libgovirt libgrss libgsf libgtop libgweather libgxps libieee1284 libiptcdata liblouis libmediaart libmms libmp4v2 libmusicbrainz5 libnautilus-extension libnfs libnice liboauth libofa libosinfo libpackagekit-glib libpeas libphonenumber libpst libpwquality libquvi libquvi-scripts libspeechd libsrtp libstemmer libsynctex liburcu libvirt libvirt-glib libvncserver libwbclient libytnef libzapojit lua52 lua52-bitop lua52-expat lua52-lpeg lua52-luajson lua52-socket mjpegtools mod_dnssd mtools nautilus-sendto net-snmp netcf numactl oath-toolkit osinfo-db phodav pipewire portaudio pulseaudio-alsa pulseaudio-bluetooth python-atspi python-xdg qemu rpcbind rtmpdump sane sbc seabios shared-color-targets smbclient spandsp speech-dispatcher spice spice-gtk srt t1lib talloc tcl telepathy-glib tevent totem-plparser usbredir vde2 virglrenderer wildmidi yajl zip zvbi baobab cheese eog epiphany evince file-rollergdm gedit gnome-backgroundsgnome-boxes gnome-calculator gnome-calendar gnome-charactersgnome-clocks gnome-color-managergnome-contacts gnome-control-center gnome-dictionary gnome-disk-utility gnome-documents gnome-font-viewergnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-software gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orcarygel simple-scan sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp appstream-glib bind-tools bubblewrap cdrdao cdrtools clutter clutter-gtk cogl ctags dvd+rw-tools evolution-data-server flatpak gcab gedit geocode-glib geoip geoip-database gjs gnome-autoar gnome-desktop gnome-online-accounts gnome-settings-daemon gspell gtksourceview4 gtkspell3 idnkit ipython js60 jsonrpc-glib libao libcryptui libdazzle libgdata libgee libgit2 libgit2-glib libgnome-games-support libgsf libgtop libgweather libnautilus-extension liboauth libpeas-1.22.0-3 libphonenumber libpst libquvi libquvi-scripts libstemmer libytnef lua52 lua52-bitop lua52-expat lua52-lpeg lua52-luajson lua52-socket nautilus ostree pipewire pulseaudio-alsa python-astroid python-atspi python-babel python-decorator python-docutils python-imagesize python-isort python-jedi python-jinja python-lazy-object-proxy python-mccabe python-parso python-pickleshare python-prompt_toolkit python-pycodestyle python-pyflakes python-pylint python-pytz python-simplejson python-snowballstemmer python-sphinx python-sphinx-alabaster-theme python-sphinx_rtd_theme python-sphinxcontrib-websupport python-sqlalchemy python-traitlets python-wcwidth python-whoosh python-wrapt qqwing ruby-dbus sbc telepathy-glib telepathy-idle telepathy-logger telepathy-mission-control template-glib totem-plparser tracker whois xdg-dbus-proxy xdg-desktop-portal xdg-desktop-portal-gtk yelp accerciser brasero dconf-editor devhelp evolution five-or-more four-in-a-row gedit-code-assistance gnome-builder gnome-chess gnome-code-assistance gnome-devel-docs gnome-klotski gnome-mahjongg gnome-mines gnome-multi-writer gnome-nettool gnome-nibbles gnome-recipes gnome-robots gnome-sound-recorder gnome-sudoku gnome-taquin gnome-tetravex gnome-tweaks gnome-usage gnome-weather hitori iagno lightsoff nautilus-sendto polari quadrapassel swell-foop sysprof tali"
+XFCE="exo garcon gtk-xce-engine mousepad orage parole ristretto thunar thunar-archive-plugin thunar-media-tags-plugin thunar-volman tumbler xburn xce4-appinder xce4-artwork xce4-battery-plugin xce4-clipman-plugin xce4-cpureq-plugin xce4-cpugraph-plugin xce4-datetime-plugin xce4-dict xce4-diskper-plugin xce4-eyes-plugin xce4-sguard-plugin xce4-genmon-plugin xce4-mailwatch-plugin xce4-mount-plugin xce4-mpc-plugin xce4-netload-plugin xce4-notes-plugin xce4-notiyd xce4-panel xce4-power-manager xce4-pulseaudio-plugin xce4-screenshooter xce4-sensors-plugin xce4-session xce4-settings xce4-smartbookmark-plugin xce4-systemload-plugin xce4-taskmanager xce4-terminal xce4-time-out-plugin xce4-timer-plugin xce4-verve-plugin xce4-wavelan-plugin xce4-weather-plugin xce4-whiskermenu-plugin xce4-xkb-plugin xcon xdesktop2 xwm4 xwm4-themes"
 
-	XFCE="exo garcon gtk-xce-engine mousepad orage parole ristretto thunar thunar-archive-plugin thunar-media-tags-plugin thunar-volman tumbler xburn xce4-appinder xce4-artwork xce4-battery-plugin xce4-clipman-plugin xce4-cpureq-plugin xce4-cpugraph-plugin xce4-datetime-plugin xce4-dict xce4-diskper-plugin xce4-eyes-plugin xce4-sguard-plugin xce4-genmon-plugin xce4-mailwatch-plugin xce4-mount-plugin xce4-mpc-plugin xce4-netload-plugin xce4-notes-plugin xce4-notiyd xce4-panel xce4-power-manager xce4-pulseaudio-plugin xce4-screenshooter xce4-sensors-plugin xce4-session xce4-settings xce4-smartbookmark-plugin xce4-systemload-plugin xce4-taskmanager xce4-terminal xce4-time-out-plugin xce4-timer-plugin xce4-verve-plugin xce4-wavelan-plugin xce4-weather-plugin xce4-whiskermenu-plugin xce4-xkb-plugin xcon xdesktop2 xwm4 xwm4-themes"
+KDE="akonadi akonadi-calendar akonadi-contacts akonadi-mime akonadi-notes akonadi-search analitza appstream appstream-qt archlinux-appstream-data audioile avogadrolibs baloo baloo-widgets bc bluez-qt breeze-icons calendarsupport celt citsio cis-utils convertlit cronie ebook-tools editorconig-core-c eventviews aac arstream luidsynth rameworkintegration reecell-solver gamin gdb gdb-common gnugo grantlee grantleetheme gst-plugins-bad guile2.0 id3lib incidenceeditor kactivities-stats kalarmcal kcachegrind-common kcalcore kcalutils kcontacts kdav kded kdeedu-data kdelibs4support kdepim-apps-libs kdepim-runtime kdesu kdevelop kdiagram kdnssd kdoctools kemoticons kilemetadata kholidays khtml kidentitymanagement kidletime kimap kinit kirigami2 kitinerary kjsembed kldap kmailtransport kmbox kmime knewstu knotiyconig kontactinterace kpeople kpimtextedit kpkpass kplotting kqtquickcharts kross krunner ksmtp ktexteditor ktne kunitconversion kwayland kxmlrpcclient ladspa ldb libbs2b libbsd libdc1394 libdmtx libdvdnav libdvdread libebur128 libdk-aac libgit2 libgme libgravatar libieee1284 libkcddb libkcompactdisc libkdcraw libkdegames libkdepim libkeduvocdocument libkgapi libkipi libkleo libkmahjongg libkolabxml libkomparedi2 libksane libksieve libmariadbclient libmbim libmms libmp4v2 libmsym libmusicbrainz5 libnice liboa libotr libpwquality libqaccessibilityclient libqalculate libqmi libsignon-glib libsrtp libstemmer libvncserver libwbclient libzip lmdb mailcommon mailimporter marble-common mariadb mariadb-clients messagelib mjpegtools mlt modemmanager modemmanager-qt molequeue net-snmp networkmanager-qt openbabel pimcommon pipewire plasma-ramework portaudio ppp prison pyqt5-common python-attrs python-automat python-click python-constantly python-hyperlink python-incremental python-pyhamcrest python-pyqt5 python-sip-pyqt5 python-twisted python-zope-interace qgpgme qhull qqc2-desktop-style qt-gstreamer qt5-graphicaleects qt5-quickcontrols qt5-quickcontrols2 qt5-webengine rtmpdump sane sbc smbclient socat spandsp spglib srt syndication syntax-highlighting talloc telepathy-accounts-signon telepathy-arstream telepathy-glib telepathy-logger telepathy-logger-qt telepathy-mission-control telepathy-qt tevent tt-hack wildmidi xapian-core xcb-util-cursor xerces-c xorg-xmessage zvbi akonadi-calendar-tools akonadi-import-wizard akonadiconsole akregator ark artikulate audiocd-kio blinken bluedevil bomber bovo breeze breeze-gtk cantor cervisia discover dolphin dolphin-plugins dragon drkonqi mpegthumbs ilelight granatier grantlee-editor gwenview juk k3b kaccounts-integration kaccounts-providers kactivitymanagerd kaddressbook kajongg kalarm kalgebra kalzium kamera kamoso kanagram kapman kapptemplate kate katomic kbackup kblackbox kblocks kbounce kbreakout kbruch kcachegrind kcalc kcharselect kcolorchooser kcron kde-cli-tools kde-dev-scripts kde-dev-utils kde-gtk-conig kdebugsettings kdecoration kdegraphics-mobipocket kdenetwork-ilesharing kdenlive kdepim-addons kdeplasma-addons kdesdk-kioslaves kdesdk-thumbnailers kd kdialog kdiamond keditbookmarks kind kloppy kourinline kgamma5 kgeography kget kgoldrunner kgpg khangman khelpcenter khotkeys kig kigo killbots kimagemapeditor kinocenter kio-extras kiriki kiten kjumpingcube kleopatra klettres klickety klines kmag kmahjongg kmail kmail-account-wizard kmenuedit kmines kmousetool kmouth kmplot knavalbattle knetattach knetwalk knotes kol kollision kolourpaint kompare konqueror konquest konsole kontact kopete korganizer kpatience krdc kreversi krb kross-interpreters kruler kscreen kscreenlocker kshisen ksirk ksnakeduel kspaceduel ksquares ksshaskpass ksudoku ksysguard ksystemlog kteatime ktimer ktouch ktuberling kturtle kubrick kwallet-pam kwalletmanager kwave kwayland-integration kwin kwordquiz kwrite kwrited libkscreen libksysguard lokalize lskat marble mbox-importer milou minuet okular oxygen palapeli parley picmi pim-data-exporter pim-sieve-editor plasma-browser-integration plasma-desktop plasma-integration plasma-nm plasma-pa plasma-sdk plasma-vault plasma-workspace plasma-workspace-wallpapers polkit-kde-agent powerdevil poxml print-manager rocs signon-kwallet-extension spectacle step sweeper systemsettings telepathy-kde-accounts-kcm telepathy-kde-approver telepathy-kde-auth-handler telepathy-kde-call-ui telepathy-kde-common-internals telepathy-kde-contact-list telepathy-kde-contact-runner telepathy-kde-desktop-applets telepathy-kde-iletranser-handler telepathy-kde-integration-module telepathy-kde-send-ile telepathy-kde-text-ui umbrello user-manager xdg-desktop-portal-kde zerocon-ioslave"
 
-	KDE="akonadi akonadi-calendar akonadi-contacts akonadi-mime akonadi-notes akonadi-search analitza appstream appstream-qt archlinux-appstream-data audioile avogadrolibs baloo baloo-widgets bc bluez-qt breeze-icons calendarsupport celt citsio cis-utils convertlit cronie ebook-tools editorconig-core-c eventviews aac arstream luidsynth rameworkintegration reecell-solver gamin gdb gdb-common gnugo grantlee grantleetheme gst-plugins-bad guile2.0 id3lib incidenceeditor kactivities-stats kalarmcal kcachegrind-common kcalcore kcalutils kcontacts kdav kded kdeedu-data kdelibs4support kdepim-apps-libs kdepim-runtime kdesu kdevelop kdiagram kdnssd kdoctools kemoticons kilemetadata kholidays khtml kidentitymanagement kidletime kimap kinit kirigami2 kitinerary kjsembed kldap kmailtransport kmbox kmime knewstu knotiyconig kontactinterace kpeople kpimtextedit kpkpass kplotting kqtquickcharts kross krunner ksmtp ktexteditor ktne kunitconversion kwayland kxmlrpcclient ladspa ldb libbs2b libbsd libdc1394 libdmtx libdvdnav libdvdread libebur128 libdk-aac libgit2 libgme libgravatar libieee1284 libkcddb libkcompactdisc libkdcraw libkdegames libkdepim libkeduvocdocument libkgapi libkipi libkleo libkmahjongg libkolabxml libkomparedi2 libksane libksieve libmariadbclient libmbim libmms libmp4v2 libmsym libmusicbrainz5 libnice liboa libotr libpwquality libqaccessibilityclient libqalculate libqmi libsignon-glib libsrtp libstemmer libvncserver libwbclient libzip lmdb mailcommon mailimporter marble-common mariadb mariadb-clients messagelib mjpegtools mlt modemmanager modemmanager-qt molequeue net-snmp networkmanager-qt openbabel pimcommon pipewire plasma-ramework portaudio ppp prison pyqt5-common python-attrs python-automat python-click python-constantly python-hyperlink python-incremental python-pyhamcrest python-pyqt5 python-sip-pyqt5 python-twisted python-zope-interace qgpgme qhull qqc2-desktop-style qt-gstreamer qt5-graphicaleects qt5-quickcontrols qt5-quickcontrols2 qt5-webengine rtmpdump sane sbc smbclient socat spandsp spglib srt syndication syntax-highlighting talloc telepathy-accounts-signon telepathy-arstream telepathy-glib telepathy-logger telepathy-logger-qt telepathy-mission-control telepathy-qt tevent tt-hack wildmidi xapian-core xcb-util-cursor xerces-c xorg-xmessage zvbi akonadi-calendar-tools akonadi-import-wizard akonadiconsole akregator ark artikulate audiocd-kio blinken bluedevil bomber bovo breeze breeze-gtk cantor cervisia discover dolphin dolphin-plugins dragon drkonqi mpegthumbs ilelight granatier grantlee-editor gwenview juk k3b kaccounts-integration kaccounts-providers kactivitymanagerd kaddressbook kajongg kalarm kalgebra kalzium kamera kamoso kanagram kapman kapptemplate kate katomic kbackup kblackbox kblocks kbounce kbreakout kbruch kcachegrind kcalc kcharselect kcolorchooser kcron kde-cli-tools kde-dev-scripts kde-dev-utils kde-gtk-conig kdebugsettings kdecoration kdegraphics-mobipocket kdenetwork-ilesharing kdenlive kdepim-addons kdeplasma-addons kdesdk-kioslaves kdesdk-thumbnailers kd kdialog kdiamond keditbookmarks kind kloppy kourinline kgamma5 kgeography kget kgoldrunner kgpg khangman khelpcenter khotkeys kig kigo killbots kimagemapeditor kinocenter kio-extras kiriki kiten kjumpingcube kleopatra klettres klickety klines kmag kmahjongg kmail kmail-account-wizard kmenuedit kmines kmousetool kmouth kmplot knavalbattle knetattach knetwalk knotes kol kollision kolourpaint kompare konqueror konquest konsole kontact kopete korganizer kpatience krdc kreversi krb kross-interpreters kruler kscreen kscreenlocker kshisen ksirk ksnakeduel kspaceduel ksquares ksshaskpass ksudoku ksysguard ksystemlog kteatime ktimer ktouch ktuberling kturtle kubrick kwallet-pam kwalletmanager kwave kwayland-integration kwin kwordquiz kwrite kwrited libkscreen libksysguard lokalize lskat marble mbox-importer milou minuet okular oxygen palapeli parley picmi pim-data-exporter pim-sieve-editor plasma-browser-integration plasma-desktop plasma-integration plasma-nm plasma-pa plasma-sdk plasma-vault plasma-workspace plasma-workspace-wallpapers polkit-kde-agent powerdevil poxml print-manager rocs signon-kwallet-extension spectacle step sweeper systemsettings telepathy-kde-accounts-kcm telepathy-kde-approver telepathy-kde-auth-handler telepathy-kde-call-ui telepathy-kde-common-internals telepathy-kde-contact-list telepathy-kde-contact-runner telepathy-kde-desktop-applets telepathy-kde-iletranser-handler telepathy-kde-integration-module telepathy-kde-send-ile telepathy-kde-text-ui umbrello user-manager xdg-desktop-portal-kde zerocon-ioslave"
+BUDGIE="budgie-desktop budgie-extras"
 
-	BUDGIE="budgie-desktop budgie-extras"
+CINNAMON="cinnamon"
 
-	CINNAMON="cinnamon"
+LXDE="gpicview lxappearance lxappearance-obconf lxde-common lxde-icon-theme lxhotkey lxinput lxlauncher lxmusic lxpanel lxrandr lxsession lxtask lxterminal openbox pcmanfm"
 
-	LXDE="gpicview lxappearance lxappearance-obconf lxde-common lxde-icon-theme lxhotkey lxinput lxlauncher lxmusic lxpanel lxrandr lxsession lxtask lxterminal openbox pcmanfm"
+LXQT="lximage-qt lxqt-about lxqt-admin lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-openssh-askpass lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo lxqt-themes obconf-qt openbox pcmanfm-qt qterminal"
 
-	LXQT="lximage-qt lxqt-about lxqt-admin lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-openssh-askpass lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo lxqt-themes obconf-qt openbox pcmanfm-qt qterminal"
+MATE=""
 
-	MATE=""
+I3WM="libev xcb-util-cursor xcb-util-xrm yajl i3-gaps"
 
-	I3WM="libev xcb-util-cursor xcb-util-xrm yajl i3-gaps"
+NODEORWM="" #leave empty
 
-	NODEORWM="" #leave empty
+LIGHTDM="lightdm lightdm-gtk-greeter" #Default of XFCE
+LXDM="lxdm" #Default of LXDE
+SDDM="sddm" #Default of KDE, LXQT
+GDM="" #Default of GNOME, CINNAMON
+NODM="" #leave empty
 
-	LIGHTDM="lightdm lightdm-gtk-greeter" #Default of XFCE
-	LXDM="lxdm" #Default of LXDE
-	SDDM="sddm" #Default of KDE, LXQT
-	GDM="" #Default of GNOME, CINNAMON
-	NODM="" #leave empty
+if [ "$INTERFACE" == "XFCE" ]; then
+	UI="$XFCE"
+elif [ "$INTERFACE" == "KDE" ]; then
+	UI="$KDE"
+elif [ "$INTERFACE" == "GNOME" ]; then
+	UI="$GNOME"
+elif [ "$INTERFACE" == "I3WM" ]; then
+	UI="$I3WM"
+elif [ "$INTERFACE" == "NODEORWM" ]; then
+	UI="$NODEORWM"
+fi
 
-	if [ "$INTERFACE" == "XFCE" ]; then
-		UI="$XFCE"
-	elif [ "$INTERFACE" == "KDE" ]; then
-		UI="$KDE"
-	elif [ "$INTERFACE" == "GNOME" ]; then
-		UI="$GNOME"
-	elif [ "$INTERFACE" == "I3WM" ]; then
-		UI="$I3WM"
-	elif [ "$INTERFACE" == "NODEORWM" ]; then
-		UI="$NODEORWM"
-	fi
-
-	if [ "$DISPLAYMANAGER" == "LIGHTDM" ]; then
-		DM="$LIGHTDM"
-	elif [ "$DISPLAYMANAGER" == "SDDM" ]; then
-		DM="$SDDM"
-	elif [ "$DISPLAYMANAGER" == "GDM" ]; then
-		DM="$GDM"
-	elif [ "$DISPLAYMANAGER" == "NODM" ]; then
-		DM="$NODM"
-	fi
+if [ "$DISPLAYMANAGER" == "LIGHTDM" ]; then
+	DM="$LIGHTDM"
+elif [ "$DISPLAYMANAGER" == "SDDM" ]; then
+	DM="$SDDM"
+elif [ "$DISPLAYMANAGER" == "GDM" ]; then
+	DM="$GDM"
+elif [ "$DISPLAYMANAGER" == "NODM" ]; then
+	DM="$NODM"
+fi
 
 ##################################################
 ################## Installation ##################
 
-	PACKAGES="autoconf automake bash binutils bison bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs fakeroot file filesystem findutils flex gawk gcc gcc-libs gettext glibc grep groff gzip inetutils iproute2 iputils jfsutils less libtool licenses linux logrotate lvm2 m4 make man-db man-pages mdadm nano netctl pacman patch pciutils perl pkgconf procps-ng psmisc reiserfsprogs s-nail sed shadow sudo sysfsutils systemd systemd-sysvcompat tar texinfo usbutils util-linux vi which \ xfsprogs \
-	$UI \
-	$DM \
-	$NVIDIA \
-	$AMD \
-	mesa \
-	xorg-server \
-	powerline-fonts \
-	os-prober \
-	git \
-	networkmanager \
-	wget \
-	curl \
-	unzip \
-	p7zip \
-	pulseaudio \
-	htop \
-	iftop \
-	iotop \
-	grub \
-	efibootmgr \
-	zsh \
-	firefox \
-	vlc \
-	sudo \
-	ntp \
-	hwloc"
+PACKAGES="autoconf automake bash binutils bison bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs fakeroot file filesystem findutils flex gawk gcc gcc-libs gettext glibc grep groff gzip inetutils iproute2 iputils jfsutils less libtool licenses linux logrotate lvm2 m4 make man-db man-pages mdadm nano netctl pacman patch pciutils perl pkgconf procps-ng psmisc reiserfsprogs s-nail sed shadow sudo sysfsutils systemd systemd-sysvcompat tar texinfo usbutils util-linux vi which \ xfsprogs \
+$UI \
+$DM \
+$NVIDIA \
+$AMD \
+mesa \
+xorg-server \
+powerline-fonts \
+os-prober \
+git \
+networkmanager \
+wget \
+curl \
+unzip \
+p7zip \
+pulseaudio \
+htop \
+iftop \
+iotop \
+grub \
+efibootmgr \
+zsh \
+firefox \
+vlc \
+sudo \
+ntp \
+hwloc"
 
-	echo "-==Installing base packages==-"
-	pacstrap /mnt ${PACKAGES}
+echo "-==Installing base packages==-"
+pacstrap /mnt ${PACKAGES}
 
-	if [ "$INTERFACE" = "KDE" ]; then
-		if [ "$DISPLAYMANAGER" = "SDDM"]; then
-			pacstrap /mnt sddm-kcm
-		fi
+if [ "$INTERFACE" = "KDE" ]; then
+	if [ "$DISPLAYMANAGER" = "SDDM"]; then
+		pacstrap /mnt sddm-kcm
 	fi
+fi
 
-	cp $0 /mnt/root/
-	chmod 777 /mnt/root/$0
+cp $0 /mnt/root/
+chmod 777 /mnt/root/$0
 
-	if $ENCRYPT_DRIVE; then
-		echo "-==configuring mkinitcpio.conf and grub config for encryption==-"
-		sed -i "s/^HOOKS=.*/HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)/" /mnt/etc/mkinitcpio.conf
-		sed -ir "s/^GRUB_CMDLINE_LINUX_DEFAULT=\"([^\s\s]*)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 cryptdevice=UUID=device-UUID:cryptroot$(if $SSD; then echo ":allow-discards"; fi) root=\/dev\/mapper\/cryptroot\"/" /mnt/etc/default/grub
-	fi
+if $ENCRYPT_DRIVE; then
+	echo "-==configuring mkinitcpio.conf and grub config for encryption==-"
+	sed -i "s/^HOOKS=.*/HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)/" /mnt/etc/mkinitcpio.conf
+	sed -ir "s/^GRUB_CMDLINE_LINUX_DEFAULT=\"([^\s\s]*)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 cryptdevice=UUID=device-UUID:cryptroot$(if $SSD; then echo ":allow-discards"; fi) root=\/dev\/mapper\/cryptroot\"/" /mnt/etc/default/grub
+fi
 
-	echo "-==Generating FS Tab==-"
-	genfstab -U /mnt >> /mnt/etc/fstab
+echo "-==Generating FS Tab==-"
+genfstab -U /mnt >> /mnt/etc/fstab
 
-	echo "-==Configuring Time Zone==-"
-	arch-chroot /mnt ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
-	arch-chroot /mnt hwclock --systohc
+echo "-==Configuring Time Zone==-"
+arch-chroot /mnt ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
+arch-chroot /mnt hwclock --systohc
 
-	echo "-==Configuring Locale==-"
-	echo "$LOCALE" >> /mnt/etc/locale.gen
-	arch-chroot /mnt locale-gen
-	echo "LANG=$(echo $LOCALE | cut -d' ' -f1)" >> /mnt/etc/locale.conf
-	echo "KEYMAP=$KEYMAP" >> /mnt/etc/vconsole.conf
+echo "-==Configuring Locale==-"
+echo "$LOCALE" >> /mnt/etc/locale.gen
+arch-chroot /mnt locale-gen
+echo "LANG=$(echo $LOCALE | cut -d' ' -f1)" >> /mnt/etc/locale.conf
+echo "KEYMAP=$KEYMAP" >> /mnt/etc/vconsole.conf
 
-	echo "-==Adding Normal User==-"
-	arch-chroot /mnt useradd -m -s /usr/bin/bash ${EXTRAUSER}
-	echo "-==Set Password for $EXTRAUSER==-"
-	arch-chroot /mnt /root/$0 password $USERPASSWD $EXTRAUSER
-	echo "${EXTRAUSER} ALL=(ALL) ALL" >> /mnt/etc/sudoers
+echo "-==Adding Normal User==-"
+arch-chroot /mnt useradd -m -s /usr/bin/bash ${EXTRAUSER}
+echo "-==Set Password for $EXTRAUSER==-"
+arch-chroot /mnt /root/$0 password $USERPASSWD $EXTRAUSER
+echo "${EXTRAUSER} ALL=(ALL) ALL" >> /mnt/etc/sudoers
 
-	#echo "-==Installing Yay==-"
-	#arch-chroot /mnt su - ${EXTRAUSER} -c "cd /tmp && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si"
-	#echo "-==Installing packages using yay==-"
-	#arch-chroot /mnt su - ${EXTRAUSER} -c "yay -s obs-linuxbrowser"
+#echo "-==Installing Yay==-"
+#arch-chroot /mnt su - ${EXTRAUSER} -c "cd /tmp && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si"
+#echo "-==Installing packages using yay==-"
+#arch-chroot /mnt su - ${EXTRAUSER} -c "yay -s obs-linuxbrowser"
 
-	echo "-==Setting Hostname==-"
-	echo "${HOSTNAME}" > /mnt/etc/hostname
-	echo "127.0.0.1 localhost ${HOSTNAME}" >> /mnt/etc/hosts
+echo "-==Setting Hostname==-"
+echo "${HOSTNAME}" > /mnt/etc/hostname
+echo "127.0.0.1 localhost ${HOSTNAME}" >> /mnt/etc/hosts
 
-	echo "-==Installing GRUB==-"
-	arch-chroot /mnt mkinitcpio -p linux
-	arch-chroot /mnt grub-install $(if $EFI; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=${BOOTLOADER_ID}"; else echo "--target=i386-pc"; fi) --recheck $(if !$EFI; then echo "$TARGET_DRIVE"; fi)
-	echo "-==creating GRUB configuration==-"
-	arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+echo "-==Installing GRUB==-"
+arch-chroot /mnt mkinitcpio -p linux
+arch-chroot /mnt grub-install $(if $EFI; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=${BOOTLOADER_ID}"; else echo "--target=i386-pc"; fi) --recheck $(if !$EFI; then echo "$TARGET_DRIVE"; fi)
+echo "-==creating GRUB configuration==-"
+arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
-	arch-chroot /mnt systemctl enable NetworkManager
-	if [ !$DISPLAYMANAGER = "NODM" ]; then
-		arch-chroot /mnt systemctl enable $DISPLAYMANAGER
-	fi
-	arch-chroot /mnt systemctl enable ntpd
-	echo "-==Setting password for root user==-"
-	arch-chroot /mnt /root/$0 password $ROOTPASSWD root
-	echo "-==Arch is ready to be used"
+arch-chroot /mnt systemctl enable NetworkManager
+if [ !$DISPLAYMANAGER = "NODM" ]; then
+	arch-chroot /mnt systemctl enable $DISPLAYMANAGER
+fi
+arch-chroot /mnt systemctl enable ntpd
+echo "-==Setting password for root user==-"
+arch-chroot /mnt /root/$0 password $ROOTPASSWD root
+echo "-==Arch is ready to be used"
 
 }
 
