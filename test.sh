@@ -13,4 +13,3 @@ if [ "$SAVED" = "true" ]; then
 else
 	exit
 fi
-
