@@ -23,13 +23,16 @@
 	TARGET_DRIVE=$(whiptail --inputbox "/dev/sd* (replace the * with the drive letter no number) $LSBLK" 15 60 /dev/ --title "target drive" 3>&1 1>&2 2>&3)
 
 # Bootloader ID
-	BOOTLOADER_ID=$(whiptail --inputbox "done=[ENTER], default=(Arch)" 8 60 --title "bootloader id" 3>&1 1>&2 2>&3)
+	BOOTLOADER_ID=$(whiptail --inputbox "done=[ENTER], write the bootloader ID.)" 8 60 --title "bootloader id" 3>&1 1>&2 2>&3)
 
 # Hostname
-	HOSTNAME=$(whiptail --inputbox "done=[ENTER], default=(arch)" 8 60 --title "hostname" 3>&1 1>&2 2>&3)
+	HOSTNAME=$(whiptail --inputbox "done=[ENTER], write the hostname (PC name).)" 8 60 --title "hostname" 3>&1 1>&2 2>&3)
 
 # Username
-	USERNAME=$(whiptail --inputbox "done=[ENTER], default=(Joe)" 8 60 --title "extra user username" 3>&1 1>&2 2>&3)
+	USERNAME=$(whiptail --inputbox "done=[ENTER], write the your username." 8 60 --title "username" 3>&1 1>&2 2>&3)
+
+# Password
+	PASSWORD=$(whiptail --passwordbox "done=[ENTER], write the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
 
 # Interface
 	INTERFACE=$(whiptail --menu "select=[ENTER]" 18 80 10 --title "interface" 3>&1 1>&2 2>&3 "NODEORWM" "Comes with nothing and is nothing." "BUDGIE" "Modern design, focuses on simplicity and elegance." "CINNAMON" "Strives to provide a traditional user experience." "GNOME" "An attractive and intuitive desktop." "KDE" "Modern and familiar working environment." "LXDE" "Strives to be less CPU and RAM intensive." "LXQT" "Lightweight, modular, blazing-fast and user-friendly." "MATE" " Intuitive and attractive desktop using traditional metaphors." "XFCE" "Traditional UNIX philosophy of modularity and re-usability." "I3WM" "Primarily targeted at developers and advanced users")
@@ -259,8 +262,12 @@
 
 # Add user
 	echo "-==Adding Normal User==-"
-	arch-chroot /mnt useradd -m -s /usr/bin/bash ${USERNAME}
-	echo "${USERNAME} ALL=(ALL) ALL" >> /mnt/etc/sudoers
+	#arch-chroot /mnt useradd -m -s /usr/bin/bash ${USERNAME}
+	#echo "${USERNAME} ALL=(ALL) ALL" >> /mnt/etc/sudoers
+
+# Create regular user
+	arch-chroot /mnt useradd -m -g users -G wheel -s /bin/bash $USERNAME
+	echo "$USERNAME:$PASSWORD" | chpasswd
 
 # Set hostname
 	echo "-==Setting Hostname==-"
