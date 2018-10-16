@@ -23,13 +23,13 @@
 	TARGET_DRIVE=$(whiptail --inputbox "/dev/sd* (replace the * with the drive letter no number) $LSBLK" 15 60 /dev/ --title "target drive" 3>&1 1>&2 2>&3)
 
 # Bootloader ID
-	BOOTLOADER_ID=$(whiptail --inputbox "done=[ENTER], default=($BOOTLOADER_ID)" 8 60 --title "bootloader id" 3>&1 1>&2 2>&3)
+	BOOTLOADER_ID=$(whiptail --inputbox "done=[ENTER], default=(Arch)" 8 60 --title "bootloader id" 3>&1 1>&2 2>&3)
 
 # Hostname
-	HOSTNAME=$(whiptail --inputbox "done=[ENTER], default=($HOSTNAME)" 8 60 --title "hostname" 3>&1 1>&2 2>&3)
+	HOSTNAME=$(whiptail --inputbox "done=[ENTER], default=(arch)" 8 60 --title "hostname" 3>&1 1>&2 2>&3)
 
 # Username
-	USERNAME=$(whiptail --inputbox "done=[ENTER], default=($USERNAME)" 8 60 --title "extra user username" 3>&1 1>&2 2>&3)
+	USERNAME=$(whiptail --inputbox "done=[ENTER], default=(Joe)" 8 60 --title "extra user username" 3>&1 1>&2 2>&3)
 
 # Interface
 	INTERFACE=$(whiptail --menu "select=[ENTER]" 18 80 10 --title "interface" 3>&1 1>&2 2>&3 "NODEORWM" "Comes with nothing and is nothing." "BUDGIE" "Modern design, focuses on simplicity and elegance." "CINNAMON" "Strives to provide a traditional user experience." "GNOME" "An attractive and intuitive desktop." "KDE" "Modern and familiar working environment." "LXDE" "Strives to be less CPU and RAM intensive." "LXQT" "Lightweight, modular, blazing-fast and user-friendly." "MATE" " Intuitive and attractive desktop using traditional metaphors." "XFCE" "Traditional UNIX philosophy of modularity and re-usability." "I3WM" "Primarily targeted at developers and advanced users")
@@ -44,10 +44,10 @@
 	OTHER_CUSTOM_PACKAGES=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "other custom packages" 3>&1 1>&2 2>&3)
 
 # Nvme drive
-	NVME=$(whiptail --menu "select=[ENTER], default=($NVME)" 8 60 2 --title "nvme" 3>&1 1>&2 2>&3 "false" "I don't have an Nvme SSD." "true" "I have an Nvme SSD.")
+	NVME=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "nvme" 3>&1 1>&2 2>&3 "false" "I don't have an Nvme SSD." "true" "I have an Nvme SSD.")
 
 # Encrypt drive
-	ENCRYPT_DRIVE=$(whiptail --menu "select=[ENTER], default=($ENCRYPT_DRIVE)" 8 60 2 --title "drive encryption" 3>&1 1>&2 2>&3 "false" "I don't want to encrypt my drive." "true" "I want to encrypt my drive.")
+	ENCRYPT_DRIVE=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "drive encryption" 3>&1 1>&2 2>&3 "false" "I don't want to encrypt my drive." "true" "I want to encrypt my drive.")
 
 # Timezone
 	TIMEZONE=""
@@ -145,6 +145,20 @@
 		AMD=""
 	fi
 
+# unmounting drives
+	echo "-==unmounting drives==-"
+	if $NVME; then
+		umount ${TARGET_DRIVE}p1 /mnt/boot
+	else
+		umount ${TARGET_DRIVE}1 /mnt/boot
+	fi
+	if $NVME; then
+		umount ${TARGET_DRIVE}p2 /mnt/
+	else
+		umount ${TARGET_DRIVE}2 /mnt/
+	fi
+
+# installing arch
 	echo "-==Starting Arch Installation==-"
 	timedatectl set-ntp true
 	echo "-==checking if system is capeable of EFI==-"
@@ -159,10 +173,6 @@
 		SSD=true
 		echo "-==$TARGET_DRIVE is an SSD, trim will be enabled for cryptsetup==-"
 	fi
-	echo "-==set password for root==-"
-	read ROOTPASSWD
-	echo "-==set password for $USERNAME==-"
-	read USERPASSWD
 	echo "-==Formatting drives/partitions==-"
 	sgdisk -og ${TARGET_DRIVE}
 	if $EFI; then
@@ -224,9 +234,6 @@
 		pacstrap /mnt ${PACKAGES}
 	fi
 
-	cp $0 /mnt/root/
-	chmod 777 /mnt/root/$0
-
 # Encrypt drive
 	if $ENCRYPT_DRIVE; then
 		echo "-==configuring mkinitcpio.conf and grub config for encryption==-"
@@ -253,8 +260,6 @@
 # Add user
 	echo "-==Adding Normal User==-"
 	arch-chroot /mnt useradd -m -s /usr/bin/bash ${USERNAME}
-	echo "-==Set Password for $USERNAME==-"
-	arch-chroot /mnt /root/$0 password $USERPASSWD $USERNAME
 	echo "${USERNAME} ALL=(ALL) ALL" >> /mnt/etc/sudoers
 
 # Set hostname
@@ -275,34 +280,5 @@
 		arch-chroot /mnt systemctl enable $DISPLAYMANAGER
 	fi
 	arch-chroot /mnt systemctl enable ntpd
-	echo "-==Setting password for root user==-"
-	arch-chroot /mnt /root/$0 password $ROOTPASSWD root
+
 	echo "-==Arch is ready to be used"
-
-	password () {
-		echo -e "$2\n$2" | passwd "$3"
-	}
-
-for arg in "$@"
-do
-    case $arg in
-        "rankmirrors" )
-        	ranknewmirrors;;
-        "install" )
-        	install_arch;;
-        "install-full" )
-			wizard
-			ranknewmirrors
-			install_arch;;
-        "reee" )
-			rollback;;
-		"startover" )
-			startover;;
-		"wizard" )
-			wizard;;
-		"password" )
-			password;;
-		"help" )
-			help;;
-   esac
-done
