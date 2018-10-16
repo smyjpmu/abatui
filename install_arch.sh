@@ -1,8 +1,6 @@
 #!/bin/bash
 
-#bash install_arch.sh wizard && bash install_arch.sh install
-
-GNUGPL="\
+	GNUGPL="\
 #    this script is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
@@ -17,172 +15,139 @@ GNUGPL="\
 #    along with this script.  If not, see <https://www.gnu.org/licenses/>.
 "
 
-##################################################
-################### Variables ####################
+# GNU G.P.L
+	whiptail --msgbox "$GNUGPL" --title "GNU General Public License" 18 78
 
-BOOTLOADER_ID="Arch"
-TARGET_DRIVE="/dev/sda"
-ENCRYPT_DRIVE=false
-HOSTNAME="arch"
-EXTRAUSER="noname"
-INTERFACE="NODEORWM" #options: XFCE, KDE, GNOME, BUDGIE, I3WM, NODEORWM
-DISPLAYMANAGER="NODM" #options: LIGHTDM, SDDM, GDM, NODM
-NVME=false
-COUNTRY="US"
-CHOOSING_TIMEZONE=true
-NEW_TIMEZONE=""
-LOCALE="en_US.UTF-8 UTF-8"
-KEYMAP="us"
-SETTINGS_FILE="install_settings"
-SSD=false
-source $SETTINGS_FILE
+# Target drive
+	LSBLK="$(lsblk)"
+	TARGET_DRIVE=$(whiptail --inputbox "/dev/sd* (replace the * with the drive letter no number) $LSBLK" 15 60 /dev/ --title "target drive" 3>&1 1>&2 2>&3)
 
-help () {
-	echo "help:"
-	echo "type \"$0 rankmirrors\" to upgrade your mirror list to get the fastest mirrors"
-	echo "type \"$0 install\" to install Arch"
-	echo "type \"$0 reee\" to unmount the partitions"
-	echo "type \"$0 startover\" to restart the installation"
-	echo "type \"$0 wizard\" to get an wizard to configure your installation"
-	echo "type \"$0 help\" to get this help"
-}
+# Bootloader ID
+	BOOTLOADER_ID=$(whiptail --inputbox "done=[ENTER], default=($BOOTLOADER_ID)" 8 60 --title "bootloader id" 3>&1 1>&2 2>&3)
 
-select_timezone() {
+# Hostname
+	HOSTNAME=$(whiptail --inputbox "done=[ENTER], default=($HOSTNAME)" 8 60 --title "hostname" 3>&1 1>&2 2>&3)
+
+# Username
+	USERNAME=$(whiptail --inputbox "done=[ENTER], default=($USERNAME)" 8 60 --title "extra user username" 3>&1 1>&2 2>&3)
+
+# Interface
+	INTERFACE=$(whiptail --menu "select=[ENTER]" 18 80 10 --title "interface" 3>&1 1>&2 2>&3 "NODEORWM" "Comes with nothing and is nothing." "BUDGIE" "Modern design, focuses on simplicity and elegance." "CINNAMON" "Strives to provide a traditional user experience." "GNOME" "An attractive and intuitive desktop." "KDE" "Modern and familiar working environment." "LXDE" "Strives to be less CPU and RAM intensive." "LXQT" "Lightweight, modular, blazing-fast and user-friendly." "MATE" " Intuitive and attractive desktop using traditional metaphors." "XFCE" "Traditional UNIX philosophy of modularity and re-usability." "I3WM" "Primarily targeted at developers and advanced users")
+
+# Display manager
+	DISPLAYMANAGER=$(whiptail --menu "select=[ENTER]" 12 50 5 --title "display manager" 3>&1 1>&2 2>&3 "NODM" "Comes with nothing and is nothing." "GDM" "Recommended for Budgie & Gnome." "LIGHTDM" "Recommended for XFCE." "LXDM" "Recommended for LXDE." "SDDM" "Recommended for KDE & LXQT.")
+
+# Custom packages
+	CUSTOM_PACKAGES=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "unzip" "Unzip" ON "p7zip" "P7zip" ON "unrar" "Unrar" ON "curl" "Curl" ON "wget" "Wget" ON "pulseaudio" "Sound Server" ON "git" "Git" ON "powerline-fonts" "Fonts" ON "firefox" "Web Browser" ON "vlc" "Multimedia Player" ON "zsh" "Z Shell" ON)
+
+# Other custom packages
+	OTHER_CUSTOM_PACKAGES=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "other custom packages" 3>&1 1>&2 2>&3)
+
+# Nvme drive
+	NVME=$(whiptail --menu "select=[ENTER], default=($NVME)" 8 60 2 --title "nvme" 3>&1 1>&2 2>&3 "false" "I don't have an Nvme SSD." "true" "I have an Nvme SSD.")
+
+# Encrypt drive
+	ENCRYPT_DRIVE=$(whiptail --menu "select=[ENTER], default=($ENCRYPT_DRIVE)" 8 60 2 --title "drive encryption" 3>&1 1>&2 2>&3 "false" "I don't want to encrypt my drive." "true" "I want to encrypt my drive.")
+
+# Timezone
+	TIMEZONE=""
+	CHOOSING_TIMEZONE=true
     while [ $CHOOSING_TIMEZONE ]; do
-        if [ -d "/usr/share/zoneinfo"$(if [ -n $NEW_TIMEZONE ]; then echo "/$NEW_TIMEZONE/"; fi) ]; then
-             TMP_TIMEZONE=$(whiptail --noitem --title "Timezone" --menu "Choose Timezone" 20 78 10 \
-             $(for ZONE in $(find /usr/share/zoneinfo/$(if [ -n "$NEW_TIMEZONE" ]; then echo "$NEW_TIMEZONE/"; fi) \
-             -maxdepth 1 \
-             $([ -z "$NEW_TIMEZONE" ] && echo "-type d")\
-             -not -name right \
-             -not -name posix \
-             -not -name Etc \
-             -not -wholename "/usr/share/zoneinfo/$NEW_TIMEZONE/" \
-             -not -wholename "/usr/share/zoneinfo/$NEW_TIMEZONE" 2>/dev/null | sed "s#/usr/share/zoneinfo/$NEW_TIMEZONE##" | sed "s#/##" \
-             ); do
+        if [ -d "/usr/share/zoneinfo"$(if [ -n $TIMEZONE ]; then echo "/$TIMEZONE/"; fi) ]; then
+             TMP_TIMEZONE=$(whiptail --noitem --title "timezone" --menu "select/continue=[enter]" 30 40 22 $(for ZONE in $(find /usr/share/zoneinfo/$(if [ -n "$TIMEZONE" ]; then echo "$TIMEZONE/"; fi) -maxdepth 1 \
+             $([ -z "$TIMEZONE" ] && echo "-type d") -not -name right -not -name posix -not -name Etc -not -wholename "/usr/share/zoneinfo/$TIMEZONE/" -not -wholename "/usr/share/zoneinfo/$TIMEZONE" 2>/dev/null | sed "s#/usr/share/zoneinfo/$TIMEZONE##" | sed "s#/##"); do
                  echo "$ZONE $ZONE"
              done) 3>&1 1>&2 2>&3)
-
-
-
-             if [ -z $NEW_TIMEZONE ]; then
-                 NEW_TIMEZONE="$TMP_TIMEZONE"
+             if [ -z $TIMEZONE ]; then
+                 TIMEZONE="$TMP_TIMEZONE"
              else
-                 NEW_TIMEZONE=$NEW_TIMEZONE/$TMP_TIMEZONE
+                 TIMEZONE=$TIMEZONE/$TMP_TIMEZONE
              fi
-
-
         else
             CHOOSING_TIMEZONE=false
             break
         fi
      done
-     echo "$NEW_TIMEZONE"
-}
 
-##################################################
-##################### Wizard #####################
+# Locale
+	LOCALE=$(whiptail --radiolist "select=[space], continue=[enter]" 40 60 30 --title "locale" 3>&1 1>&2 2>&3 "aa_DJ.UTF-8 UTF-8" "locale" OFF "aa_DJ ISO-8859-1" "locale" OFF "aa_ER UTF-8" "locale" OFF "aa_ER@saaho UTF-8" "locale" OFF "aa_ET UTF-8" "locale" OFF "af_ZA.UTF-8 UTF-8" "locale" OFF "af_ZA ISO-8859-1" "locale" OFF "agr_PE UTF-8" "locale" OFF "ak_GH UTF-8" "locale" OFF "am_ET UTF-8" "locale" OFF "an_ES.UTF-8 UTF-8" "locale" OFF "an_ES ISO-8859-15" "locale" OFF "anp_IN UTF-8" "locale" OFF "ar_AE.UTF-8 UTF-8" "locale" OFF "ar_AE ISO-8859-6" "locale" OFF "ar_BH.UTF-8 UTF-8" "locale" OFF "ar_BH ISO-8859-6" "locale" OFF "ar_DZ.UTF-8 UTF-8" "locale" OFF "ar_DZ ISO-8859-6" "locale" OFF "ar_EG.UTF-8 UTF-8" "locale" OFF "ar_EG ISO-8859-6" "locale" OFF "ar_IN UTF-8" "locale" OFF "ar_IQ.UTF-8 UTF-8" "locale" OFF "ar_IQ ISO-8859-6" "locale" OFF "ar_JO.UTF-8 UTF-8" "locale" OFF "ar_JO ISO-8859-6" "locale" OFF "ar_KW.UTF-8 UTF-8" "locale" OFF "ar_KW ISO-8859-6" "locale" OFF "ar_LB.UTF-8 UTF-8" "locale" OFF "ar_LB ISO-8859-6" "locale" OFF "ar_LY.UTF-8 UTF-8" "locale" OFF "ar_LY ISO-8859-6" "locale" OFF "ar_MA.UTF-8 UTF-8" "locale" OFF "ar_MA ISO-8859-6" "locale" OFF "ar_OM.UTF-8 UTF-8" "locale" OFF "ar_OM ISO-8859-6" "locale" OFF "ar_QA.UTF-8 UTF-8" "locale" OFF "ar_QA ISO-8859-6" "locale" OFF "ar_SA.UTF-8 UTF-8" "locale" OFF "ar_SA ISO-8859-6" "locale" OFF "ar_SD.UTF-8 UTF-8" "locale" OFF "ar_SD ISO-8859-6" "locale" OFF "ar_SS UTF-8" "locale" OFF "ar_SY.UTF-8 UTF-8" "locale" OFF "ar_SY ISO-8859-6" "locale" OFF "ar_TN.UTF-8 UTF-8" "locale" OFF "ar_TN ISO-8859-6" "locale" OFF "ar_YE.UTF-8 UTF-8" "locale" OFF "ar_YE ISO-8859-6" "locale" OFF "ayc_PE UTF-8" "locale" OFF "az_AZ UTF-8" "locale" OFF "az_IR UTF-8" "locale" OFF "as_IN UTF-8" "locale" OFF "ast_ES.UTF-8 UTF-8" "locale" OFF "ast_ES ISO-8859-15" "locale" OFF "be_BY.UTF-8 UTF-8" "locale" OFF "be_BY CP1251" "locale" OFF "be_BY@latin UTF-8" "locale" OFF "bem_ZM UTF-8" "locale" OFF "ber_DZ UTF-8" "locale" OFF "ber_MA UTF-8" "locale" OFF "bg_BG.UTF-8 UTF-8" "locale" OFF "bg_BG CP1251" "locale" OFF "bhb_IN.UTF-8 UTF-8" "locale" OFF "bho_IN UTF-8" "locale" OFF "bho_NP UTF-8" "locale" OFF "bi_VU UTF-8" "locale" OFF "bn_BD UTF-8" "locale" OFF "bn_IN UTF-8" "locale" OFF "bo_CN UTF-8" "locale" OFF "bo_IN UTF-8" "locale" OFF "br_FR.UTF-8 UTF-8" "locale" OFF "br_FR ISO-8859-1" "locale" OFF "br_FR@euro ISO-8859-15" "locale" OFF "brx_IN UTF-8" "locale" OFF "bs_BA.UTF-8 UTF-8" "locale" OFF "bs_BA ISO-8859-2" "locale" OFF "byn_ER UTF-8" "locale" OFF "ca_AD.UTF-8 UTF-8" "locale" OFF "ca_AD ISO-8859-15" "locale" OFF "ca_ES.UTF-8 UTF-8" "locale" OFF "ca_ES ISO-8859-1" "locale" OFF "ca_ES@euro ISO-8859-15" "locale" OFF "ca_ES@valencia UTF-8" "locale" OFF "ca_FR.UTF-8 UTF-8" "locale" OFF "ca_FR ISO-8859-15" "locale" OFF "ca_IT.UTF-8 UTF-8" "locale" OFF "ca_IT ISO-8859-15" "locale" OFF "ce_RU UTF-8" "locale" OFF "chr_US UTF-8" "locale" OFF "cmn_TW UTF-8" "locale" OFF "crh_UA UTF-8" "locale" OFF "cs_CZ.UTF-8 UTF-8" "locale" OFF "cs_CZ ISO-8859-2" "locale" OFF "csb_PL UTF-8" "locale" OFF "cv_RU UTF-8" "locale" OFF "cy_GB.UTF-8 UTF-8" "locale" OFF "cy_GB ISO-8859-14" "locale" OFF "da_DK.UTF-8 UTF-8" "locale" OFF "da_DK ISO-8859-1" "locale" OFF "de_AT.UTF-8 UTF-8" "locale" OFF "de_AT ISO-8859-1" "locale" OFF "de_AT@euro ISO-8859-15" "locale" OFF "de_BE.UTF-8 UTF-8" "locale" OFF "de_BE ISO-8859-1" "locale" OFF "de_BE@euro ISO-8859-15" "locale" OFF "de_CH.UTF-8 UTF-8" "locale" OFF "de_CH ISO-8859-1" "locale" OFF "de_DE.UTF-8 UTF-8" "locale" OFF "de_DE ISO-8859-1" "locale" OFF "de_DE@euro ISO-8859-15" "locale" OFF "de_IT.UTF-8 UTF-8" "locale" OFF "de_IT ISO-8859-1" "locale" OFF "de_LI.UTF-8 UTF-8" "locale" OFF "de_LU.UTF-8 UTF-8" "locale" OFF "de_LU ISO-8859-1" "locale" OFF "de_LU@euro ISO-8859-15" "locale" OFF "doi_IN UTF-8" "locale" OFF "dsb_DE UTF-8" "locale" OFF "dv_MV UTF-8" "locale" OFF "dz_BT UTF-8" "locale" OFF "el_GR.UTF-8 UTF-8" "locale" OFF "el_GR ISO-8859-7" "locale" OFF "el_GR@euro ISO-8859-7" "locale" OFF "el_CY.UTF-8 UTF-8" "locale" OFF "el_CY ISO-8859-7" "locale" OFF "en_AG UTF-8" "locale" OFF "en_AU.UTF-8 UTF-8" "locale" OFF "en_AU ISO-8859-1" "locale" OFF "en_BW.UTF-8 UTF-8" "locale" OFF "en_BW ISO-8859-1" "locale" OFF "en_CA.UTF-8 UTF-8" "locale" OFF "en_CA ISO-8859-1" "locale" OFF "en_DK.UTF-8 UTF-8" "locale" OFF "en_DK ISO-8859-1" "locale" OFF "en_GB.UTF-8 UTF-8" "locale" OFF "en_GB ISO-8859-1" "locale" OFF "en_HK.UTF-8 UTF-8" "locale" OFF "en_HK ISO-8859-1" "locale" OFF "en_IE.UTF-8 UTF-8" "locale" OFF "en_IE ISO-8859-1" "locale" OFF "en_IE@euro ISO-8859-15" "locale" OFF "en_IL UTF-8" "locale" OFF "en_IN UTF-8" "locale" OFF "en_NG UTF-8" "locale" OFF "en_NZ.UTF-8 UTF-8" "locale" OFF "en_NZ ISO-8859-1" "locale" OFF "en_PH.UTF-8 UTF-8" "locale" OFF "en_PH ISO-8859-1" "locale" OFF "en_SC.UTF-8 UTF-8" "locale" OFF "en_SG.UTF-8 UTF-8" "locale" OFF "en_SG ISO-8859-1" "locale" OFF "en_US.UTF-8 UTF-8" "locale" OFF "en_US ISO-8859-1" "locale" OFF "en_ZA.UTF-8 UTF-8" "locale" OFF "en_ZA ISO-8859-1" "locale" OFF "en_ZM UTF-8" "locale" OFF "en_ZW.UTF-8 UTF-8" "locale" OFF "en_ZW ISO-8859-1" "locale" OFF "eo UTF-8" "locale" OFF "es_AR.UTF-8 UTF-8" "locale" OFF "es_AR ISO-8859-1" "locale" OFF "es_BO.UTF-8 UTF-8" "locale" OFF "es_BO ISO-8859-1" "locale" OFF "es_CL.UTF-8 UTF-8" "locale" OFF "es_CL ISO-8859-1" "locale" OFF "es_CO.UTF-8 UTF-8" "locale" OFF "es_CO ISO-8859-1" "locale" OFF "es_CR.UTF-8 UTF-8" "locale" OFF "es_CR ISO-8859-1" "locale" OFF "es_CU UTF-8" "locale" OFF "es_DO.UTF-8 UTF-8" "locale" OFF "es_DO ISO-8859-1" "locale" OFF "es_EC.UTF-8 UTF-8" "locale" OFF "es_EC ISO-8859-1" "locale" OFF "es_ES.UTF-8 UTF-8" "locale" OFF "es_ES ISO-8859-1" "locale" OFF "es_ES@euro ISO-8859-15" "locale" OFF "es_GT.UTF-8 UTF-8" "locale" OFF "es_GT ISO-8859-1" "locale" OFF "es_HN.UTF-8 UTF-8" "locale" OFF "es_HN ISO-8859-1" "locale" OFF "es_MX.UTF-8 UTF-8" "locale" OFF "es_MX ISO-8859-1" "locale" OFF "es_NI.UTF-8 UTF-8" "locale" OFF "es_NI ISO-8859-1" "locale" OFF "es_PA.UTF-8 UTF-8" "locale" OFF "es_PA ISO-8859-1" "locale" OFF "es_PE.UTF-8 UTF-8" "locale" OFF "es_PE ISO-8859-1" "locale" OFF "es_PR.UTF-8 UTF-8" "locale" OFF "es_PR ISO-8859-1" "locale" OFF "es_PY.UTF-8 UTF-8" "locale" OFF "es_PY ISO-8859-1" "locale" OFF "es_SV.UTF-8 UTF-8" "locale" OFF "es_SV ISO-8859-1" "locale" OFF "es_US.UTF-8 UTF-8" "locale" OFF "es_US ISO-8859-1" "locale" OFF "es_UY.UTF-8 UTF-8" "locale" OFF "es_UY ISO-8859-1" "locale" OFF "es_VE.UTF-8 UTF-8" "locale" OFF "es_VE ISO-8859-1" "locale" OFF "et_EE.UTF-8 UTF-8" "locale" OFF "et_EE ISO-8859-1" "locale" OFF "et_EE.ISO-8859-15 ISO-8859-15" "locale" OFF "eu_ES.UTF-8 UTF-8" "locale" OFF "eu_ES ISO-8859-1" "locale" OFF "eu_ES@euro ISO-8859-15" "locale" OFF "fa_IR UTF-8" "locale" OFF "ff_SN UTF-8" "locale" OFF "fi_FI.UTF-8 UTF-8" "locale" OFF "fi_FI ISO-8859-1" "locale" OFF "fi_FI@euro ISO-8859-15" "locale" OFF "fil_PH UTF-8" "locale" OFF "fo_FO.UTF-8 UTF-8" "locale" OFF "fo_FO ISO-8859-1" "locale" OFF "fr_BE.UTF-8 UTF-8" "locale" OFF "fr_BE ISO-8859-1" "locale" OFF "fr_BE@euro ISO-8859-15" "locale" OFF "fr_CA.UTF-8 UTF-8" "locale" OFF "fr_CA ISO-8859-1" "locale" OFF "fr_CH.UTF-8 UTF-8" "locale" OFF "fr_CH ISO-8859-1" "locale" OFF "fr_FR.UTF-8 UTF-8" "locale" OFF "fr_FR ISO-8859-1" "locale" OFF "fr_FR@euro ISO-8859-15" "locale" OFF "fr_LU.UTF-8 UTF-8" "locale" OFF "fr_LU ISO-8859-1" "locale" OFF "fr_LU@euro ISO-8859-15" "locale" OFF "fur_IT UTF-8" "locale" OFF "fy_NL UTF-8" "locale" OFF "fy_DE UTF-8" "locale" OFF "ga_IE.UTF-8 UTF-8" "locale" OFF "ga_IE ISO-8859-1" "locale" OFF "ga_IE@euro ISO-8859-15" "locale" OFF "gd_GB.UTF-8 UTF-8" "locale" OFF "gd_GB ISO-8859-15" "locale" OFF "gez_ER UTF-8" "locale" OFF "gez_ER@abegede UTF-8" "locale" OFF "gez_ET UTF-8" "locale" OFF "gez_ET@abegede UTF-8" "locale" OFF "gl_ES.UTF-8 UTF-8" "locale" OFF "gl_ES ISO-8859-1" "locale" OFF "gl_ES@euro ISO-8859-15" "locale" OFF "gu_IN UTF-8" "locale" OFF "gv_GB.UTF-8 UTF-8" "locale" OFF "gv_GB ISO-8859-1" "locale" OFF "ha_NG UTF-8" "locale" OFF "hak_TW UTF-8" "locale" OFF "he_IL.UTF-8 UTF-8" "locale" OFF "he_IL ISO-8859-8" "locale" OFF "hi_IN UTF-8" "locale" OFF "hif_FJ UTF-8" "locale" OFF "hne_IN UTF-8" "locale" OFF "hr_HR.UTF-8 UTF-8" "locale" OFF "hr_HR ISO-8859-2" "locale" OFF "hsb_DE ISO-8859-2" "locale" OFF "hsb_DE.UTF-8 UTF-8" "locale" OFF "ht_HT UTF-8" "locale" OFF "hu_HU.UTF-8 UTF-8" "locale" OFF "hu_HU ISO-8859-2" "locale" OFF "hy_AM UTF-8" "locale" OFF "hy_AM.ARMSCII-8 ARMSCII-8" "locale" OFF "ia_FR UTF-8" "locale" OFF "id_ID.UTF-8 UTF-8" "locale" OFF "id_ID ISO-8859-1" "locale" OFF "ig_NG UTF-8" "locale" OFF "ik_CA UTF-8" "locale" OFF "is_IS.UTF-8 UTF-8" "locale" OFF "is_IS ISO-8859-1" "locale" OFF "it_CH.UTF-8 UTF-8" "locale" OFF "it_CH ISO-8859-1" "locale" OFF "it_IT.UTF-8 UTF-8" "locale" OFF "it_IT ISO-8859-1" "locale" OFF "it_IT@euro ISO-8859-15" "locale" OFF "iu_CA UTF-8" "locale" OFF "ja_JP.EUC-JP EUC-JP" "locale" OFF "ja_JP.UTF-8 UTF-8" "locale" OFF "ka_GE.UTF-8 UTF-8" "locale" OFF "ka_GE GEORGIAN-PS" "locale" OFF "kab_DZ UTF-8" "locale" OFF "kk_KZ.UTF-8 UTF-8" "locale" OFF "kk_KZ PT154" "locale" OFF "kl_GL.UTF-8 UTF-8" "locale" OFF "kl_GL ISO-8859-1" "locale" OFF "km_KH UTF-8" "locale" OFF "kn_IN UTF-8" "locale" OFF "ko_KR.EUC-KR EUC-KR" "locale" OFF "ko_KR.UTF-8 UTF-8" "locale" OFF "kok_IN UTF-8" "locale" OFF "ks_IN UTF-8" "locale" OFF "ks_IN@devanagari UTF-8" "locale" OFF "ku_TR.UTF-8 UTF-8" "locale" OFF "ku_TR ISO-8859-9" "locale" OFF "kw_GB.UTF-8 UTF-8" "locale" OFF "kw_GB ISO-8859-1" "locale" OFF "ky_KG UTF-8" "locale" OFF "lb_LU UTF-8" "locale" OFF "lg_UG.UTF-8 UTF-8" "locale" OFF "lg_UG ISO-8859-10" "locale" OFF "li_BE UTF-8" "locale" OFF "li_NL UTF-8" "locale" OFF "lij_IT UTF-8" "locale" OFF "ln_CD UTF-8" "locale" OFF "lo_LA UTF-8" "locale" OFF "lt_LT.UTF-8 UTF-8" "locale" OFF "lt_LT ISO-8859-13" "locale" OFF "lv_LV.UTF-8 UTF-8" "locale" OFF "lv_LV ISO-8859-13" "locale" OFF "lzh_TW UTF-8" "locale" OFF "mag_IN UTF-8" "locale" OFF "mai_IN UTF-8" "locale" OFF "mai_NP UTF-8" "locale" OFF "mfe_MU UTF-8" "locale" OFF "mg_MG.UTF-8 UTF-8" "locale" OFF "mg_MG ISO-8859-15" "locale" OFF "mhr_RU UTF-8" "locale" OFF "mi_NZ.UTF-8 UTF-8" "locale" OFF "mi_NZ ISO-8859-13" "locale" OFF "miq_NI UTF-8" "locale" OFF "mjw_IN UTF-8" "locale" OFF "mk_MK.UTF-8 UTF-8" "locale" OFF "mk_MK ISO-8859-5" "locale" OFF "ml_IN UTF-8" "locale" OFF "mn_MN UTF-8" "locale" OFF "mni_IN UTF-8" "locale" OFF "mr_IN UTF-8" "locale" OFF "ms_MY.UTF-8 UTF-8" "locale" OFF "ms_MY ISO-8859-1" "locale" OFF "mt_MT.UTF-8 UTF-8" "locale" OFF "mt_MT ISO-8859-3" "locale" OFF "my_MM UTF-8" "locale" OFF "nan_TW UTF-8" "locale" OFF "nan_TW@latin UTF-8" "locale" OFF "nb_NO.UTF-8 UTF-8" "locale" OFF "nb_NO ISO-8859-1" "locale" OFF "nds_DE UTF-8" "locale" OFF "nds_NL UTF-8" "locale" OFF "ne_NP UTF-8" "locale" OFF "nhn_MX UTF-8" "locale" OFF "niu_NU UTF-8" "locale" OFF "niu_NZ UTF-8" "locale" OFF "nl_AW UTF-8" "locale" OFF "nl_BE.UTF-8 UTF-8" "locale" OFF "nl_BE ISO-8859-1" "locale" OFF "nl_BE@euro ISO-8859-15" "locale" OFF "nl_NL.UTF-8 UTF-8" "locale" OFF "nl_NL ISO-8859-1" "locale" OFF "nl_NL@euro ISO-8859-15" "locale" OFF "nn_NO.UTF-8 UTF-8" "locale" OFF "nn_NO ISO-8859-1" "locale" OFF "nr_ZA UTF-8" "locale" OFF "nso_ZA UTF-8" "locale" OFF "oc_FR.UTF-8 UTF-8" "locale" OFF "oc_FR ISO-8859-1" "locale" OFF "om_ET UTF-8" "locale" OFF "om_KE ISO-8859-1" "locale" OFF "om_KE.UTF-8 UTF-8" "locale" OFF "or_IN UTF-8" "locale" OFF "os_RU UTF-8" "locale" OFF "pa_IN UTF-8" "locale" OFF "pa_PK UTF-8" "locale" OFF "pap_AW UTF-8" "locale" OFF "pap_CW UTF-8" "locale" OFF "pl_PL.UTF-8 UTF-8" "locale" OFF "pl_PL ISO-8859-2" "locale" OFF "ps_AF UTF-8" "locale" OFF "pt_BR.UTF-8 UTF-8" "locale" OFF "pt_BR ISO-8859-1" "locale" OFF "pt_PT.UTF-8 UTF-8" "locale" OFF "pt_PT ISO-8859-1" "locale" OFF "pt_PT@euro ISO-8859-15" "locale" OFF "quz_PE UTF-8" "locale" OFF "raj_IN UTF-8" "locale" OFF "ro_RO.UTF-8 UTF-8" "locale" OFF "ro_RO ISO-8859-2" "locale" OFF "ru_RU.KOI8-R KOI8-R" "locale" OFF "ru_RU.UTF-8 UTF-8" "locale" OFF "ru_RU ISO-8859-5" "locale" OFF "ru_UA.UTF-8 UTF-8" "locale" OFF "ru_UA KOI8-U" "locale" OFF "sa_IN UTF-8" "locale" OFF "rw_RW UTF-8" "locale" OFF "sah_RU UTF-8" "locale" OFF "sat_IN UTF-8" "locale" OFF "sc_IT UTF-8" "locale" OFF "sd_IN UTF-8" "locale" OFF "sd_IN@devanagari UTF-8" "locale" OFF "se_NO UTF-8" "locale" OFF "sgs_LT UTF-8" "locale" OFF "shn_MM UTF-8" "locale" OFF "shs_CA UTF-8" "locale" OFF "si_LK UTF-8" "locale" OFF "sid_ET UTF-8" "locale" OFF "sk_SK.UTF-8 UTF-8" "locale" OFF "sk_SK ISO-8859-2" "locale" OFF "sl_SI.UTF-8 UTF-8" "locale" OFF "sl_SI ISO-8859-2" "locale" OFF "sm_WS UTF-8" "locale" OFF "so_DJ.UTF-8 UTF-8" "locale" OFF "so_DJ ISO-8859-1" "locale" OFF "so_ET UTF-8" "locale" OFF "so_KE ISO-8859-1" "locale" OFF "so_KE.UTF-8 UTF-8" "locale" OFF "so_SO.UTF-8 UTF-8" "locale" OFF "so_SO ISO-8859-1" "locale" OFF "sq_AL.UTF-8 UTF-8" "locale" OFF "sq_AL ISO-8859-1" "locale" OFF "sq_MK UTF-8" "locale" OFF "sr_ME UTF-8" "locale" OFF "sr_RS UTF-8" "locale" OFF "sr_RS@latin UTF-8" "locale" OFF "ss_ZA UTF-8" "locale" OFF "st_ZA.UTF-8 UTF-8" "locale" OFF "st_ZA ISO-8859-1" "locale" OFF "sv_FI.UTF-8 UTF-8" "locale" OFF "sv_FI ISO-8859-1" "locale" OFF "sv_FI@euro ISO-8859-15" "locale" OFF "sv_SE.UTF-8 UTF-8" "locale" OFF "sv_SE ISO-8859-1" "locale" OFF "sw_KE UTF-8" "locale" OFF "sw_TZ UTF-8" "locale" OFF "szl_PL UTF-8" "locale" OFF "ta_IN UTF-8" "locale" OFF "ta_LK UTF-8" "locale" OFF "tcy_IN.UTF-8 UTF-8" "locale" OFF "te_IN UTF-8" "locale" OFF "tg_TJ.UTF-8 UTF-8" "locale" OFF "tg_TJ KOI8-T" "locale" OFF "th_TH.UTF-8 UTF-8" "locale" OFF "th_TH TIS-620" "locale" OFF "the_NP UTF-8" "locale" OFF "ti_ER UTF-8" "locale" OFF "ti_ET UTF-8" "locale" OFF "tig_ER UTF-8" "locale" OFF "tk_TM UTF-8" "locale" OFF "tl_PH.UTF-8 UTF-8" "locale" OFF "tl_PH ISO-8859-1" "locale" OFF "tn_ZA UTF-8" "locale" OFF "to_TO UTF-8" "locale" OFF "tpi_PG UTF-8" "locale" OFF "tr_CY.UTF-8 UTF-8" "locale" OFF "tr_CY ISO-8859-9" "locale" OFF "tr_TR.UTF-8 UTF-8" "locale" OFF "tr_TR ISO-8859-9" "locale" OFF "ts_ZA UTF-8" "locale" OFF "tt_RU UTF-8" "locale" OFF "tt_RU@iqtelif UTF-8" "locale" OFF "ug_CN UTF-8" "locale" OFF "uk_UA.UTF-8 UTF-8" "locale" OFF "uk_UA KOI8-U" "locale" OFF "unm_US UTF-8" "locale" OFF "ur_IN UTF-8" "locale" OFF "ur_PK UTF-8" "locale" OFF "uz_UZ.UTF-8 UTF-8" "locale" OFF "uz_UZ ISO-8859-1" "locale" OFF "uz_UZ@cyrillic UTF-8" "locale" OFF "ve_ZA UTF-8" "locale" OFF "vi_VN UTF-8" "locale" OFF "wa_BE ISO-8859-1" "locale" OFF "wa_BE@euro ISO-8859-15" "locale" OFF "wa_BE.UTF-8 UTF-8" "locale" OFF "wae_CH UTF-8" "locale" OFF "wal_ET UTF-8" "locale" OFF "wo_SN UTF-8" "locale" OFF "xh_ZA.UTF-8 UTF-8" "locale" OFF "xh_ZA ISO-8859-1" "locale" OFF "yi_US.UTF-8 UTF-8" "locale" OFF "yi_US CP1255" "locale" OFF "yo_NG UTF-8" "locale" OFF "yue_HK UTF-8" "locale" OFF "yuw_PG UTF-8" "locale" OFF "zh_CN.GB18030 GB18030" "locale" OFF "zh_CN.GBK GBK" "locale" OFF "zh_CN.UTF-8 UTF-8" "locale" OFF "zh_CN GB2312" "locale" OFF "zh_HK.UTF-8 UTF-8" "locale" OFF "zh_HK BIG5-HKSCS" "locale" OFF "zh_SG.UTF-8 UTF-8" "locale" OFF "zh_SG.GBK GBK" "locale" OFF "zh_SG GB2312" "locale" OFF "zh_TW.EUC-TW EUC-TW" "locale" OFF "zh_TW.UTF-8 UTF-8" "locale" OFF "zh_TW BIG5" "locale" OFF "zu_ZA.UTF-8 UTF-8" "locale" OFF "zu_ZA ISO-8859-1" "locale" OFF)
 
-wizard () {
-	> $SETTINGS_FILE
-	whiptail --msgbox "$GNUGPL" --title "GNU General Public License" 20 78
-	LSBLK="$(lsblk)"
-	NEW_TARGET_DRIVE=$(whiptail --inputbox "/dev/sd* (replace the * with the drive letter no number) $LSBLK" 40 60 /dev/ --title "target drive" 3>&1 1>&2 2>&3)
-	if [ -n "$NEW_TARGET_DRIVE" ]; then
-	  echo "TARGET_DRIVE=\"$NEW_TARGET_DRIVE\"" >> $SETTINGS_FILE
-	else
-	  echo "TARGET_DRIVE=\"$TARGET_DRIVE\"" >> $SETTINGS_FILE
-	fi
-	NEW_BOOTLOADER_ID=$(whiptail --inputbox "done=[ENTER], default=($BOOTLOADER_ID)" 40 60 --title "bootloader id" 3>&1 1>&2 2>&3)
-	if [ -n "$NEW_BOOTLOADER_ID" ]; then
-	  echo "BOOTLOADER_ID=\"$NEW_BOOTLOADER_ID\"" >> $SETTINGS_FILE
-	else
-		echo "BOOTLOADER_ID=\"$BOOTLOADER_ID\"" >> $SETTINGS_FILE
-	fi
-	NEW_ENCRYPT_DRIVE=$(whiptail --menu "select=[ENTER], default=($ENCRYPT_DRIVE)" 40 60 30 --title "drive encryption" 3>&1 1>&2 2>&3 \
-	"false" "I don't want to encrypt my drive." "true" "I want to encrypt my drive.")
-	if [ -n "$NEW_ENCRYPT_DRIVE" ]; then
-	  eval echo "ENCRYPT_DRIVE=$NEW_ENCRYPT_DRIVE" >> $SETTINGS_FILE
-	fi
-	NEW_HOSTNAME=$(whiptail --inputbox "done=[ENTER], default=($HOSTNAME)" 40 60 --title "hostname" 3>&1 1>&2 2>&3)
-	if [ -n "$NEW_HOSTNAME" ]; then
-	  echo "HOSTNAME=\"$NEW_HOSTNAME\"" >> $SETTINGS_FILE
-	else
-		echo "HOSTNAME=\"$HOSTNAME\"" >> $SETTINGS_FILE
-	fi
-	NEW_EXTRAUSER=$(whiptail --inputbox "done=[ENTER], default=($EXTRAUSER)" 40 60 --title "extra user username" 3>&1 1>&2 2>&3)
-	if [ -n "$NEW_EXTRAUSER" ]; then
-	  echo "EXTRAUSER=\"$NEW_EXTRAUSER\"" >> $SETTINGS_FILE
-	else
-		echo "EXTRAUSER=\"$EXTRAUSER\"" >> $SETTINGS_FILE
-	fi
-	NEW_INTERFACE=$(whiptail --menu "select=[ENTER], default=($INTERFACE)" 40 60 30 --title "interface" 3>&1 1>&2 2>&3 \
-	"XFCE" "Fast(light), modular and easy to use." "KDE" "Modern(qt), modular and easy to use." "GNOME" "Slow(heavy), modular and easy to use." "I3WM" "Fastest(lightest), most modular but hard to use." "NODEORWM" "Nothing. You install what you want. (expert)")
-	if [ -n "$NEW_INTERFACE" ]; then
-	  echo "INTERFACE=\"$NEW_INTERFACE\"" >> $SETTINGS_FILE
-	fi
-	NEW_DISPLAYMANAGER=$(whiptail --menu "select=[ENTER], default=($DISPLAYMANAGER)" 40 60 30 --title "display manager" 3>&1 1>&2 2>&3 \
-	"LIGHTDM" "Recommended for XFCE" "SDDM" "Recommended for KDE" "GDM" "Recommended for GNOME" "NODM" "Nothing. You install what you want. (expert)")
-	if [ -n "$NEW_DISPLAYMANAGER" ]; then
-	  echo "DISPLAYMANAGER=\"$NEW_DISPLAYMANAGER\"" >> $SETTINGS_FILE
-	fi
-	NEW_NVME=$(whiptail --menu "select=[ENTER], default=($NVME)" 40 60 30 --title "nvme" 3>&1 1>&2 2>&3 \
-	"false" "I don't have an Nvme SSD." "true" "I have an Nvme SSD.")
-	if [ -n "$NEW_NVME" ]; then
-	  eval echo "NVME=$NEW_NVME" >> $SETTINGS_FILE
-	fi
-	echo -n "Country code for Pacman mirrors [$COUNTRY]:"
-	read NEW_COUNTRY
-	if [ -n "$NEW_COUNTRY" ]; then
-		echo "COUNTRY=\"$NEW_COUNTRY\"" >> $SETTINGS_FILE
-	fi
-	echo "TIMEZONE=$(select_timezone)" >> $SETTINGS_FILE
-	NEW_LOCALE=$(whiptail --radiolist "select=[space], continue=[enter], none selected=default($LOCALE)." 40 60 30 --title "locale" 3>&1 1>&2 2>&3 \
-	"aa_DJ.UTF-8 UTF-8" "locale" OFF "aa_DJ ISO-8859-1" "locale" OFF "aa_ER UTF-8" "locale" OFF "aa_ER@saaho UTF-8" "locale" OFF "aa_ET UTF-8" "locale" OFF "af_ZA.UTF-8 UTF-8" "locale" OFF "af_ZA ISO-8859-1" "locale" OFF "agr_PE UTF-8" "locale" OFF "ak_GH UTF-8" "locale" OFF "am_ET UTF-8" "locale" OFF "an_ES.UTF-8 UTF-8" "locale" OFF "an_ES ISO-8859-15" "locale" OFF "anp_IN UTF-8" "locale" OFF "ar_AE.UTF-8 UTF-8" "locale" OFF "ar_AE ISO-8859-6" "locale" OFF "ar_BH.UTF-8 UTF-8" "locale" OFF "ar_BH ISO-8859-6" "locale" OFF "ar_DZ.UTF-8 UTF-8" "locale" OFF "ar_DZ ISO-8859-6" "locale" OFF "ar_EG.UTF-8 UTF-8" "locale" OFF "ar_EG ISO-8859-6" "locale" OFF "ar_IN UTF-8" "locale" OFF "ar_IQ.UTF-8 UTF-8" "locale" OFF "ar_IQ ISO-8859-6" "locale" OFF "ar_JO.UTF-8 UTF-8" "locale" OFF "ar_JO ISO-8859-6" "locale" OFF "ar_KW.UTF-8 UTF-8" "locale" OFF "ar_KW ISO-8859-6" "locale" OFF "ar_LB.UTF-8 UTF-8" "locale" OFF "ar_LB ISO-8859-6" "locale" OFF "ar_LY.UTF-8 UTF-8" "locale" OFF "ar_LY ISO-8859-6" "locale" OFF "ar_MA.UTF-8 UTF-8" "locale" OFF "ar_MA ISO-8859-6" "locale" OFF "ar_OM.UTF-8 UTF-8" "locale" OFF "ar_OM ISO-8859-6" "locale" OFF "ar_QA.UTF-8 UTF-8" "locale" OFF "ar_QA ISO-8859-6" "locale" OFF "ar_SA.UTF-8 UTF-8" "locale" OFF "ar_SA ISO-8859-6" "locale" OFF "ar_SD.UTF-8 UTF-8" "locale" OFF "ar_SD ISO-8859-6" "locale" OFF "ar_SS UTF-8" "locale" OFF "ar_SY.UTF-8 UTF-8" "locale" OFF "ar_SY ISO-8859-6" "locale" OFF "ar_TN.UTF-8 UTF-8" "locale" OFF "ar_TN ISO-8859-6" "locale" OFF "ar_YE.UTF-8 UTF-8" "locale" OFF "ar_YE ISO-8859-6" "locale" OFF "ayc_PE UTF-8" "locale" OFF "az_AZ UTF-8" "locale" OFF "az_IR UTF-8" "locale" OFF "as_IN UTF-8" "locale" OFF "ast_ES.UTF-8 UTF-8" "locale" OFF "ast_ES ISO-8859-15" "locale" OFF "be_BY.UTF-8 UTF-8" "locale" OFF "be_BY CP1251" "locale" OFF "be_BY@latin UTF-8" "locale" OFF "bem_ZM UTF-8" "locale" OFF "ber_DZ UTF-8" "locale" OFF "ber_MA UTF-8" "locale" OFF "bg_BG.UTF-8 UTF-8" "locale" OFF "bg_BG CP1251" "locale" OFF "bhb_IN.UTF-8 UTF-8" "locale" OFF "bho_IN UTF-8" "locale" OFF "bho_NP UTF-8" "locale" OFF "bi_VU UTF-8" "locale" OFF "bn_BD UTF-8" "locale" OFF "bn_IN UTF-8" "locale" OFF "bo_CN UTF-8" "locale" OFF "bo_IN UTF-8" "locale" OFF "br_FR.UTF-8 UTF-8" "locale" OFF "br_FR ISO-8859-1" "locale" OFF "br_FR@euro ISO-8859-15" "locale" OFF "brx_IN UTF-8" "locale" OFF "bs_BA.UTF-8 UTF-8" "locale" OFF "bs_BA ISO-8859-2" "locale" OFF "byn_ER UTF-8" "locale" OFF "ca_AD.UTF-8 UTF-8" "locale" OFF "ca_AD ISO-8859-15" "locale" OFF "ca_ES.UTF-8 UTF-8" "locale" OFF "ca_ES ISO-8859-1" "locale" OFF "ca_ES@euro ISO-8859-15" "locale" OFF "ca_ES@valencia UTF-8" "locale" OFF "ca_FR.UTF-8 UTF-8" "locale" OFF "ca_FR ISO-8859-15" "locale" OFF "ca_IT.UTF-8 UTF-8" "locale" OFF "ca_IT ISO-8859-15" "locale" OFF "ce_RU UTF-8" "locale" OFF "chr_US UTF-8" "locale" OFF "cmn_TW UTF-8" "locale" OFF "crh_UA UTF-8" "locale" OFF "cs_CZ.UTF-8 UTF-8" "locale" OFF "cs_CZ ISO-8859-2" "locale" OFF "csb_PL UTF-8" "locale" OFF "cv_RU UTF-8" "locale" OFF "cy_GB.UTF-8 UTF-8" "locale" OFF "cy_GB ISO-8859-14" "locale" OFF "da_DK.UTF-8 UTF-8" "locale" OFF "da_DK ISO-8859-1" "locale" OFF "de_AT.UTF-8 UTF-8" "locale" OFF "de_AT ISO-8859-1" "locale" OFF "de_AT@euro ISO-8859-15" "locale" OFF "de_BE.UTF-8 UTF-8" "locale" OFF "de_BE ISO-8859-1" "locale" OFF "de_BE@euro ISO-8859-15" "locale" OFF "de_CH.UTF-8 UTF-8" "locale" OFF "de_CH ISO-8859-1" "locale" OFF "de_DE.UTF-8 UTF-8" "locale" OFF "de_DE ISO-8859-1" "locale" OFF "de_DE@euro ISO-8859-15" "locale" OFF "de_IT.UTF-8 UTF-8" "locale" OFF "de_IT ISO-8859-1" "locale" OFF "de_LI.UTF-8 UTF-8" "locale" OFF "de_LU.UTF-8 UTF-8" "locale" OFF "de_LU ISO-8859-1" "locale" OFF "de_LU@euro ISO-8859-15" "locale" OFF "doi_IN UTF-8" "locale" OFF "dsb_DE UTF-8" "locale" OFF "dv_MV UTF-8" "locale" OFF "dz_BT UTF-8" "locale" OFF "el_GR.UTF-8 UTF-8" "locale" OFF "el_GR ISO-8859-7" "locale" OFF "el_GR@euro ISO-8859-7" "locale" OFF "el_CY.UTF-8 UTF-8" "locale" OFF "el_CY ISO-8859-7" "locale" OFF "en_AG UTF-8" "locale" OFF "en_AU.UTF-8 UTF-8" "locale" OFF "en_AU ISO-8859-1" "locale" OFF "en_BW.UTF-8 UTF-8" "locale" OFF "en_BW ISO-8859-1" "locale" OFF "en_CA.UTF-8 UTF-8" "locale" OFF "en_CA ISO-8859-1" "locale" OFF "en_DK.UTF-8 UTF-8" "locale" OFF "en_DK ISO-8859-1" "locale" OFF "en_GB.UTF-8 UTF-8" "locale" OFF "en_GB ISO-8859-1" "locale" OFF "en_HK.UTF-8 UTF-8" "locale" OFF "en_HK ISO-8859-1" "locale" OFF "en_IE.UTF-8 UTF-8" "locale" OFF "en_IE ISO-8859-1" "locale" OFF "en_IE@euro ISO-8859-15" "locale" OFF "en_IL UTF-8" "locale" OFF "en_IN UTF-8" "locale" OFF "en_NG UTF-8" "locale" OFF "en_NZ.UTF-8 UTF-8" "locale" OFF "en_NZ ISO-8859-1" "locale" OFF "en_PH.UTF-8 UTF-8" "locale" OFF "en_PH ISO-8859-1" "locale" OFF "en_SC.UTF-8 UTF-8" "locale" OFF "en_SG.UTF-8 UTF-8" "locale" OFF "en_SG ISO-8859-1" "locale" OFF "en_US.UTF-8 UTF-8" "locale" OFF "en_US ISO-8859-1" "locale" OFF "en_ZA.UTF-8 UTF-8" "locale" OFF "en_ZA ISO-8859-1" "locale" OFF "en_ZM UTF-8" "locale" OFF "en_ZW.UTF-8 UTF-8" "locale" OFF "en_ZW ISO-8859-1" "locale" OFF "eo UTF-8" "locale" OFF "es_AR.UTF-8 UTF-8" "locale" OFF "es_AR ISO-8859-1" "locale" OFF "es_BO.UTF-8 UTF-8" "locale" OFF "es_BO ISO-8859-1" "locale" OFF "es_CL.UTF-8 UTF-8" "locale" OFF "es_CL ISO-8859-1" "locale" OFF "es_CO.UTF-8 UTF-8" "locale" OFF "es_CO ISO-8859-1" "locale" OFF "es_CR.UTF-8 UTF-8" "locale" OFF "es_CR ISO-8859-1" "locale" OFF "es_CU UTF-8" "locale" OFF "es_DO.UTF-8 UTF-8" "locale" OFF "es_DO ISO-8859-1" "locale" OFF "es_EC.UTF-8 UTF-8" "locale" OFF "es_EC ISO-8859-1" "locale" OFF "es_ES.UTF-8 UTF-8" "locale" OFF "es_ES ISO-8859-1" "locale" OFF "es_ES@euro ISO-8859-15" "locale" OFF "es_GT.UTF-8 UTF-8" "locale" OFF "es_GT ISO-8859-1" "locale" OFF "es_HN.UTF-8 UTF-8" "locale" OFF "es_HN ISO-8859-1" "locale" OFF "es_MX.UTF-8 UTF-8" "locale" OFF "es_MX ISO-8859-1" "locale" OFF "es_NI.UTF-8 UTF-8" "locale" OFF "es_NI ISO-8859-1" "locale" OFF "es_PA.UTF-8 UTF-8" "locale" OFF "es_PA ISO-8859-1" "locale" OFF "es_PE.UTF-8 UTF-8" "locale" OFF "es_PE ISO-8859-1" "locale" OFF "es_PR.UTF-8 UTF-8" "locale" OFF "es_PR ISO-8859-1" "locale" OFF "es_PY.UTF-8 UTF-8" "locale" OFF "es_PY ISO-8859-1" "locale" OFF "es_SV.UTF-8 UTF-8" "locale" OFF "es_SV ISO-8859-1" "locale" OFF "es_US.UTF-8 UTF-8" "locale" OFF "es_US ISO-8859-1" "locale" OFF "es_UY.UTF-8 UTF-8" "locale" OFF "es_UY ISO-8859-1" "locale" OFF "es_VE.UTF-8 UTF-8" "locale" OFF "es_VE ISO-8859-1" "locale" OFF "et_EE.UTF-8 UTF-8" "locale" OFF "et_EE ISO-8859-1" "locale" OFF "et_EE.ISO-8859-15 ISO-8859-15" "locale" OFF "eu_ES.UTF-8 UTF-8" "locale" OFF "eu_ES ISO-8859-1" "locale" OFF "eu_ES@euro ISO-8859-15" "locale" OFF "fa_IR UTF-8" "locale" OFF "ff_SN UTF-8" "locale" OFF "fi_FI.UTF-8 UTF-8" "locale" OFF "fi_FI ISO-8859-1" "locale" OFF "fi_FI@euro ISO-8859-15" "locale" OFF "fil_PH UTF-8" "locale" OFF "fo_FO.UTF-8 UTF-8" "locale" OFF "fo_FO ISO-8859-1" "locale" OFF "fr_BE.UTF-8 UTF-8" "locale" OFF "fr_BE ISO-8859-1" "locale" OFF "fr_BE@euro ISO-8859-15" "locale" OFF "fr_CA.UTF-8 UTF-8" "locale" OFF "fr_CA ISO-8859-1" "locale" OFF "fr_CH.UTF-8 UTF-8" "locale" OFF "fr_CH ISO-8859-1" "locale" OFF "fr_FR.UTF-8 UTF-8" "locale" OFF "fr_FR ISO-8859-1" "locale" OFF "fr_FR@euro ISO-8859-15" "locale" OFF "fr_LU.UTF-8 UTF-8" "locale" OFF "fr_LU ISO-8859-1" "locale" OFF "fr_LU@euro ISO-8859-15" "locale" OFF "fur_IT UTF-8" "locale" OFF "fy_NL UTF-8" "locale" OFF "fy_DE UTF-8" "locale" OFF "ga_IE.UTF-8 UTF-8" "locale" OFF "ga_IE ISO-8859-1" "locale" OFF "ga_IE@euro ISO-8859-15" "locale" OFF "gd_GB.UTF-8 UTF-8" "locale" OFF "gd_GB ISO-8859-15" "locale" OFF "gez_ER UTF-8" "locale" OFF "gez_ER@abegede UTF-8" "locale" OFF "gez_ET UTF-8" "locale" OFF "gez_ET@abegede UTF-8" "locale" OFF "gl_ES.UTF-8 UTF-8" "locale" OFF "gl_ES ISO-8859-1" "locale" OFF "gl_ES@euro ISO-8859-15" "locale" OFF "gu_IN UTF-8" "locale" OFF "gv_GB.UTF-8 UTF-8" "locale" OFF "gv_GB ISO-8859-1" "locale" OFF "ha_NG UTF-8" "locale" OFF "hak_TW UTF-8" "locale" OFF "he_IL.UTF-8 UTF-8" "locale" OFF "he_IL ISO-8859-8" "locale" OFF "hi_IN UTF-8" "locale" OFF "hif_FJ UTF-8" "locale" OFF "hne_IN UTF-8" "locale" OFF "hr_HR.UTF-8 UTF-8" "locale" OFF "hr_HR ISO-8859-2" "locale" OFF "hsb_DE ISO-8859-2" "locale" OFF "hsb_DE.UTF-8 UTF-8" "locale" OFF "ht_HT UTF-8" "locale" OFF "hu_HU.UTF-8 UTF-8" "locale" OFF "hu_HU ISO-8859-2" "locale" OFF "hy_AM UTF-8" "locale" OFF "hy_AM.ARMSCII-8 ARMSCII-8" "locale" OFF "ia_FR UTF-8" "locale" OFF "id_ID.UTF-8 UTF-8" "locale" OFF "id_ID ISO-8859-1" "locale" OFF "ig_NG UTF-8" "locale" OFF "ik_CA UTF-8" "locale" OFF "is_IS.UTF-8 UTF-8" "locale" OFF "is_IS ISO-8859-1" "locale" OFF "it_CH.UTF-8 UTF-8" "locale" OFF "it_CH ISO-8859-1" "locale" OFF "it_IT.UTF-8 UTF-8" "locale" OFF "it_IT ISO-8859-1" "locale" OFF "it_IT@euro ISO-8859-15" "locale" OFF "iu_CA UTF-8" "locale" OFF "ja_JP.EUC-JP EUC-JP" "locale" OFF "ja_JP.UTF-8 UTF-8" "locale" OFF "ka_GE.UTF-8 UTF-8" "locale" OFF "ka_GE GEORGIAN-PS" "locale" OFF "kab_DZ UTF-8" "locale" OFF "kk_KZ.UTF-8 UTF-8" "locale" OFF "kk_KZ PT154" "locale" OFF "kl_GL.UTF-8 UTF-8" "locale" OFF "kl_GL ISO-8859-1" "locale" OFF "km_KH UTF-8" "locale" OFF "kn_IN UTF-8" "locale" OFF "ko_KR.EUC-KR EUC-KR" "locale" OFF "ko_KR.UTF-8 UTF-8" "locale" OFF "kok_IN UTF-8" "locale" OFF "ks_IN UTF-8" "locale" OFF "ks_IN@devanagari UTF-8" "locale" OFF "ku_TR.UTF-8 UTF-8" "locale" OFF "ku_TR ISO-8859-9" "locale" OFF "kw_GB.UTF-8 UTF-8" "locale" OFF "kw_GB ISO-8859-1" "locale" OFF "ky_KG UTF-8" "locale" OFF "lb_LU UTF-8" "locale" OFF "lg_UG.UTF-8 UTF-8" "locale" OFF "lg_UG ISO-8859-10" "locale" OFF "li_BE UTF-8" "locale" OFF "li_NL UTF-8" "locale" OFF "lij_IT UTF-8" "locale" OFF "ln_CD UTF-8" "locale" OFF "lo_LA UTF-8" "locale" OFF "lt_LT.UTF-8 UTF-8" "locale" OFF "lt_LT ISO-8859-13" "locale" OFF "lv_LV.UTF-8 UTF-8" "locale" OFF "lv_LV ISO-8859-13" "locale" OFF "lzh_TW UTF-8" "locale" OFF "mag_IN UTF-8" "locale" OFF "mai_IN UTF-8" "locale" OFF "mai_NP UTF-8" "locale" OFF "mfe_MU UTF-8" "locale" OFF "mg_MG.UTF-8 UTF-8" "locale" OFF "mg_MG ISO-8859-15" "locale" OFF "mhr_RU UTF-8" "locale" OFF "mi_NZ.UTF-8 UTF-8" "locale" OFF "mi_NZ ISO-8859-13" "locale" OFF "miq_NI UTF-8" "locale" OFF "mjw_IN UTF-8" "locale" OFF "mk_MK.UTF-8 UTF-8" "locale" OFF "mk_MK ISO-8859-5" "locale" OFF "ml_IN UTF-8" "locale" OFF "mn_MN UTF-8" "locale" OFF "mni_IN UTF-8" "locale" OFF "mr_IN UTF-8" "locale" OFF "ms_MY.UTF-8 UTF-8" "locale" OFF "ms_MY ISO-8859-1" "locale" OFF "mt_MT.UTF-8 UTF-8" "locale" OFF "mt_MT ISO-8859-3" "locale" OFF "my_MM UTF-8" "locale" OFF "nan_TW UTF-8" "locale" OFF "nan_TW@latin UTF-8" "locale" OFF "nb_NO.UTF-8 UTF-8" "locale" OFF "nb_NO ISO-8859-1" "locale" OFF "nds_DE UTF-8" "locale" OFF "nds_NL UTF-8" "locale" OFF "ne_NP UTF-8" "locale" OFF "nhn_MX UTF-8" "locale" OFF "niu_NU UTF-8" "locale" OFF "niu_NZ UTF-8" "locale" OFF "nl_AW UTF-8" "locale" OFF "nl_BE.UTF-8 UTF-8" "locale" OFF "nl_BE ISO-8859-1" "locale" OFF "nl_BE@euro ISO-8859-15" "locale" OFF "nl_NL.UTF-8 UTF-8" "locale" OFF "nl_NL ISO-8859-1" "locale" OFF "nl_NL@euro ISO-8859-15" "locale" OFF "nn_NO.UTF-8 UTF-8" "locale" OFF "nn_NO ISO-8859-1" "locale" OFF "nr_ZA UTF-8" "locale" OFF "nso_ZA UTF-8" "locale" OFF "oc_FR.UTF-8 UTF-8" "locale" OFF "oc_FR ISO-8859-1" "locale" OFF "om_ET UTF-8" "locale" OFF "om_KE ISO-8859-1" "locale" OFF "om_KE.UTF-8 UTF-8" "locale" OFF "or_IN UTF-8" "locale" OFF "os_RU UTF-8" "locale" OFF "pa_IN UTF-8" "locale" OFF "pa_PK UTF-8" "locale" OFF "pap_AW UTF-8" "locale" OFF "pap_CW UTF-8" "locale" OFF "pl_PL.UTF-8 UTF-8" "locale" OFF "pl_PL ISO-8859-2" "locale" OFF "ps_AF UTF-8" "locale" OFF "pt_BR.UTF-8 UTF-8" "locale" OFF "pt_BR ISO-8859-1" "locale" OFF "pt_PT.UTF-8 UTF-8" "locale" OFF "pt_PT ISO-8859-1" "locale" OFF "pt_PT@euro ISO-8859-15" "locale" OFF "quz_PE UTF-8" "locale" OFF "raj_IN UTF-8" "locale" OFF "ro_RO.UTF-8 UTF-8" "locale" OFF "ro_RO ISO-8859-2" "locale" OFF "ru_RU.KOI8-R KOI8-R" "locale" OFF "ru_RU.UTF-8 UTF-8" "locale" OFF "ru_RU ISO-8859-5" "locale" OFF "ru_UA.UTF-8 UTF-8" "locale" OFF "ru_UA KOI8-U" "locale" OFF "sa_IN UTF-8" "locale" OFF "rw_RW UTF-8" "locale" OFF "sah_RU UTF-8" "locale" OFF "sat_IN UTF-8" "locale" OFF "sc_IT UTF-8" "locale" OFF "sd_IN UTF-8" "locale" OFF "sd_IN@devanagari UTF-8" "locale" OFF "se_NO UTF-8" "locale" OFF "sgs_LT UTF-8" "locale" OFF "shn_MM UTF-8" "locale" OFF "shs_CA UTF-8" "locale" OFF "si_LK UTF-8" "locale" OFF "sid_ET UTF-8" "locale" OFF "sk_SK.UTF-8 UTF-8" "locale" OFF "sk_SK ISO-8859-2" "locale" OFF "sl_SI.UTF-8 UTF-8" "locale" OFF "sl_SI ISO-8859-2" "locale" OFF "sm_WS UTF-8" "locale" OFF "so_DJ.UTF-8 UTF-8" "locale" OFF "so_DJ ISO-8859-1" "locale" OFF "so_ET UTF-8" "locale" OFF "so_KE ISO-8859-1" "locale" OFF "so_KE.UTF-8 UTF-8" "locale" OFF "so_SO.UTF-8 UTF-8" "locale" OFF "so_SO ISO-8859-1" "locale" OFF "sq_AL.UTF-8 UTF-8" "locale" OFF "sq_AL ISO-8859-1" "locale" OFF "sq_MK UTF-8" "locale" OFF "sr_ME UTF-8" "locale" OFF "sr_RS UTF-8" "locale" OFF "sr_RS@latin UTF-8" "locale" OFF "ss_ZA UTF-8" "locale" OFF "st_ZA.UTF-8 UTF-8" "locale" OFF "st_ZA ISO-8859-1" "locale" OFF "sv_FI.UTF-8 UTF-8" "locale" OFF "sv_FI ISO-8859-1" "locale" OFF "sv_FI@euro ISO-8859-15" "locale" OFF "sv_SE.UTF-8 UTF-8" "locale" OFF "sv_SE ISO-8859-1" "locale" OFF "sw_KE UTF-8" "locale" OFF "sw_TZ UTF-8" "locale" OFF "szl_PL UTF-8" "locale" OFF "ta_IN UTF-8" "locale" OFF "ta_LK UTF-8" "locale" OFF "tcy_IN.UTF-8 UTF-8" "locale" OFF "te_IN UTF-8" "locale" OFF "tg_TJ.UTF-8 UTF-8" "locale" OFF "tg_TJ KOI8-T" "locale" OFF "th_TH.UTF-8 UTF-8" "locale" OFF "th_TH TIS-620" "locale" OFF "the_NP UTF-8" "locale" OFF "ti_ER UTF-8" "locale" OFF "ti_ET UTF-8" "locale" OFF "tig_ER UTF-8" "locale" OFF "tk_TM UTF-8" "locale" OFF "tl_PH.UTF-8 UTF-8" "locale" OFF "tl_PH ISO-8859-1" "locale" OFF "tn_ZA UTF-8" "locale" OFF "to_TO UTF-8" "locale" OFF "tpi_PG UTF-8" "locale" OFF "tr_CY.UTF-8 UTF-8" "locale" OFF "tr_CY ISO-8859-9" "locale" OFF "tr_TR.UTF-8 UTF-8" "locale" OFF "tr_TR ISO-8859-9" "locale" OFF "ts_ZA UTF-8" "locale" OFF "tt_RU UTF-8" "locale" OFF "tt_RU@iqtelif UTF-8" "locale" OFF "ug_CN UTF-8" "locale" OFF "uk_UA.UTF-8 UTF-8" "locale" OFF "uk_UA KOI8-U" "locale" OFF "unm_US UTF-8" "locale" OFF "ur_IN UTF-8" "locale" OFF "ur_PK UTF-8" "locale" OFF "uz_UZ.UTF-8 UTF-8" "locale" OFF "uz_UZ ISO-8859-1" "locale" OFF "uz_UZ@cyrillic UTF-8" "locale" OFF "ve_ZA UTF-8" "locale" OFF "vi_VN UTF-8" "locale" OFF "wa_BE ISO-8859-1" "locale" OFF "wa_BE@euro ISO-8859-15" "locale" OFF "wa_BE.UTF-8 UTF-8" "locale" OFF "wae_CH UTF-8" "locale" OFF "wal_ET UTF-8" "locale" OFF "wo_SN UTF-8" "locale" OFF "xh_ZA.UTF-8 UTF-8" "locale" OFF "xh_ZA ISO-8859-1" "locale" OFF "yi_US.UTF-8 UTF-8" "locale" OFF "yi_US CP1255" "locale" OFF "yo_NG UTF-8" "locale" OFF "yue_HK UTF-8" "locale" OFF "yuw_PG UTF-8" "locale" OFF "zh_CN.GB18030 GB18030" "locale" OFF "zh_CN.GBK GBK" "locale" OFF "zh_CN.UTF-8 UTF-8" "locale" OFF "zh_CN GB2312" "locale" OFF "zh_HK.UTF-8 UTF-8" "locale" OFF "zh_HK BIG5-HKSCS" "locale" OFF "zh_SG.UTF-8 UTF-8" "locale" OFF "zh_SG.GBK GBK" "locale" OFF "zh_SG GB2312" "locale" OFF "zh_TW.EUC-TW EUC-TW" "locale" OFF "zh_TW.UTF-8 UTF-8" "locale" OFF "zh_TW BIG5" "locale" OFF "zu_ZA.UTF-8 UTF-8" "locale" OFF "zu_ZA ISO-8859-1" "locale" OFF)
-	if [ -n "$NEW_LOCALE" ]; then
-	  echo "LOCALE=\"$NEW_LOCALE\"" >> $SETTINGS_FILE
-	else
-	  echo "LOCALE=\"$LOCALE\"" >> $SETTINGS_FILE
-	fi
-	NEW_KEYMAP=$(whiptail --radiolist "Check only 1 locale with [space] and select with [enter]" 40 60 30 --title "keymap" 3>&1 1>&2 2>&3 \
-	"ANSI-dvorak" "keymap" OFF "amiga-de" "keymap" OFF "amiga-us" "keymap" OFF "applkey" "keymap" OFF "atari-de" "keymap" OFF "atari-se" "keymap" OFF "atari-uk-falcon" "keymap" OFF "atari-us" "keymap" OFF "azerty" "keymap" OFF "backspace" "keymap" OFF "bashkir" "keymap" OFF "be-latin1" "keymap" OFF "bg-cp1251" "keymap" OFF "bg-cp855" "keymap" OFF "bg_bds-cp1251" "keymap" OFF "bg_bds-utf8" "keymap" OFF "bg_pho-cp1251" "keymap" OFF "bg_pho-utf8" "keymap" OFF "br-abnt" "keymap" OFF "br-abnt2" "keymap" OFF "br-latin1-abnt2" "keymap" OFF "br-latin1-us" "keymap" OFF "by" "keymap" OFF "by-cp1251" "keymap" OFF "bywin-cp1251" "keymap" OFF "carpalx" "keymap" OFF "carpalx-full" "keymap" OFF "cf" "keymap" OFF "colemak" "keymap" OFF "croat" "keymap" OFF "ctrl" "keymap" OFF "cz" "keymap" OFF "cz-cp1250" "keymap" OFF "cz-lat2" "keymap" OFF "cz-lat2-prog" "keymap" OFF "cz-qwertz" "keymap" OFF "cz-us-qwertz" "keymap" OFF "de" "keymap" OFF "de-latin1" "keymap" OFF "de-latin1-nodeadkeys" "keymap" OFF "de-mobii" "keymap" OFF "de_CH-latin1" "keymap" OFF "de_alt_UTF-8" "keymap" OFF "defkeymap" "keymap" OFF "defkeymap_V1.0" "keymap" OFF "dk" "keymap" OFF "dk-latin1" "keymap" OFF "dvorak" "keymap" OFF "dvorak-ca-fr" "keymap" OFF "dvorak-es" "keymap" OFF "dvorak-fr" "keymap" OFF "dvorak-l" "keymap" OFF "dvorak-la" "keymap" OFF "dvorak-programmer" "keymap" OFF "dvorak-r" "keymap" OFF "dvorak-ru" "keymap" OFF "dvorak-sv-a1" "keymap" OFF "dvorak-sv-a5" "keymap" OFF "dvorak-uk" "keymap" OFF "emacs" "keymap" OFF "emacs2" "keymap" OFF "es" "keymap" OFF "es-cp850" "keymap" OFF "es-olpc" "keymap" OFF "et" "keymap" OFF "et-nodeadkeys" "keymap" OFF "euro" "keymap" OFF "euro1" "keymap" OFF "euro2" "keymap" OFF "fi" "keymap" OFF "fr" "keymap" OFF "fr-bepo" "keymap" OFF "fr-bepo-latin9" "keymap" OFF "fr-latin1" "keymap" OFF "fr-latin9" "keymap" OFF "fr-pc" "keymap" OFF "fr_CH" "keymap" OFF "fr_CH-latin1" "keymap" OFF "gr" "keymap" OFF "gr-pc" "keymap" OFF "hu" "keymap" OFF "hu101" "keymap" OFF "il" "keymap" OFF "il-heb" "keymap" OFF "il-phonetic" "keymap" OFF "is-latin1" "keymap" OFF "is-latin1-us" "keymap" OFF "it" "keymap" OFF "it-ibm" "keymap" OFF "it2" "keymap" OFF "jp106" "keymap" OFF "kazakh" "keymap" OFF "keypad" "keymap" OFF "ky_alt_sh-UTF-8" "keymap" OFF "kyrgyz" "keymap" OFF "la-latin1" "keymap" OFF "lt" "keymap" OFF "lt.baltic" "keymap" OFF "lt.l4" "keymap" OFF "lv" "keymap" OFF "lv-tilde" "keymap" OFF "mac-be" "keymap" OFF "mac-de-latin1" "keymap" OFF "mac-de-latin1-nodeadkeys" "keymap" OFF "mac-de_CH" "keymap" OFF "mac-dk-latin1" "keymap" OFF "mac-dvorak" "keymap" OFF "mac-es" "keymap" OFF "mac-euro" "keymap" OFF "mac-euro2" "keymap" OFF "mac-fi-latin1" "keymap" OFF "mac-fr" "keymap" OFF "mac-fr_CH-latin1" "keymap" OFF "mac-it" "keymap" OFF "mac-pl" "keymap" OFF "mac-pt-latin1" "keymap" OFF "mac-se" "keymap" OFF "mac-template" "keymap" OFF "mac-uk" "keymap" OFF "mac-us" "keymap" OFF "mk" "keymap" OFF "mk-cp1251" "keymap" OFF "mk-utf" "keymap" OFF "mk0" "keymap" OFF "nl" "keymap" OFF "nl2" "keymap" OFF "no" "keymap" OFF "no-dvorak" "keymap" OFF "no-latin1" "keymap" OFF "pc110" "keymap" OFF "pl" "keymap" OFF "pl1" "keymap" OFF "pl2" "keymap" OFF "pl3" "keymap" OFF "pl4" "keymap" OFF "pt-latin1" "keymap" OFF "pt-latin9" "keymap" OFF "pt-olpc" "keymap" OFF "ro" "keymap" OFF "ro_std" "keymap" OFF "ro_win" "keymap" OFF "ru" "keymap" OFF "ru-cp1251" "keymap" OFF "ru-ms" "keymap" OFF "ru-yawerty" "keymap" OFF "ru1" "keymap" OFF "ru2" "keymap" OFF "ru3" "keymap" OFF "ru4" "keymap" OFF "ru_win" "keymap" OFF "ruwin_alt-CP1251" "keymap" OFF "ruwin_alt-KOI8-R" "keymap" OFF "ruwin_alt-UTF-8" "keymap" OFF "ruwin_alt_sh-UTF-8" "keymap" OFF "ruwin_cplk-CP1251" "keymap" OFF "ruwin_cplk-KOI8-R" "keymap" OFF "ruwin_cplk-UTF-8" "keymap" OFF "ruwin_ct_sh-CP1251" "keymap" OFF "ruwin_ct_sh-KOI8-R" "keymap" OFF "ruwin_ct_sh-UTF-8" "keymap" OFF "ruwin_ctrl-CP1251" "keymap" OFF "ruwin_ctrl-KOI8-R" "keymap" OFF "ruwin_ctrl-UTF-8" "keymap" OFF "se-fi-ir209" "keymap" OFF "se-fi-lat6" "keymap" OFF "se-ir209" "keymap" OFF "se-lat6" "keymap" OFF "sg" "keymap" OFF "sg-latin1" "keymap" OFF "sg-latin1-lk450" "keymap" OFF "sk-prog-qwerty" "keymap" OFF "sk-prog-qwertz" "keymap" OFF "sk-qwerty" "keymap" OFF "sk-qwertz" "keymap" OFF "slovene" "keymap" OFF "sr-cy" "keymap" OFF "sun-pl" "keymap" OFF "sun-pl-altgraph" "keymap" OFF "sundvorak" "keymap" OFF "sunkeymap" "keymap" OFF "sunt4-es" "keymap" OFF "sunt4-fi-latin1" "keymap" OFF "sunt4-no-latin1" "keymap" OFF "sunt5-cz-us" "keymap" OFF "sunt5-de-latin1" "keymap" OFF "sunt5-es" "keymap" OFF "sunt5-fi-latin1" "keymap" OFF "sunt5-fr-latin1" "keymap" OFF "sunt5-ru" "keymap" OFF "sunt5-uk" "keymap" OFF "sunt5-us-cz" "keymap" OFF "sunt6-uk" "keymap" OFF "sv-latin1" "keymap" OFF "tj_alt-UTF8" "keymap" OFF "tr_f-latin5" "keymap" OFF "tr_q-latin5" "keymap" OFF "tralt" "keymap" OFF "trf" "keymap" OFF "trf-fgGIod" "keymap" OFF "trq" "keymap" OFF "ttwin_alt-UTF-8" "keymap" OFF "ttwin_cplk-UTF-8" "keymap" OFF "ttwin_ct_sh-UTF-8" "keymap" OFF "ttwin_ctrl-UTF-8" "keymap" OFF "ua" "keymap" OFF "ua-cp1251" "keymap" OFF "ua-utf" "keymap" OFF "ua-utf-ws" "keymap" OFF "ua-ws" "keymap" OFF "uk" "keymap" OFF "unicode" "keymap" OFF "us" "keymap" OFF "us-acentos" "keymap" OFF "wangbe" "keymap" OFF "wangbe2" "keymap" OFF "windowkeys" "keymap" OFF)
-	if [ -n "$NEW_KEYMAP" ]; then
-		echo "KEYMAP=\"$NEW_KEYMAP\"" >> $SETTINGS_FILE
-	else
-		echo "KEYMAP=\"$KEYMAP\"" >> $SETTINGS_FILE
-	fi
-}
+# Keymap
+	KEYMAP=$(whiptail --radiolist "select=[space], continue=[enter]" 40 60 30 --title "keymap" 3>&1 1>&2 2>&3 "ANSI-dvorak" "keymap" OFF "amiga-de" "keymap" OFF "amiga-us" "keymap" OFF "applkey" "keymap" OFF "atari-de" "keymap" OFF "atari-se" "keymap" OFF "atari-uk-falcon" "keymap" OFF "atari-us" "keymap" OFF "azerty" "keymap" OFF "backspace" "keymap" OFF "bashkir" "keymap" OFF "be-latin1" "keymap" OFF "bg-cp1251" "keymap" OFF "bg-cp855" "keymap" OFF "bg_bds-cp1251" "keymap" OFF "bg_bds-utf8" "keymap" OFF "bg_pho-cp1251" "keymap" OFF "bg_pho-utf8" "keymap" OFF "br-abnt" "keymap" OFF "br-abnt2" "keymap" OFF "br-latin1-abnt2" "keymap" OFF "br-latin1-us" "keymap" OFF "by" "keymap" OFF "by-cp1251" "keymap" OFF "bywin-cp1251" "keymap" OFF "carpalx" "keymap" OFF "carpalx-full" "keymap" OFF "cf" "keymap" OFF "colemak" "keymap" OFF "croat" "keymap" OFF "ctrl" "keymap" OFF "cz" "keymap" OFF "cz-cp1250" "keymap" OFF "cz-lat2" "keymap" OFF "cz-lat2-prog" "keymap" OFF "cz-qwertz" "keymap" OFF "cz-us-qwertz" "keymap" OFF "de" "keymap" OFF "de-latin1" "keymap" OFF "de-latin1-nodeadkeys" "keymap" OFF "de-mobii" "keymap" OFF "de_CH-latin1" "keymap" OFF "de_alt_UTF-8" "keymap" OFF "defkeymap" "keymap" OFF "defkeymap_V1.0" "keymap" OFF "dk" "keymap" OFF "dk-latin1" "keymap" OFF "dvorak" "keymap" OFF "dvorak-ca-fr" "keymap" OFF "dvorak-es" "keymap" OFF "dvorak-fr" "keymap" OFF "dvorak-l" "keymap" OFF "dvorak-la" "keymap" OFF "dvorak-programmer" "keymap" OFF "dvorak-r" "keymap" OFF "dvorak-ru" "keymap" OFF "dvorak-sv-a1" "keymap" OFF "dvorak-sv-a5" "keymap" OFF "dvorak-uk" "keymap" OFF "emacs" "keymap" OFF "emacs2" "keymap" OFF "es" "keymap" OFF "es-cp850" "keymap" OFF "es-olpc" "keymap" OFF "et" "keymap" OFF "et-nodeadkeys" "keymap" OFF "euro" "keymap" OFF "euro1" "keymap" OFF "euro2" "keymap" OFF "fi" "keymap" OFF "fr" "keymap" OFF "fr-bepo" "keymap" OFF "fr-bepo-latin9" "keymap" OFF "fr-latin1" "keymap" OFF "fr-latin9" "keymap" OFF "fr-pc" "keymap" OFF "fr_CH" "keymap" OFF "fr_CH-latin1" "keymap" OFF "gr" "keymap" OFF "gr-pc" "keymap" OFF "hu" "keymap" OFF "hu101" "keymap" OFF "il" "keymap" OFF "il-heb" "keymap" OFF "il-phonetic" "keymap" OFF "is-latin1" "keymap" OFF "is-latin1-us" "keymap" OFF "it" "keymap" OFF "it-ibm" "keymap" OFF "it2" "keymap" OFF "jp106" "keymap" OFF "kazakh" "keymap" OFF "keypad" "keymap" OFF "ky_alt_sh-UTF-8" "keymap" OFF "kyrgyz" "keymap" OFF "la-latin1" "keymap" OFF "lt" "keymap" OFF "lt.baltic" "keymap" OFF "lt.l4" "keymap" OFF "lv" "keymap" OFF "lv-tilde" "keymap" OFF "mac-be" "keymap" OFF "mac-de-latin1" "keymap" OFF "mac-de-latin1-nodeadkeys" "keymap" OFF "mac-de_CH" "keymap" OFF "mac-dk-latin1" "keymap" OFF "mac-dvorak" "keymap" OFF "mac-es" "keymap" OFF "mac-euro" "keymap" OFF "mac-euro2" "keymap" OFF "mac-fi-latin1" "keymap" OFF "mac-fr" "keymap" OFF "mac-fr_CH-latin1" "keymap" OFF "mac-it" "keymap" OFF "mac-pl" "keymap" OFF "mac-pt-latin1" "keymap" OFF "mac-se" "keymap" OFF "mac-template" "keymap" OFF "mac-uk" "keymap" OFF "mac-us" "keymap" OFF "mk" "keymap" OFF "mk-cp1251" "keymap" OFF "mk-utf" "keymap" OFF "mk0" "keymap" OFF "nl" "keymap" OFF "nl2" "keymap" OFF "no" "keymap" OFF "no-dvorak" "keymap" OFF "no-latin1" "keymap" OFF "pc110" "keymap" OFF "pl" "keymap" OFF "pl1" "keymap" OFF "pl2" "keymap" OFF "pl3" "keymap" OFF "pl4" "keymap" OFF "pt-latin1" "keymap" OFF "pt-latin9" "keymap" OFF "pt-olpc" "keymap" OFF "ro" "keymap" OFF "ro_std" "keymap" OFF "ro_win" "keymap" OFF "ru" "keymap" OFF "ru-cp1251" "keymap" OFF "ru-ms" "keymap" OFF "ru-yawerty" "keymap" OFF "ru1" "keymap" OFF "ru2" "keymap" OFF "ru3" "keymap" OFF "ru4" "keymap" OFF "ru_win" "keymap" OFF "ruwin_alt-CP1251" "keymap" OFF "ruwin_alt-KOI8-R" "keymap" OFF "ruwin_alt-UTF-8" "keymap" OFF "ruwin_alt_sh-UTF-8" "keymap" OFF "ruwin_cplk-CP1251" "keymap" OFF "ruwin_cplk-KOI8-R" "keymap" OFF "ruwin_cplk-UTF-8" "keymap" OFF "ruwin_ct_sh-CP1251" "keymap" OFF "ruwin_ct_sh-KOI8-R" "keymap" OFF "ruwin_ct_sh-UTF-8" "keymap" OFF "ruwin_ctrl-CP1251" "keymap" OFF "ruwin_ctrl-KOI8-R" "keymap" OFF "ruwin_ctrl-UTF-8" "keymap" OFF "se-fi-ir209" "keymap" OFF "se-fi-lat6" "keymap" OFF "se-ir209" "keymap" OFF "se-lat6" "keymap" OFF "sg" "keymap" OFF "sg-latin1" "keymap" OFF "sg-latin1-lk450" "keymap" OFF "sk-prog-qwerty" "keymap" OFF "sk-prog-qwertz" "keymap" OFF "sk-qwerty" "keymap" OFF "sk-qwertz" "keymap" OFF "slovene" "keymap" OFF "sr-cy" "keymap" OFF "sun-pl" "keymap" OFF "sun-pl-altgraph" "keymap" OFF "sundvorak" "keymap" OFF "sunkeymap" "keymap" OFF "sunt4-es" "keymap" OFF "sunt4-fi-latin1" "keymap" OFF "sunt4-no-latin1" "keymap" OFF "sunt5-cz-us" "keymap" OFF "sunt5-de-latin1" "keymap" OFF "sunt5-es" "keymap" OFF "sunt5-fi-latin1" "keymap" OFF "sunt5-fr-latin1" "keymap" OFF "sunt5-ru" "keymap" OFF "sunt5-uk" "keymap" OFF "sunt5-us-cz" "keymap" OFF "sunt6-uk" "keymap" OFF "sv-latin1" "keymap" OFF "tj_alt-UTF8" "keymap" OFF "tr_f-latin5" "keymap" OFF "tr_q-latin5" "keymap" OFF "tralt" "keymap" OFF "trf" "keymap" OFF "trf-fgGIod" "keymap" OFF "trq" "keymap" OFF "ttwin_alt-UTF-8" "keymap" OFF "ttwin_cplk-UTF-8" "keymap" OFF "ttwin_ct_sh-UTF-8" "keymap" OFF "ttwin_ctrl-UTF-8" "keymap" OFF "ua" "keymap" OFF "ua-cp1251" "keymap" OFF "ua-utf" "keymap" OFF "ua-utf-ws" "keymap" OFF "ua-ws" "keymap" OFF "uk" "keymap" OFF "unicode" "keymap" OFF "us" "keymap" OFF "us-acentos" "keymap" OFF "wangbe" "keymap" OFF "wangbe2" "keymap" OFF "windowkeys" "keymap" OFF)
 
-rollback () {
-	echo "-==unmounting drives==-"
-	if $NVME; then
-		umount ${TARGET_DRIVE}p1 /mnt/boot
-	else
-		umount ${TARGET_DRIVE}1 /mnt/boot
+# Packages
+	BASE="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vi which xfsprogs"
+	BASE_DEVEL="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
+	PACKAGES="$BASE $BASE_DEVEL $UI $DM $NVIDIA $AMD $CUSTOM_PACKAGES $OTHER_CUSTOM_PACKAGES mesa xorg-server os-prober networkmanager htop iftop iotop grub efibootmgr ntp hwloc"
+
+# DE/WM's
+	BUDGIE="budgie-desktop budgie-extras baobab cheese eog epiphany evince file-roller gedit gnome-backgrounds gnome-calculator gnome-calendar gnome-characters gnome-clocks gnome-color-manager gnome-contacts gnome-control-center nome-dictionary gnome-disk-utility gnome-documents gnome-font-viewer gnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orca rygel sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp gnome-boxes gnome-software simple-scan"
+	CINNAMON="cinnamon"
+	GNOME="baobab cheese eog epiphany evince file-roller gedit gnome-backgrounds gnome-calculator gnome-calendar gnome-characters gnome-clocks gnome-color-manager gnome-contacts gnome-control-center nome-dictionary gnome-disk-utility gnome-documents gnome-font-viewer gnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orca rygel sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp gnome-boxes gnome-software simple-scan accerciser brasero dconf-editor devhelp evolution five-or-more four-in-a-row gnome-builder gnome-chess gnome-devel-docs gnome-klotski gnome-mahjongg gnome-mines gnome-nettool gnome-nibbles gnome-robots gnome-sound-recorder gnome-sudoku gnome-taquin gnome-tetravex gnome-tweaks gnome-weather hitori iagno lightsoff nautilus-sendto polari quadrapassel swell-foop sysprof tali gedit-code-assistance gnome-code-assistance gnome-multi-writer gnome-recipes gnome-usage"
+	KDE="plasma-meta kde-applications-meta"
+	LXDE="gpicview lxappearance lxappearance-obconf lxde-common lxde-icon-theme lxhotkey lxinput lxlauncher lxmusic lxpanel lxrandr lxsession lxtask lxterminal openbox pcmanfm"
+	LXQT="lximage-qt lxqt-about lxqt-admin lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-openssh-askpass lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo lxqt-themes obconf-qt openbox pcmanfm-qt qterminal"
+	MATE="caja marco mate-backgrounds mate-control-center mate-desktop mate-icon-theme mate-menus mate-notification-daemon mate-panel mate-polkit mate-session-manager mate-settings-daemon mate-themes mate-user-guide atril caja-image-converter caja-open-terminal caja-sendto caja-share caja-wallpaper caja-xattr-tags engrampa eom mate-applets mate-calc mate-icon-theme-faenza mate-media mate-netbook mate-power-manager mate-screensaver mate-sensors-applet mate-system-monitor mate-terminal mate-user-share mate-utils mozo pluma"
+	XFCE="exo garcon gtk-xfce-engine thunar thunar-volman tumbler xfce4-appfinder xfce4-panel xfce4-power-manager xfce4-session xfce4-settings xfce4-terminal xfconf xfdesktop xfwm4 xfwm4-themes mousepad orage thunar-archive-plugin thunar-media-tags-plugin xfburn xfce4-artwork xfce4-battery-plugin xfce4-clipman-plugin xfce4-cpufreq-plugin xfce4-cpugraph-plugin xfce4-datetime-plugin xfce4-dict xfce4-diskperf-plugin xfce4-eyes-plugin xfce4-fsguard-plugin xfce4-genmon-plugin xfce4-mailwatch-plugin xfce4-mount-plugin xfce4-mpc-plugin xfce4-netload-plugin xfce4-notes-plugin xfce4-notifyd xfce4-pulseaudio-plugin xfce4-screenshooter xfce4-sensors-plugin xfce4-smartbookmark-plugin xfce4-systemload-plugin xfce4-taskmanager xfce4-time-out-plugin xfce4-timer-plugin xfce4-verve-plugin xfce4-wavelan-plugin xfce4-weather-plugin xfce4-xkb-plugin parole ristretto xfce4-whiskermenu-plugin"
+	I3WM="i3-gaps rofi"
+
+	if [ "$INTERFACE" == "BUDGIE" ]; then
+		UI="$BUDGIE"
+	elif [ "$INTERFACE" == "CINNAMON" ]; then
+		UI="$CINNAMON"
+	elif [ "$INTERFACE" == "GNOME" ]; then
+		UI="$GNOME"
+	elif [ "$INTERFACE" == "KDE" ]; then
+		UI="$KDE"
+	elif [ "$INTERFACE" == "LXDE" ]; then
+		UI="$LXDE"
+	elif [ "$INTERFACE" == "LXQT" ]; then
+		UI="$LXQT"
+	elif [ "$INTERFACE" == "MATE" ]; then
+		UI="$MATE"
+	elif [ "$INTERFACE" == "XFCE" ]; then
+		UI="$XFCE"
+	elif [ "$INTERFACE" == "I3WM" ]; then
+		UI="$I3WM"
+	elif [ "$INTERFACE" == "NODEORWM" ]; then
+		UI=""
 	fi
-	if $NVME; then
-		umount ${TARGET_DRIVE}p2 /mnt/
-	else
-		umount ${TARGET_DRIVE}2 /mnt/
+
+# DM's
+	GDM="gdm"
+	LIGHTDM="lightdm lightdm-gtk-greeter"
+	LXDM="lxdm"
+	SDDM="sddm"
+
+	if [ "$DISPLAYMANAGER" == "GDM" ]; then
+		DM="$GDM"
+	elif [ "$DISPLAYMANAGER" == "SDDM" ]; then
+		DM="$SDDM"
+	elif [ "$DISPLAYMANAGER" == "GDM" ]; then
+		DM="$GDM"
+	elif [ "$DISPLAYMANAGER" == "NODM" ]; then
+		DM="$NODM"
 	fi
-}
 
-ranknewmirrors () {
-	echo "-==installing neccesarry packages to rank mirrors==-"
-	pacman -Sy
-	pacman -S --noconfirm pacman-contrib
-	echo "-==backing up old mirrorlist==-"
-	cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-	echo "-==creating list of 5 fastest Mirrors for $COUNTRY this might take a bit==-"
-	curl -s "https://www.archlinux.org/mirrorlist/?country=$COUNTRY&protocol=https&use_mirror_status=on" | sed -e 's/^#S/S/' | rankmirrors -n 5 - > /etc/pacman.d/mirrorlist
-	echo "-==new mirrorlist created==-"
-}
+# Nvidia (i)GPU
+	if $(lspci | grep -i "VGA compatible controller: NVIDIA Corporation" > /dev/null 2>&1); then
+		echo "nVIDIA (i)GPU found, drivers will be installed"
+		NVIDIA="nvidia nvidia-utils nvidia-settings"
+	else
+		NVIDIA=""
+	fi
 
+# AMD (i)GPU
+	if $(lspci | grep -i "VGA compatible controller: Advanced Micro Devices" > /dev/null 2>&1); then
+		echo "AMD (i)GPU found, drivers will be installed"
+		AMD="xf86-video-amdgpu vulkan-radeon libva-mesa-driver"
+	else
+		AMD=""
+	fi
 
-install_arch () {
 	echo "-==Starting Arch Installation==-"
 	timedatectl set-ntp true
-	echo "-==checking is system is capeable of EFI==-"
+	echo "-==checking if system is capeable of EFI==-"
 	if ls /sys/firmware/efi/efivars > /dev/null 2>&1; then
 		EFI=true
 	else
@@ -196,7 +161,7 @@ install_arch () {
 	fi
 	echo "-==set password for root==-"
 	read ROOTPASSWD
-	echo "-==set password for $EXTRAUSER==-"
+	echo "-==set password for $USERNAME==-"
 	read USERPASSWD
 	echo "-==Formatting drives/partitions==-"
 	sgdisk -og ${TARGET_DRIVE}
@@ -251,175 +216,72 @@ install_arch () {
 		fi
 	fi
 
-	##################################################
-	################# (i)GPU drivers #################
-
-	if $(lspci | grep -i "VGA compatible controller: NVIDIA Corporation" > /dev/null 2>&1); then
-		echo "nVIDIA GPU found, nvidia drivers will be installed"
-		NVIDIA="nvidia nvidia-utils nvidia-settings"
+# Install packages
+	echo "-==Installing base packages==-"
+	if [[ "$INTERFACE" == KDE && "$DISPLAYMANAGER" == "$SDDM" ]]; then
+  	pacstrap /mnt ${PACKAGES} sddm-kcm
 	else
-		NVIDIA=""
+		pacstrap /mnt ${PACKAGES}
 	fi
 
-	if $(lspci | grep -i "VGA compatible controller: Advanced Micro Devices" > /dev/null 2>&1); then
-		echo "AMD GPU found, amdgpu drivers will be installed"
-		AMD="xf86-video-amdgpu vulkan-radeon libva-mesa-driver"
-	else
-		AMD=""
+	cp $0 /mnt/root/
+	chmod 777 /mnt/root/$0
+
+# Encrypt drive
+	if $ENCRYPT_DRIVE; then
+		echo "-==configuring mkinitcpio.conf and grub config for encryption==-"
+		sed -i "s/^HOOKS=.*/HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)/" /mnt/etc/mkinitcpio.conf
+		sed -ir "s/^GRUB_CMDLINE_LINUX_DEFAULT=\"([^\s\s]*)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 cryptdevice=UUID=device-UUID:cryptroot$(if $SSD; then echo ":allow-discards"; fi) root=\/dev\/mapper\/cryptroot\"/" /mnt/etc/default/grub
 	fi
 
-##################################################
-############## DE/WM & DM Packages ###############
-GNOME="apache appstream-glib apr apr-util augeas brltty bubblewrap cdrtools celt celt0.5.1 ceph-libs cifs-utils clutter clutter-gst clutter-gtk cogl colord-sane cups-pk-helper dleyna-connector-dbus dleyna-core dleyna-renderer dleyna-server dotconf espeak evolution evolution-data-server faac folks freerdp frei0r-plugins gamin gavl gcab geocode-glib gfbgraph gjs glusterfs gmime3 gnome-autoar gnome-bluetooth gnome-desktop gnome-online-accounts gnome-online-minersgom gperftools grilo gsound gspell gssdp gst-plugins-bad gtk-vnc gtkspell3 gupnp gupnp-av gupnp-dlna js60 ladspa ldb leveldb libao libbs2b libbsd libcacard libchamplain libcryptui libcue libdazzle libdc1394 libdmapsharing libdvdnav libdvdread libfdk-aac libgdata libgdm libgee libgepub libgme libgovirt libgrss libgsf libgtop libgweather libgxps libieee1284 libiptcdata liblouis libmediaart libmms libmp4v2 libmusicbrainz5 libnautilus-extension libnfs libnice liboauth libofa libosinfo libpackagekit-glib libpeas libphonenumber libpst libpwquality libquvi libquvi-scripts libspeechd libsrtp libstemmer libsynctex liburcu libvirt libvirt-glib libvncserver libwbclient libytnef libzapojit lua52 lua52-bitop lua52-expat lua52-lpeg lua52-luajson lua52-socket mjpegtools mod_dnssd mtools nautilus-sendto net-snmp netcf numactl oath-toolkit osinfo-db phodav pipewire portaudio pulseaudio-alsa pulseaudio-bluetooth python-atspi python-xdg qemu rpcbind rtmpdump sane sbc seabios shared-color-targets smbclient spandsp speech-dispatcher spice spice-gtk srt t1lib talloc tcl telepathy-glib tevent totem-plparser usbredir vde2 virglrenderer wildmidi yajl zip zvbi baobab cheese eog epiphany evince file-rollergdm gedit gnome-backgroundsgnome-boxes gnome-calculator gnome-calendar gnome-charactersgnome-clocks gnome-color-managergnome-contacts gnome-control-center gnome-dictionary gnome-disk-utility gnome-documents gnome-font-viewergnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-software gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orcarygel simple-scan sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp appstream-glib bind-tools bubblewrap cdrdao cdrtools clutter clutter-gtk cogl ctags dvd+rw-tools evolution-data-server flatpak gcab gedit geocode-glib geoip geoip-database gjs gnome-autoar gnome-desktop gnome-online-accounts gnome-settings-daemon gspell gtksourceview4 gtkspell3 idnkit ipython js60 jsonrpc-glib libao libcryptui libdazzle libgdata libgee libgit2 libgit2-glib libgnome-games-support libgsf libgtop libgweather libnautilus-extension liboauth libpeas-1.22.0-3 libphonenumber libpst libquvi libquvi-scripts libstemmer libytnef lua52 lua52-bitop lua52-expat lua52-lpeg lua52-luajson lua52-socket nautilus ostree pipewire pulseaudio-alsa python-astroid python-atspi python-babel python-decorator python-docutils python-imagesize python-isort python-jedi python-jinja python-lazy-object-proxy python-mccabe python-parso python-pickleshare python-prompt_toolkit python-pycodestyle python-pyflakes python-pylint python-pytz python-simplejson python-snowballstemmer python-sphinx python-sphinx-alabaster-theme python-sphinx_rtd_theme python-sphinxcontrib-websupport python-sqlalchemy python-traitlets python-wcwidth python-whoosh python-wrapt qqwing ruby-dbus sbc telepathy-glib telepathy-idle telepathy-logger telepathy-mission-control template-glib totem-plparser tracker whois xdg-dbus-proxy xdg-desktop-portal xdg-desktop-portal-gtk yelp accerciser brasero dconf-editor devhelp evolution five-or-more four-in-a-row gedit-code-assistance gnome-builder gnome-chess gnome-code-assistance gnome-devel-docs gnome-klotski gnome-mahjongg gnome-mines gnome-multi-writer gnome-nettool gnome-nibbles gnome-recipes gnome-robots gnome-sound-recorder gnome-sudoku gnome-taquin gnome-tetravex gnome-tweaks gnome-usage gnome-weather hitori iagno lightsoff nautilus-sendto polari quadrapassel swell-foop sysprof tali"
+# Generate fstab
+	echo "-==Generating FS Tab==-"
+	genfstab -U /mnt >> /mnt/etc/fstab
 
-XFCE="exo garcon gtk-xce-engine mousepad orage parole ristretto thunar thunar-archive-plugin thunar-media-tags-plugin thunar-volman tumbler xburn xce4-appinder xce4-artwork xce4-battery-plugin xce4-clipman-plugin xce4-cpureq-plugin xce4-cpugraph-plugin xce4-datetime-plugin xce4-dict xce4-diskper-plugin xce4-eyes-plugin xce4-sguard-plugin xce4-genmon-plugin xce4-mailwatch-plugin xce4-mount-plugin xce4-mpc-plugin xce4-netload-plugin xce4-notes-plugin xce4-notiyd xce4-panel xce4-power-manager xce4-pulseaudio-plugin xce4-screenshooter xce4-sensors-plugin xce4-session xce4-settings xce4-smartbookmark-plugin xce4-systemload-plugin xce4-taskmanager xce4-terminal xce4-time-out-plugin xce4-timer-plugin xce4-verve-plugin xce4-wavelan-plugin xce4-weather-plugin xce4-whiskermenu-plugin xce4-xkb-plugin xcon xdesktop2 xwm4 xwm4-themes"
+# Configure timezone
+	echo "-==Configuring Time Zone==-"
+	arch-chroot /mnt ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
+	arch-chroot /mnt hwclock --systohc
 
-KDE="akonadi akonadi-calendar akonadi-contacts akonadi-mime akonadi-notes akonadi-search analitza appstream appstream-qt archlinux-appstream-data audioile avogadrolibs baloo baloo-widgets bc bluez-qt breeze-icons calendarsupport celt citsio cis-utils convertlit cronie ebook-tools editorconig-core-c eventviews aac arstream luidsynth rameworkintegration reecell-solver gamin gdb gdb-common gnugo grantlee grantleetheme gst-plugins-bad guile2.0 id3lib incidenceeditor kactivities-stats kalarmcal kcachegrind-common kcalcore kcalutils kcontacts kdav kded kdeedu-data kdelibs4support kdepim-apps-libs kdepim-runtime kdesu kdevelop kdiagram kdnssd kdoctools kemoticons kilemetadata kholidays khtml kidentitymanagement kidletime kimap kinit kirigami2 kitinerary kjsembed kldap kmailtransport kmbox kmime knewstu knotiyconig kontactinterace kpeople kpimtextedit kpkpass kplotting kqtquickcharts kross krunner ksmtp ktexteditor ktne kunitconversion kwayland kxmlrpcclient ladspa ldb libbs2b libbsd libdc1394 libdmtx libdvdnav libdvdread libebur128 libdk-aac libgit2 libgme libgravatar libieee1284 libkcddb libkcompactdisc libkdcraw libkdegames libkdepim libkeduvocdocument libkgapi libkipi libkleo libkmahjongg libkolabxml libkomparedi2 libksane libksieve libmariadbclient libmbim libmms libmp4v2 libmsym libmusicbrainz5 libnice liboa libotr libpwquality libqaccessibilityclient libqalculate libqmi libsignon-glib libsrtp libstemmer libvncserver libwbclient libzip lmdb mailcommon mailimporter marble-common mariadb mariadb-clients messagelib mjpegtools mlt modemmanager modemmanager-qt molequeue net-snmp networkmanager-qt openbabel pimcommon pipewire plasma-ramework portaudio ppp prison pyqt5-common python-attrs python-automat python-click python-constantly python-hyperlink python-incremental python-pyhamcrest python-pyqt5 python-sip-pyqt5 python-twisted python-zope-interace qgpgme qhull qqc2-desktop-style qt-gstreamer qt5-graphicaleects qt5-quickcontrols qt5-quickcontrols2 qt5-webengine rtmpdump sane sbc smbclient socat spandsp spglib srt syndication syntax-highlighting talloc telepathy-accounts-signon telepathy-arstream telepathy-glib telepathy-logger telepathy-logger-qt telepathy-mission-control telepathy-qt tevent tt-hack wildmidi xapian-core xcb-util-cursor xerces-c xorg-xmessage zvbi akonadi-calendar-tools akonadi-import-wizard akonadiconsole akregator ark artikulate audiocd-kio blinken bluedevil bomber bovo breeze breeze-gtk cantor cervisia discover dolphin dolphin-plugins dragon drkonqi mpegthumbs ilelight granatier grantlee-editor gwenview juk k3b kaccounts-integration kaccounts-providers kactivitymanagerd kaddressbook kajongg kalarm kalgebra kalzium kamera kamoso kanagram kapman kapptemplate kate katomic kbackup kblackbox kblocks kbounce kbreakout kbruch kcachegrind kcalc kcharselect kcolorchooser kcron kde-cli-tools kde-dev-scripts kde-dev-utils kde-gtk-conig kdebugsettings kdecoration kdegraphics-mobipocket kdenetwork-ilesharing kdenlive kdepim-addons kdeplasma-addons kdesdk-kioslaves kdesdk-thumbnailers kd kdialog kdiamond keditbookmarks kind kloppy kourinline kgamma5 kgeography kget kgoldrunner kgpg khangman khelpcenter khotkeys kig kigo killbots kimagemapeditor kinocenter kio-extras kiriki kiten kjumpingcube kleopatra klettres klickety klines kmag kmahjongg kmail kmail-account-wizard kmenuedit kmines kmousetool kmouth kmplot knavalbattle knetattach knetwalk knotes kol kollision kolourpaint kompare konqueror konquest konsole kontact kopete korganizer kpatience krdc kreversi krb kross-interpreters kruler kscreen kscreenlocker kshisen ksirk ksnakeduel kspaceduel ksquares ksshaskpass ksudoku ksysguard ksystemlog kteatime ktimer ktouch ktuberling kturtle kubrick kwallet-pam kwalletmanager kwave kwayland-integration kwin kwordquiz kwrite kwrited libkscreen libksysguard lokalize lskat marble mbox-importer milou minuet okular oxygen palapeli parley picmi pim-data-exporter pim-sieve-editor plasma-browser-integration plasma-desktop plasma-integration plasma-nm plasma-pa plasma-sdk plasma-vault plasma-workspace plasma-workspace-wallpapers polkit-kde-agent powerdevil poxml print-manager rocs signon-kwallet-extension spectacle step sweeper systemsettings telepathy-kde-accounts-kcm telepathy-kde-approver telepathy-kde-auth-handler telepathy-kde-call-ui telepathy-kde-common-internals telepathy-kde-contact-list telepathy-kde-contact-runner telepathy-kde-desktop-applets telepathy-kde-iletranser-handler telepathy-kde-integration-module telepathy-kde-send-ile telepathy-kde-text-ui umbrello user-manager xdg-desktop-portal-kde zerocon-ioslave"
+# Configure locale
+	echo "-==Configuring Locale==-"
+	echo "$LOCALE" >> /mnt/etc/locale.gen
+	arch-chroot /mnt locale-gen
+	echo "LANG=$(echo $LOCALE | cut -d' ' -f1)" >> /mnt/etc/locale.conf
+	echo "KEYMAP=$KEYMAP" >> /mnt/etc/vconsole.conf
 
-BUDGIE="budgie-desktop budgie-extras"
+# Add user
+	echo "-==Adding Normal User==-"
+	arch-chroot /mnt useradd -m -s /usr/bin/bash ${USERNAME}
+	echo "-==Set Password for $USERNAME==-"
+	arch-chroot /mnt /root/$0 password $USERPASSWD $USERNAME
+	echo "${USERNAME} ALL=(ALL) ALL" >> /mnt/etc/sudoers
 
-CINNAMON="cinnamon"
+# Set hostname
+	echo "-==Setting Hostname==-"
+	echo "${HOSTNAME}" > /mnt/etc/hostname
+	echo "127.0.0.1 localhost ${HOSTNAME}" >> /mnt/etc/hosts
 
-LXDE="gpicview lxappearance lxappearance-obconf lxde-common lxde-icon-theme lxhotkey lxinput lxlauncher lxmusic lxpanel lxrandr lxsession lxtask lxterminal openbox pcmanfm"
+# Install grub
+	echo "-==Installing GRUB==-"
+	arch-chroot /mnt mkinitcpio -p linux
+	arch-chroot /mnt grub-install $(if $EFI; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=${BOOTLOADER_ID}"; else echo "--target=i386-pc"; fi) --recheck $(if !$EFI; then echo "$TARGET_DRIVE"; fi)
+	echo "-==creating GRUB configuration==-"
+	arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
-LXQT="lximage-qt lxqt-about lxqt-admin lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-openssh-askpass lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo lxqt-themes obconf-qt openbox pcmanfm-qt qterminal"
-
-MATE=""
-
-I3WM="libev xcb-util-cursor xcb-util-xrm yajl i3-gaps"
-
-NODEORWM="" #leave empty
-
-LIGHTDM="lightdm lightdm-gtk-greeter" #Default of XFCE
-LXDM="lxdm" #Default of LXDE
-SDDM="sddm" #Default of KDE, LXQT
-GDM="" #Default of GNOME, CINNAMON
-NODM="" #leave empty
-
-if [ "$INTERFACE" == "XFCE" ]; then
-	UI="$XFCE"
-elif [ "$INTERFACE" == "KDE" ]; then
-	UI="$KDE"
-elif [ "$INTERFACE" == "GNOME" ]; then
-	UI="$GNOME"
-elif [ "$INTERFACE" == "I3WM" ]; then
-	UI="$I3WM"
-elif [ "$INTERFACE" == "NODEORWM" ]; then
-	UI="$NODEORWM"
-fi
-
-if [ "$DISPLAYMANAGER" == "LIGHTDM" ]; then
-	DM="$LIGHTDM"
-elif [ "$DISPLAYMANAGER" == "SDDM" ]; then
-	DM="$SDDM"
-elif [ "$DISPLAYMANAGER" == "GDM" ]; then
-	DM="$GDM"
-elif [ "$DISPLAYMANAGER" == "NODM" ]; then
-	DM="$NODM"
-fi
-
-##################################################
-################## Installation ##################
-
-PACKAGES="autoconf automake bash binutils bison bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs fakeroot file filesystem findutils flex gawk gcc gcc-libs gettext glibc grep groff gzip inetutils iproute2 iputils jfsutils less libtool licenses linux logrotate lvm2 m4 make man-db man-pages mdadm nano netctl pacman patch pciutils perl pkgconf procps-ng psmisc reiserfsprogs s-nail sed shadow sudo sysfsutils systemd systemd-sysvcompat tar texinfo usbutils util-linux vi which \ xfsprogs \
-$UI \
-$DM \
-$NVIDIA \
-$AMD \
-mesa \
-xorg-server \
-powerline-fonts \
-os-prober \
-git \
-networkmanager \
-wget \
-curl \
-unzip \
-p7zip \
-pulseaudio \
-htop \
-iftop \
-iotop \
-grub \
-efibootmgr \
-zsh \
-firefox \
-vlc \
-sudo \
-ntp \
-hwloc"
-
-echo "-==Installing base packages==-"
-pacstrap /mnt ${PACKAGES}
-
-if [ "$INTERFACE" = "KDE" ]; then
-	if [ "$DISPLAYMANAGER" = "SDDM"]; then
-		pacstrap /mnt sddm-kcm
+# Enable services
+	arch-chroot /mnt systemctl enable NetworkManager
+	if [ !$DISPLAYMANAGER = "NODM" ]; then
+		arch-chroot /mnt systemctl enable $DISPLAYMANAGER
 	fi
-fi
+	arch-chroot /mnt systemctl enable ntpd
+	echo "-==Setting password for root user==-"
+	arch-chroot /mnt /root/$0 password $ROOTPASSWD root
+	echo "-==Arch is ready to be used"
 
-cp $0 /mnt/root/
-chmod 777 /mnt/root/$0
-
-if $ENCRYPT_DRIVE; then
-	echo "-==configuring mkinitcpio.conf and grub config for encryption==-"
-	sed -i "s/^HOOKS=.*/HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)/" /mnt/etc/mkinitcpio.conf
-	sed -ir "s/^GRUB_CMDLINE_LINUX_DEFAULT=\"([^\s\s]*)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 cryptdevice=UUID=device-UUID:cryptroot$(if $SSD; then echo ":allow-discards"; fi) root=\/dev\/mapper\/cryptroot\"/" /mnt/etc/default/grub
-fi
-
-echo "-==Generating FS Tab==-"
-genfstab -U /mnt >> /mnt/etc/fstab
-
-echo "-==Configuring Time Zone==-"
-arch-chroot /mnt ln -sf /usr/share/zoneinfo/$TIMEZONE /etc/localtime
-arch-chroot /mnt hwclock --systohc
-
-echo "-==Configuring Locale==-"
-echo "$LOCALE" >> /mnt/etc/locale.gen
-arch-chroot /mnt locale-gen
-echo "LANG=$(echo $LOCALE | cut -d' ' -f1)" >> /mnt/etc/locale.conf
-echo "KEYMAP=$KEYMAP" >> /mnt/etc/vconsole.conf
-
-echo "-==Adding Normal User==-"
-arch-chroot /mnt useradd -m -s /usr/bin/bash ${EXTRAUSER}
-echo "-==Set Password for $EXTRAUSER==-"
-arch-chroot /mnt /root/$0 password $USERPASSWD $EXTRAUSER
-echo "${EXTRAUSER} ALL=(ALL) ALL" >> /mnt/etc/sudoers
-
-#echo "-==Installing Yay==-"
-#arch-chroot /mnt su - ${EXTRAUSER} -c "cd /tmp && git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si"
-#echo "-==Installing packages using yay==-"
-#arch-chroot /mnt su - ${EXTRAUSER} -c "yay -s obs-linuxbrowser"
-
-echo "-==Setting Hostname==-"
-echo "${HOSTNAME}" > /mnt/etc/hostname
-echo "127.0.0.1 localhost ${HOSTNAME}" >> /mnt/etc/hosts
-
-echo "-==Installing GRUB==-"
-arch-chroot /mnt mkinitcpio -p linux
-arch-chroot /mnt grub-install $(if $EFI; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=${BOOTLOADER_ID}"; else echo "--target=i386-pc"; fi) --recheck $(if !$EFI; then echo "$TARGET_DRIVE"; fi)
-echo "-==creating GRUB configuration==-"
-arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
-
-arch-chroot /mnt systemctl enable NetworkManager
-if [ !$DISPLAYMANAGER = "NODM" ]; then
-	arch-chroot /mnt systemctl enable $DISPLAYMANAGER
-fi
-arch-chroot /mnt systemctl enable ntpd
-echo "-==Setting password for root user==-"
-arch-chroot /mnt /root/$0 password $ROOTPASSWD root
-echo "-==Arch is ready to be used"
-
-}
-
-password () {
-	echo -e "$2\n$2" | passwd "$3"
-}
-
-startover () {
-	rollback
-	install_arch
-}
+	password () {
+		echo -e "$2\n$2" | passwd "$3"
+	}
 
 for arg in "$@"
 do
