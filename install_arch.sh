@@ -123,6 +123,8 @@
 		DM="$SDDM"
 	elif [ "$DISPLAYMANAGER" == "GDM" ]; then
 		DM="$GDM"
+	elif [ "$DISPLAYMANAGER" == "LIGHTDM" ]; then
+		DM="$LIGHTDM"
 	elif [ "$DISPLAYMANAGER" == "NODM" ]; then
 		DM=""
 	fi
