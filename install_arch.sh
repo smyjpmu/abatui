@@ -129,19 +129,19 @@
 	fi
 
 # DM's
-	gdm="gdm"
-	lightdm="lightdm lightdm-gtk-greeter"
-	lxdm="lxdm"
-	sddm="sddm"
+	GDM="gdm"
+	LIGHTDM="lightdm lightdm-gtk-greeter"
+	LXDM="lxdm"
+	SDDM="sddm"
 
 	if [ "$DISPLAYMANAGER" == "GDM" ]; then
-		DM="$gdm"
+		DM="$GDM"
 	elif [ "$DISPLAYMANAGER" == "SDDM" ]; then
-		DM="$sddm"
+		DM="$SDDM"
 	elif [ "$DISPLAYMANAGER" == "LXDM" ]; then
-		DM="$lxdm"
+		DM="$LXDM"
 	elif [ "$DISPLAYMANAGER" == "LIGHTDM" ]; then
-		DM="$lightdm"
+		DM="$LIGHTDM"
 	elif [ "$DISPLAYMANAGER" == "NODM" ]; then
 		DM=""
 	fi
@@ -305,4 +305,4 @@
 	fi
 	arch-chroot /mnt systemctl enable ntpd
 
-	echo "-==Arch is ready to be used"
+	echo "-==Arch is ready to be used==-"
