@@ -55,7 +55,7 @@
 	DISPLAYMANAGER=$(whiptail --menu "select=[ENTER]" 12 50 5 --title "display manager" 3>&1 1>&2 2>&3 "nodm" "Comes with nothing and is nothing." "gdm" "Recommended for Budgie & Gnome." "lightdm" "Recommended for XFCE." "lxdm" "Recommended for LXDE." "sddm" "Recommended for KDE & LXQT.")
 
 # Custom packages
-	CUSTOM_PACKAGES=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "unzip" "Unzip" ON "p7zip" "P7zip" ON "unrar" "Unrar" ON "curl" "Curl" ON "wget" "Wget" ON "pulseaudio" "Sound Server" ON "git" "Git" ON "powerline-fonts" "Fonts" ON "firefox" "Web Browser" ON "vlc" "Multimedia Player" ON "zsh" "Z Shell" ON)
+	CUSTOM_PACKAGES=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "unzip" "Unzip" ON "p7zip" "P7zip" ON "unrar" "Unrar" ON "curl" "Curl" ON "wget" "Wget" ON "pulseaudio" "Sound Server" ON "git" "Git" ON "powerline-fonts" "Fonts" ON "firefox" "Web Browser" ON "vlc" "Multimedia Player" ON "zsh" "Z Shell" ON "openvpn" "openvpn" ON "arandr" "arandr" ON "deluge" "torrent client" ON "gimp" "GNU image manipulation program" ON "audacity" "audio recorder/editor" ON "blender" "3D/video/games" ON "darktable" "picture editor" ON "inkscape" "vector editor" ON "krita" "drawing program" ON "libreoffice" "office suite" ON "steam" "game launcher" ON "ttf-dejavu" "font" ON "rxvt-unicode" "terminal" ON)
 
 # Other custom packages
 	OTHER_CUSTOM_PACKAGES=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "other custom packages" 3>&1 1>&2 2>&3)
@@ -165,7 +165,7 @@
 # Packages
 	BASE="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vi which xfsprogs"
 	BASE_DEVEL="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
-	PACKAGES="$DM $BASE $BASE_DEVEL $UI $CUSTOM_PACKAGES $OTHER_CUSTOM_PACKAGES mesa xorg-server os-prober networkmanager htop iftop iotop grub efibootmgr ntp hwloc"
+	PACKAGES="$BASE $BASE_DEVEL $DM $UI $CUSTOM_PACKAGES $OTHER_CUSTOM_PACKAGES mesa xorg-server os-prober networkmanager htop iftop iotop grub efibootmgr ntp hwloc"
 
 # unmounting drives
 	echo "-==unmounting drives==-"
