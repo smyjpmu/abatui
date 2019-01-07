@@ -1,7 +1,7 @@
 # Arch/BlackArch CLI Installer
 
-Currently supports XFCE, KDE, Gnome, i3-gaps and also an option for no DE/WM.
-You can choose what you want to install/use simply by selecting it.
+Currently supports Mate, LXDE, LXQT, XFCE, KDE, Gnome, i3-gaps aswell as no DE.
+You can choose what you want to install/use by simply selecting it.
 
 To run the scrip;
 `wget goo.gl/3wJsT8 && chmod +x installer.sh && ./installer.sh`
