@@ -49,13 +49,16 @@
 	fi
 
 # Interface
-	INTERFACE=$(whiptail --menu "select=[ENTER]" 18 80 10 --title "interface" 3>&1 1>&2 2>&3 "NODEORWM" "Comes with nothing and is nothing." "BUDGIE" "Modern design, focuses on simplicity and elegance." "CINNAMON" "Strives to provide a traditional user experience." "GNOME" "An attractive and intuitive desktop." "KDE" "Modern and familiar working environment." "LXDE" "Strives to be less CPU and RAM intensive." "LXQT" "Lightweight, modular, blazing-fast and user-friendly." "MATE" " Intuitive and attractive desktop using traditional metaphors." "XFCE" "Traditional UNIX philosophy of modularity and re-usability." "I3WM" "Primarily targeted at developers and advanced users")
+	INTERFACE=$(whiptail --menu "select=[ENTER]" 18 80 10 --title "interface" 3>&1 1>&2 2>&3 "nodeorwm" "Comes with nothing and is nothing." "budgie" "Modern design, focuses on simplicity and elegance." "cinnamon" "Strives to provide a traditional user experience." "gnome" "An attractive and intuitive desktop." "kde" "Modern and familiar working environment." "lxde" "Strives to be less CPU and RAM intensive." "lxqt" "Lightweight, modular, blazing-fast and user-friendly." "mate" " Intuitive and attractive desktop using traditional metaphors." "xfce" "Traditional UNIX philosophy of modularity and re-usability." "i3wm" "Primarily targeted at developers and advanced users")
 
 # Display manager
 	DISPLAYMANAGER=$(whiptail --menu "select=[ENTER]" 12 50 5 --title "display manager" 3>&1 1>&2 2>&3 "nodm" "Comes with nothing and is nothing." "gdm" "Recommended for Budgie & Gnome." "lightdm" "Recommended for XFCE." "lxdm" "Recommended for LXDE." "sddm" "Recommended for KDE & LXQT.")
 
+# BlackArch
+	BLACKARCH=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "BlackArch" 3>&1 1>&2 2>&3 "false" "Do not install BlackArch tools" "true" "Install BlackArch tools")
+
 # Custom packages
-	CUSTOM_PACKAGES=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "unzip" "Unzip" ON "p7zip" "P7zip" ON "unrar" "Unrar" ON "curl" "Curl" ON "wget" "Wget" ON "pulseaudio" "Sound Server" ON "git" "Git" ON "powerline-fonts" "Fonts" ON "firefox" "Web Browser" ON "vlc" "Multimedia Player" ON "zsh" "Z Shell" ON "openvpn" "openvpn" ON "arandr" "arandr" ON "deluge" "torrent client" ON "gimp" "GNU image manipulation program" ON "audacity" "audio recorder/editor" ON "blender" "3D/video/games" ON "darktable" "picture editor" ON "inkscape" "vector editor" ON "krita" "drawing program" ON "libreoffice" "office suite" ON "steam" "game launcher" ON "ttf-dejavu" "font" ON "rxvt-unicode" "terminal" ON)
+	CUSTOM_PACKAGES=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "firefox" "Web Browser" ON "libreoffice" "libreoffice" ON "deluge" "torrent manager" ON "gimp" "image manipulator" ON "audacity" "audio editor" ON "blender" "3d editor" ON "darktable" "photo editor" ON "inkscape" "vector editor" ON "krita" "drawing editor" ON "steam" "steam" ON "playonlinux" "wine manager" ON "lutris" "wine manager" ON)
 
 # Other custom packages
 	OTHER_CUSTOM_PACKAGES=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "other custom packages" 3>&1 1>&2 2>&3)
@@ -96,53 +99,38 @@
 	)
 
 # DE/WM's
-	BUDGIE="budgie-desktop budgie-extras baobab cheese eog epiphany evince file-roller gedit gnome-backgrounds gnome-calculator gnome-calendar gnome-characters gnome-clocks gnome-color-manager gnome-contacts gnome-control-center gnome-dictionary gnome-disk-utility gnome-documents gnome-font-viewer gnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orca rygel sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp gnome-boxes gnome-software simple-scan"
-	CINNAMON="cinnamon"
-	GNOME="baobab cheese eog epiphany evince file-roller gedit gnome-backgrounds gnome-calculator gnome-calendar gnome-characters gnome-clocks gnome-color-manager gnome-contacts gnome-control-center gnome-dictionary gnome-disk-utility gnome-documents gnome-font-viewer gnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orca rygel sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp gnome-boxes gnome-software simple-scan accerciser brasero dconf-editor devhelp evolution five-or-more four-in-a-row gnome-builder gnome-chess gnome-devel-docs gnome-klotski gnome-mahjongg gnome-mines gnome-nettool gnome-nibbles gnome-robots gnome-sound-recorder gnome-sudoku gnome-taquin gnome-tetravex gnome-tweaks gnome-weather hitori iagno lightsoff nautilus-sendto polari quadrapassel swell-foop sysprof tali gedit-code-assistance gnome-code-assistance gnome-multi-writer gnome-recipes gnome-usage"
-	KDE="plasma-meta kde-applications-meta"
-	LXDE="gpicview lxappearance lxappearance-obconf lxde-common lxde-icon-theme lxhotkey lxinput lxlauncher lxmusic lxpanel lxrandr lxsession lxtask lxterminal openbox pcmanfm"
-	LXQT="lximage-qt lxqt-about lxqt-admin lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-openssh-askpass lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo lxqt-themes obconf-qt openbox pcmanfm-qt qterminal"
-	MATE="caja marco mate-backgrounds mate-control-center mate-desktop mate-icon-theme mate-menus mate-notification-daemon mate-panel mate-polkit mate-session-manager mate-settings-daemon mate-themes mate-user-guide atril caja-image-converter caja-open-terminal caja-sendto caja-share caja-wallpaper caja-xattr-tags engrampa eom mate-applets mate-calc mate-icon-theme-faenza mate-media mate-netbook mate-power-manager mate-screensaver mate-sensors-applet mate-system-monitor mate-terminal mate-user-share mate-utils mozo pluma"
-	XFCE="exo garcon gtk-xfce-engine thunar thunar-volman tumbler xfce4-appfinder xfce4-panel xfce4-power-manager xfce4-session xfce4-settings xfce4-terminal xfconf xfdesktop xfwm4 xfwm4-themes mousepad orage thunar-archive-plugin thunar-media-tags-plugin xfburn xfce4-artwork xfce4-battery-plugin xfce4-clipman-plugin xfce4-cpufreq-plugin xfce4-cpugraph-plugin xfce4-datetime-plugin xfce4-dict xfce4-diskperf-plugin xfce4-eyes-plugin xfce4-fsguard-plugin xfce4-genmon-plugin xfce4-mailwatch-plugin xfce4-mount-plugin xfce4-mpc-plugin xfce4-netload-plugin xfce4-notes-plugin xfce4-notifyd xfce4-pulseaudio-plugin xfce4-screenshooter xfce4-sensors-plugin xfce4-smartbookmark-plugin xfce4-systemload-plugin xfce4-taskmanager xfce4-time-out-plugin xfce4-timer-plugin xfce4-verve-plugin xfce4-wavelan-plugin xfce4-weather-plugin xfce4-xkb-plugin parole ristretto xfce4-whiskermenu-plugin"
-	I3WM="i3-gaps rofi"
-
-	if [ "$INTERFACE" == "BUDGIE" ]; then
-		UI="$BUDGIE"
-	elif [ "$INTERFACE" == "CINNAMON" ]; then
-		UI="$CINNAMON"
-	elif [ "$INTERFACE" == "GNOME" ]; then
-		UI="$GNOME"
-	elif [ "$INTERFACE" == "KDE" ]; then
-		UI="$KDE"
-	elif [ "$INTERFACE" == "LXDE" ]; then
-		UI="$LXDE"
-	elif [ "$INTERFACE" == "LXQT" ]; then
-		UI="$LXQT"
-	elif [ "$INTERFACE" == "MATE" ]; then
-		UI="$MATE"
-	elif [ "$INTERFACE" == "XFCE" ]; then
-		UI="$XFCE"
-	elif [ "$INTERFACE" == "I3WM" ]; then
-		UI="$I3WM"
-	elif [ "$INTERFACE" == "NODEORWM" ]; then
-		UI=""
+	if [ "$INTERFACE" == "budgie" ]; then
+		DE="budgie-desktop budgie-extras baobab cheese eog epiphany evince file-roller gedit gnome-backgrounds gnome-calculator gnome-calendar gnome-characters gnome-clocks gnome-color-manager gnome-contacts gnome-control-center gnome-dictionary gnome-disk-utility gnome-documents gnome-font-viewer gnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orca rygel sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp gnome-boxes gnome-software simple-scan"
+	elif [ "$INTERFACE" == "cinnamon" ]; then
+		DE="cinnamon"
+	elif [ "$INTERFACE" == "gnome" ]; then
+		DE="baobab cheese eog epiphany evince file-roller gedit gnome-backgrounds gnome-calculator gnome-calendar gnome-characters gnome-clocks gnome-color-manager gnome-contacts gnome-control-center gnome-dictionary gnome-disk-utility gnome-documents gnome-font-viewer gnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orca rygel sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp gnome-boxes gnome-software simple-scan accerciser brasero dconf-editor devhelp evolution five-or-more four-in-a-row gnome-builder gnome-chess gnome-devel-docs gnome-klotski gnome-mahjongg gnome-mines gnome-nettool gnome-nibbles gnome-robots gnome-sound-recorder gnome-sudoku gnome-taquin gnome-tetravex gnome-tweaks gnome-weather hitori iagno lightsoff nautilus-sendto polari quadrapassel swell-foop sysprof tali gedit-code-assistance gnome-code-assistance gnome-multi-writer gnome-recipes gnome-usage"
+	elif [ "$INTERFACE" == "kde" ]; then
+		DE="plasma-meta kde-applications-meta"
+	elif [ "$INTERFACE" == "lxde" ]; then
+		DE="gpicview lxappearance lxappearance-obconf lxde-common lxde-icon-theme lxhotkey lxinput lxlauncher lxmusic lxpanel lxrandr lxsession lxtask lxterminal openbox pcmanfm"
+	elif [ "$INTERFACE" == "lxqt" ]; then
+		DE="lximage-qt lxqt-about lxqt-admin lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-openssh-askpass lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo lxqt-themes obconf-qt openbox pcmanfm-qt qterminal"
+	elif [ "$INTERFACE" == "mate" ]; then
+		DE="caja marco mate-backgrounds mate-control-center mate-desktop mate-icon-theme mate-menus mate-notification-daemon mate-panel mate-polkit mate-session-manager mate-settings-daemon mate-themes mate-user-guide atril caja-image-converter caja-open-terminal caja-sendto caja-share caja-wallpaper caja-xattr-tags engrampa eom mate-applets mate-calc mate-icon-theme-faenza mate-media mate-netbook mate-power-manager mate-screensaver mate-sensors-applet mate-system-monitor mate-terminal mate-user-share mate-utils mozo pluma"
+	elif [ "$INTERFACE" == "xfce" ]; then
+		DE="exo garcon gtk-xfce-engine thunar thunar-volman tumbler xfce4-appfinder xfce4-panel xfce4-power-manager xfce4-session xfce4-settings xfce4-terminal xfconf xfdesktop xfwm4 xfwm4-themes mousepad orage thunar-archive-plugin thunar-media-tags-plugin xfburn xfce4-artwork xfce4-battery-plugin xfce4-clipman-plugin xfce4-cpufreq-plugin xfce4-cpugraph-plugin xfce4-datetime-plugin xfce4-dict xfce4-diskperf-plugin xfce4-eyes-plugin xfce4-fsguard-plugin xfce4-genmon-plugin xfce4-mailwatch-plugin xfce4-mount-plugin xfce4-mpc-plugin xfce4-netload-plugin xfce4-notes-plugin xfce4-notifyd xfce4-pulseaudio-plugin xfce4-screenshooter xfce4-sensors-plugin xfce4-smartbookmark-plugin xfce4-systemload-plugin xfce4-taskmanager xfce4-time-out-plugin xfce4-timer-plugin xfce4-verve-plugin xfce4-wavelan-plugin xfce4-weather-plugin xfce4-xkb-plugin parole ristretto xfce4-whiskermenu-plugin"
+	elif [ "$INTERFACE" == "i3wm" ]; then
+		DE="i3-gaps rofi rxvt-unicode ranger mc pcurses neofetch cmus calcurse bc"
+	elif [ "$INTERFACE" == "nodeorwm" ]; then
+		DE=""
 	fi
 
 # DM's
-	GDM="gdm"
-	LIGHTDM="lightdm lightdm-gtk-greeter"
-	LXDM="lxdm"
-	SDDM="sddm"
-
-	if [ "$DISPLAYMANAGER" == "GDM" ]; then
-		DM="$GDM"
-	elif [ "$DISPLAYMANAGER" == "SDDM" ]; then
-		DM="$SDDM"
-	elif [ "$DISPLAYMANAGER" == "LXDM" ]; then
-		DM="$LXDM"
-	elif [ "$DISPLAYMANAGER" == "LIGHTDM" ]; then
-		DM="$LIGHTDM"
-	elif [ "$DISPLAYMANAGER" == "NODM" ]; then
+	if [ "$DISPLAYMANAGER" == "gdm" ]; then
+		DM="gdm"
+	elif [ "$DISPLAYMANAGER" == "sddm" ]; then
+		DM="sddm"
+	elif [ "$DISPLAYMANAGER" == "lxdm" ]; then
+		DM="lxdm"
+	elif [ "$DISPLAYMANAGER" == "lightdm" ]; then
+		DM="lightdm lightdm-gtk-greeter"
+	elif [ "$DISPLAYMANAGER" == "nodm" ]; then
 		DM=""
 	fi
 
@@ -165,7 +153,8 @@
 # Packages
 	BASE="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vi which xfsprogs"
 	BASE_DEVEL="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
-	PACKAGES="$BASE $BASE_DEVEL $DM $UI $CUSTOM_PACKAGES $OTHER_CUSTOM_PACKAGES mesa xorg-server os-prober networkmanager htop iftop iotop grub efibootmgr ntp hwloc"
+	BLACKARCHTOOLS=""
+	PACKAGES="$BASE $BASE_DEVEL $DE $DM $CUSTOM_PACKAGES $OTHER_CUSTOM_PACKAGES mesa xorg-server networkmanager grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh tor vim openvpn networkmanager-openvpn arandr"
 
 # unmounting drives
 	echo "-==unmounting drives==-"
@@ -299,10 +288,24 @@
 	arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 
 # Enable services
+	echo "-==Enabling services==-"
 	arch-chroot /mnt systemctl enable NetworkManager
 	if [ "$DISPLAYMANAGER" != "nodm" ]; then
 		arch-chroot /mnt systemctl enable $DISPLAYMANAGER
 	fi
 	arch-chroot /mnt systemctl enable ntpd
+	arch-chroot /mnt systemctl enable tor
+
+# Installing yay
+	echo "-==Installing yay==-"
+	arch-chroot /mnt git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
+
+# Installing blackarch
+	if [ "$BLACKARCH" == "true" ]; then
+		echo "-==Adding BlackArch repository==-"
+		arch-chroot /mnt curl -O https://blackarch.org/strap.sh && chmod +x strap.sh && ./strap.sh
+		echo "-==Installing BlackArch tools==-"
+		arch-chroot /mnt pacman -S blackarch
+	fi
 
 	echo "-==Arch is ready to be used==-"
