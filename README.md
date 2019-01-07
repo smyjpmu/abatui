@@ -1,4 +1,4 @@
-# Install Arch/Blackarch CLI
+# Arch/BlackArch CLI Installer
 
 Currently supports XFCE, KDE, Gnome, i3-gaps and also an option for no DE/WM.
 You can choose what you want to install/use simply by selecting it.
