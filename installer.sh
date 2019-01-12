@@ -1,5 +1,4 @@
 #!/bin/bash
-#wget https://raw.githubusercontent.com/Im-Nameless/Install_Arch_CLI/master/install_arch.sh && chmod +x install_arch.sh && ./install_arch.sh
 	GNUGPL="\
 #    this script is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
