@@ -153,7 +153,7 @@
 	BASE="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vi which xfsprogs"
 	BASE_DEVEL="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
 	BLACKARCHTOOLS=""
-	PACKAGES="$BASE $BASE_DEVEL $DE $DM $CUSTOM_PACKAGES $OTHER_CUSTOM_PACKAGES mesa xorg-server networkmanager grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh tor vim openvpn networkmanager-openvpn arandr"
+	PACKAGES="$BASE $BASE_DEVEL $DE $DM $CUSTOM_PACKAGES $OTHER_CUSTOM_PACKAGES mesa xorg-server networkmanager grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh tor vim openvpn networkmanager-openvpn arandr udiskie"
 
 # unmounting drives
 	echo "-==unmounting drives==-"
@@ -297,7 +297,7 @@
 
 # Installing yay
 	echo "-==Installing yay==-"
-	arch-chroot /mnt git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si
+	arch-chroot /mnt git clone https://aur.archlinux.org/yay.git && cd yay/ && makepkg -si
 
 # Installing blackarch
 	if [ "$BLACKARCH" == "true" ]; then
