@@ -200,9 +200,9 @@
 		if $ENCRYPT_DRIVE; then
 			cryptsetup -y -v luksFormat --type luks2 ${TARGET_DRIVE}p$SYSTEM_PARTITION
 			cryptsetup open $(if $SSD; then echo "--allow-discards"; fi) ${TARGET_DRIVE}p$SYSTEM_PARTITION cryptroot
-			mkfs.btrfs /dev/mapper/cryptroot
+			mkfs.ext4 /dev/mapper/cryptroot
 		else
-			mkfs.btrfs ${TARGET_DRIVE}p$SYSTEM_PARTITION
+			mkfs.ext4 ${TARGET_DRIVE}p$SYSTEM_PARTITION
 		fi
 	else
 		if $EFI; then
@@ -211,9 +211,9 @@
 		if $ENCRYPT_DRIVE; then
 			cryptsetup -y -v luksFormat --type luks2 ${TARGET_DRIVE}2
 			cryptsetup open $(if $SSD; then echo "--allow-discards"; fi) ${TARGET_DRIVE}$SYSTEM_PARTITION cryptroot
-			mkfs.btrfs /dev/mapper/cryptroot
+			mkfs.ext4 /dev/mapper/cryptroot
 		else
-			mkfs.btrfs ${TARGET_DRIVE}$SYSTEM_PARTITION
+			mkfs.ext4 ${TARGET_DRIVE}$SYSTEM_PARTITION
 		fi
 	fi
 
