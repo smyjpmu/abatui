@@ -34,14 +34,14 @@
 	USERNAME=$(whiptail --inputbox "done=[ENTER], write your username." 8 60 noname --title "username" 3>&1 1>&2 2>&3)
 
 # User Password
-	while [ "$WPD" == "$PWD2" ]; do
+	while [ "$WPD" != "$PWD2" ]; do
 	  PWD=$(whiptail --passwordbox "done=[ENTER], enter the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
 	  PWD2=$(whiptail --passwordbox "done=[ENTER], re-enter the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
 		whiptail --msgbox "Passowrds did not match, please try again." --title "failed password" 8 60
 	done
 
 # Root Password
-	while [ "$ROOT_PWD" == "$ROOT_PWD2" ]; do
+	while [ "$ROOT_PWD" != "$ROOT_PWD2" ]; do
 		ROOT_PWD=$(whiptail --passwordbox "done=[ENTER], enter the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
 		ROOT_PWD2=$(whiptail --passwordbox "done=[ENTER], re-enter the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
 		whiptail --msgbox "Passowrds did not match, please try again." --title "failed password" 8 60
