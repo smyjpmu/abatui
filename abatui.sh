@@ -74,6 +74,9 @@
 # Encrypt drive
 	ENCRYPT_DRIVE=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "drive encryption" 3>&1 1>&2 2>&3 "false" "I don't want to encrypt my drive." "true" "I want to encrypt my drive.")
 
+# Country
+	COUNTRY=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "What's your country? Capital first letter." 3>&1 1>&2 2>&3)
+
 # Timezone
 	TIMEZONE=""
 	CHOOSING_TIMEZONE=true
@@ -92,7 +95,7 @@
             CHOOSING_TIMEZONE=false
             break
         fi
-     done
+    done
 
 # Locale
 	LOCALE=$(eval 'whiptail --radiolist "select=[space], continue=[enter]. default=en_US.UTF-8 UTF-8" 40 60 30 --title "locale" 3>&1 1>&2 2>&3' "$(perl -lne 'BEGIN{$\=" "} next unless /^#?[a-z]\S+\s\S+\s*$/; s/^#//; s/\s+$//; print "\"$_\" locale OFF" ' /etc/locale.gen)")
@@ -247,6 +250,16 @@
 			mount ${TARGET_DRIVE}1 /mnt/boot
 		fi
 	fi
+
+# Ranking mirrors
+	echo "-==installing neccesarry packages to rank mirrors==-"
+	pacman -Sy
+	pacman -S --noconfirm pacman-contrib
+	echo "-==backing up old mirrorlist==-"
+	cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+	echo "-==creating list of 5 fastest Mirrors for $COUNTRY this might take a bit==-"
+	curl -s "https://www.archlinux.org/mirrorlist/?country=$COUNTRY&protocol=https&use_mirror_status=on" | sed -e 's/^#S/S/' | rankmirrors -n 5 - > /etc/pacman.d/mirrorlist
+	echo "-==new mirrorlist created==-"
 
 # Install packages
 	echo "-==Installing Base Packages==-"
