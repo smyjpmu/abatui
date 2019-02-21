@@ -34,38 +34,18 @@
 	USERNAME=$(whiptail --inputbox "done=[ENTER], write your username." 8 60 noname --title "username" 3>&1 1>&2 2>&3)
 
 # User Password
-	PWD=$(whiptail --passwordbox "done=[ENTER], enter the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
-	PWD2=$(whiptail --passwordbox "done=[ENTER], re-enter the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
-	if [ "$PWD" != "$PWD2" ]; then
-		whiptail --msgbox "Passowrds did not match, please try again. (2 tries left)" --title "failed password" 8 60
-		PWD=$(whiptail --passwordbox "done=[ENTER], write the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
-		PWD2=$(whiptail --passwordbox "done=[ENTER], write the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
-		if [ "$PWD" != "$PWD2" ]; then
-			whiptail --msgbox "Passowrds did not match, please try again. (last try)" --title "failed password" 8 60
-			PWD=$(whiptail --passwordbox "done=[ENTER], write the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
-			PWD2=$(whiptail --passwordbox "done=[ENTER], write the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
-			if [ "$PWD" != "$PWD2" ]; then
-				exit
-			fi
-		fi
-	fi
+	while [ "$WPD" == "$PWD2" ]; do
+	  PWD=$(whiptail --passwordbox "done=[ENTER], enter the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
+	  PWD2=$(whiptail --passwordbox "done=[ENTER], re-enter the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
+		whiptail --msgbox "Passowrds did not match, please try again." --title "failed password" 8 60
+	done
 
-# User Password
-	ROOT_PWD=$(whiptail --passwordbox "done=[ENTER], enter the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
-	ROOT_PWD2=$(whiptail --passwordbox "done=[ENTER], re-enter the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
-	if [ "$ROOT_PWD" != "$ROOT_PWD2" ]; then
-		whiptail --msgbox "Passowrds did not match, please try again. (2 tries left)" --title "failed password" 8 60
-		ROOT_PWD=$(whiptail --passwordbox "done=[ENTER], write the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
-		ROOT_PWD2=$(whiptail --passwordbox "done=[ENTER], write the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
-		if [ "$ROOT_PWD" != "$ROOT_PWD2" ]; then
-			whiptail --msgbox "Passowrds did not match, please try again. (last try)" --title "failed password" 8 60
-			ROOT_PWD=$(whiptail --passwordbox "done=[ENTER], write the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
-			ROOT_PWD2=$(whiptail --passwordbox "done=[ENTER], write the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
-			if [ "$ROOT_PWD" != "$ROOT_PWD2" ]; then
-				exit
-			fi
-		fi
-	fi
+# Root Password
+	while [ "$ROOT_PWD" == "$ROOT_PWD2" ]; do
+		ROOT_PWD=$(whiptail --passwordbox "done=[ENTER], enter the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
+		ROOT_PWD2=$(whiptail --passwordbox "done=[ENTER], re-enter the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
+		whiptail --msgbox "Passowrds did not match, please try again." --title "failed password" 8 60
+	done
 
 # Interface
 	INTERFACE=$(whiptail --menu "select=[ENTER]" 18 80 10 --title "interface" 3>&1 1>&2 2>&3 "nodeorwm" "Comes with nothing and is nothing." "budgie" "Modern design, focuses on simplicity and elegance." "cinnamon" "Strives to provide a traditional user experience." "gnome" "An attractive and intuitive desktop." "kde" "Modern and familiar working environment." "lxde" "Strives to be less CPU and RAM intensive." "lxqt" "Lightweight, modular, blazing-fast and user-friendly." "mate" " Intuitive and attractive desktop using traditional metaphors." "xfce" "Traditional UNIX philosophy of modularity and re-usability." "i3wm" "Primarily targeted at developers and advanced users" "sway" "Drop-in replacement of i3/i3-gaps for Wayland")
@@ -182,7 +162,7 @@
 # Packages
 	BASE="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vi which xfsprogs"
 	BASE_DEVEL="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
-	PACKAGES="$BASE $BASE_DEVEL $DE $DM $COMPOSITOR $CUSTOM_PACKAGES $OTHER_CUSTOM_PACKAGES mesa xorg-server networkmanager grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh vim openvpn networkmanager-openvpn arandr udiskie"
+	PACKAGES="$BASE $BASE_DEVEL $DE $DM $COMPOSITOR $CUSTOM_PACKAGES $OTHER_CUSTOM_PACKAGES mesa xorg-server networkmanager grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh vim openvpn networkmanager-openvpn arandr udiskie ntp"
 	AUR_PACKAGES="$AUR_CUSTOM_PACKAGES $AUR_OTHER_CUSTOM_PACKAGES"
 
 # unmounting drives
@@ -278,10 +258,11 @@
 
 # Installing yay
 	echo "-==Installing Yay==-"
-	arch-chroot /mnt git clone https://aur.archlinux.org/yay.git
-	arch-chroot /mnt cd yay/
-	arch-chroot /mnt makepkg -si
-	arch-chroot /mnt yay -S $AUR_DM $AUR_PACKAGES
+	cd "$(mktemp -d)"
+	git clone https://aur.archlinux.org/yay.git .
+	PACMAN="pacman -r /mnt" makepkg -si
+	cd -
+	arch-chroot /mnt su $USERNAME -c yay -S $AUR_DM $AUR_PACKAGES
 
 # Installing blackarch
 	if [ "$BLACKARCH" == "true" ]; then
