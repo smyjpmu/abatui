@@ -54,7 +54,12 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	display_mgr=$(whiptail --menu "select=[ENTER]" 12 50 5 --title "display manager" 3>&1 1>&2 2>&3 "nodm" "Comes with nothing and is nothing." "gdm" "Recommended for Budgie & Gnome." "lightdm" "Recommended for XFCE." "lxdm" "Recommended for LXDE." "sddm" "Recommended for KDE & LXQT." "ly" "TUI based" "tty" "CLI based")
 
 # BlackArch
-	blackarch=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "BlackArch" 3>&1 1>&2 2>&3 "false" "Do not install BlackArch tools" "true" "Install BlackArch tools")
+	blackarch=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "BlackArch" 3>&1 1>&2 2>&3 "false" "I DO NOT want the BlackArch repository." "true" "I want the BlackArch repository.")
+
+# BlackArch tools
+	if $blackarch; then
+		blackarch_tools=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "BlackArch Tools" 3>&1 1>&2 2>&3 "false" "DO NOT install BlackArch tools." "true" "Install BlackArch tools. (~50GB)")
+	fi
 
 # Custom packages
 	custom_pkg=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "firefox" "Web Browser" ON "atom" "IDE" ON "weechat" "IRC client" ON "libreoffice" "Office suite" ON "tor" "proxy" ON "deluge" "torrent manager" ON "gimp" "image manipulator" ON "audacity" "audio editor" ON "blender" "3d editor" ON "darktable" "photo editor" ON "inkscape" "vector editor" ON "krita" "drawing editor" ON "steam" "Game client" OFF "playonlinux" "wine manager" OFF "lutris" "wine manager" OFF)
@@ -63,7 +68,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	other_custom_pkg=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "other custom packages" 3>&1 1>&2 2>&3)
 
 # Custom packages
-	aur_custom_pkg=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "discord" "discord" ON "spotify" "spotify" OFF "polybar" "polybar" ON)
+	aur_custom_pkg=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "discord" "discord" OFF "spotify" "spotify" OFF "polybar" "polybar" OFF)
 
 # Other custom packages
 	aur_other_custom_pkg=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "other custom packages" 3>&1 1>&2 2>&3)
@@ -124,9 +129,9 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	elif [ "$desktop_env" == "xfce" ]; then
 		desktop_env_pkg="exo garcon gtk-xfce-engine thunar thunar-volman tumbler xfce4-appfinder xfce4-panel xfce4-power-manager xfce4-session xfce4-settings xfce4-terminal xfconf xfdesktop xfwm4 xfwm4-themes mousepad orage thunar-archive-plugin thunar-media-tags-plugin xfburn xfce4-artwork xfce4-battery-plugin xfce4-clipman-plugin xfce4-cpufreq-plugin xfce4-cpugraph-plugin xfce4-datetime-plugin xfce4-dict xfce4-diskperf-plugin xfce4-eyes-plugin xfce4-fsguard-plugin xfce4-genmon-plugin xfce4-mailwatch-plugin xfce4-mount-plugin xfce4-mpc-plugin xfce4-netload-plugin xfce4-notes-plugin xfce4-notifyd xfce4-pulseaudio-plugin xfce4-screenshooter xfce4-sensors-plugin xfce4-smartbookmark-plugin xfce4-systemload-plugin xfce4-taskmanager xfce4-time-out-plugin xfce4-timer-plugin xfce4-verve-plugin xfce4-wavelan-plugin xfce4-weather-plugin xfce4-xkb-plugin parole ristretto xfce4-whiskermenu-plugin"
 	elif [ "$desktop_env" == "i3wm" ]; then
-		desktop_env_pkg="i3-gaps rofi rxvt-unicode ranger mc pcurses neofetch cmus calcurse bc maim xclip"
+		desktop_env_pkg="i3-gaps rofi rxvt-unicode ranger mc pcurses neofetch cmus calcurse bc maim xclip xsel"
 	elif [ "$desktop_env" == "sway" ]; then
-		desktop_env_pkg="sway rofi rxvt-unicode ranger mc pcurses neofetch cmus calcurse bc maim xclip"
+		desktop_env_pkg="sway rofi rxvt-unicode ranger mc pcurses neofetch cmus calcurse bc maim xclip xsel"
 	elif [ "$desktop_env" == "nodeorwm" ]; then
 		desktop_env_pkg=""
 	fi
@@ -171,7 +176,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # Packages
 	BASE="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vi which xfsprogs"
 	BASE_DEVEL="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
-	pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg $blackarch_pkg mesa xorg-server networkmanager grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh vim openvpn networkmanager-openvpn arandr udiskie ntp"
+	pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg $blackarch_pkg linux-headers mesa xorg-server networkmanager network-manager-applet grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh vim openvpn networkmanager-openvpn arandr udiskie ntp"
 	aur_pkg="$aur_desktop_env_pkg $aur_display_mgr_pkg $aur_custom_pkg $aur_other_custom_pkg"
 
 # unmounting drives
@@ -280,10 +285,13 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		arch-chroot /mnt/home/${username}/Downloads curl -O https://blackarch.org/strap.sh
 		arch-chroot /mnt/home/${username}/Downloads chmod +x strap.sh
 		arch-chroot /mnt/home/${username}/Downloads ./strap.sh
-		blackarch_pkg="blackarch"
-	else
-		blackarch_pkg=""
+		if $blackarch_tools; then
+			blackarch_pkg="blackarch"
+		else
+			blackarch_pkg=""
+		fi
 	fi
+
 
 # Install packages
 	echo "-==Installing Base Packages==-"
@@ -298,6 +306,15 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	git clone https://aur.archlinux.org/yay.git /mnt/home/${username}/GitHub/
 	arch-chroot /mnt/home/${username}/GitHub/yay/ makepkg -si
 	arch-chroot /mnt su $username -c yes $user_pwd | yay -S $aur_pkg
+
+# Installing Oh-My-ZSH
+	echo "-==Installing Oh-My-ZSH==-"
+	umask g-w,o-w
+	env git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git /mnt/home/${username}/.oh-my-zsh
+	cp /mnt/home/${username}/.oh-my-zsh/templates/zshrc.zsh-template /mnt/home/${username}/.zshrc
+	arch-chroot /mnt sed "/^export ZSH=/ c\ export ZSH=\"/mnt/home/${username}/.oh-my-zsh\"" ~/.zshrc > ~/.zshrc-omztemp
+	mv -f ~/.zshrc-omztemp ~/.zshrc
+	yes $user_pwd | chsh -s $(grep /zsh$ /etc/shells | tail -1)
 
 # Generate fstab
 	echo "-==Generating FS Tab==-"
@@ -339,15 +356,6 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	if echo $custom_pkg | grep -q 'tor'; then
 	   arch-chroot /mnt systemctl enable tor
 	fi
-
-# Installing Oh-My-ZSH
-	echo "-==Installing Oh-My-ZSH==-"
-	umask g-w,o-w
-	env git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git /mnt/home/${username}/.oh-my-zsh
-	cp /mnt/home/${username}/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc
-	arch-chroot /mnt sed "/^export ZSH=/ c\ export ZSH=\"/mnt/home/${username}/.oh-my-zsh\"" ~/.zshrc > ~/.zshrc-omztemp
-	mv -f ~/.zshrc-omztemp ~/.zshrc
-	yes $user_pwd | chsh -s $(grep /zsh$ /etc/shells | tail -1)
 
 # Encrypt drive
 	if $encrypt; then
