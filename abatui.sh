@@ -355,7 +355,6 @@ wizard
 	pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg $blackarch_pkg linux-headers mesa xorg-server networkmanager network-manager-applet grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh vim openvpn networkmanager-openvpn arandr udiskie ntp"
 	aur_pkg="$aur_desktop_env_pkg $aur_display_mgr_pkg $aur_custom_pkg $aur_other_custom_pkg"
 
-Installation () {
 # unmounting drives
 	echo "-==Unmounting Drives==-"
 	if $nvme; then
@@ -554,7 +553,6 @@ Installation () {
 	if echo $custom_pkg | grep -q 'tor'; then
 	   arch-chroot /mnt systemctl enable tor
 	fi
-}
-installation
+
 
 echo "-==Arch Is Ready==-"
