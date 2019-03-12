@@ -21,9 +21,8 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	gnugpl
 
 # Target drive
-	LSBLK="$(lsblk)"
 	drive () {
-		drive=$(whiptail --inputbox "/dev/sd* (replace the * with the drive letter) $LSBLK" 20 60 /dev/ --title "target drive" 3>&1 1>&2 2>&3)
+		drive=$(whiptail --inputbox "/dev/sd* (replace the * with the drive letter) $(lsblk)" 20 60 /dev/sd\* --title "What drive do I install onto?" 3>&1 1>&2 2>&3)
 		if [ "$exitstatus" == "1" ]; then
 			exit
 		fi
@@ -32,7 +31,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Nvme drive
 	nvme () {
-		nvme=$(whiptail --menu "select=[ENTER]" 8 60 2 --title "nvme" 3>&1 1>&2 2>&3 "false" "I don't have an Nvme SSD." "true" "I have an Nvme SSD.")
+		nvme=$(whiptail --menu "" 8 60 2 --title "Do I have an Nvme ssd?" 3>&1 1>&2 2>&3 "false" "I don't have an Nvme SSD." "true" "I have an Nvme SSD.")
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			drive
@@ -42,7 +41,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Erase drive
 	erase () {
-		encrypt=$(whiptail --menu "select=[ENTER]" 8 60 2 --title "erase drive" 3>&1 1>&2 2>&3 "false" "I don't want to erase my drive." "true" "erase my drive.")
+		encrypt=$(whiptail --menu "" 8 60 2 --title "Do I rewrite/erase my drive with zeros?" 3>&1 1>&2 2>&3 "false" "I don't want to erase my drive." "true" "I want to erase my drive.")
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			nvme
@@ -52,7 +51,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Encrypt drive
 	encrypt () {
-		encrypt=$(whiptail --menu "select=[ENTER]" 8 60 2 --title "drive encryption" 3>&1 1>&2 2>&3 "false" "I don't want to encrypt my drive." "true" "I want to encrypt my drive.")
+		encrypt=$(whiptail --menu "" 8 60 2 --title "Do I encrypt my drive?" 3>&1 1>&2 2>&3 "false" "I don't want to encrypt my drive." "true" "I want to encrypt my drive.")
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			erase
@@ -62,7 +61,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # File System
 	filesystem () {
-		filesystem=$(whiptail --menu "select=[ENTER]" 12 50 5 --title "file systems" 3>&1 1>&2 2>&3 "ext4" "Recommended and is nearly indestructible." "btrfs" "Use only if you need certain features.")
+		filesystem=$(whiptail --menu "" 8 60 2 --title "What filesystem do I want?" 3>&1 1>&2 2>&3 "ext4" "Recommended and is nearly indestructible." "btrfs" "Use only if you need certain features.")
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			encrypt
@@ -72,7 +71,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Bootloader ID
 	bootloader_id () {
-		bootloader_id=$(whiptail --inputbox "done=[ENTER], write the bootloader ID." 8 60 Arch\ Linux --title "bootloader id" 3>&1 1>&2 2>&3)
+		bootloader_id=$(whiptail --inputbox "" 8 60 Arch\ Linux --title "What bootloader ID do I want?" 3>&1 1>&2 2>&3)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			filesystem
@@ -82,7 +81,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Hostname
 	hostname () {
-		hostname=$(whiptail --inputbox "done=[ENTER], write the hostname (PC name)." 8 60 archlinux --title "hostname" 3>&1 1>&2 2>&3)
+		hostname=$(whiptail --inputbox "" 8 60 archlinux --title "What hostname do I want?" 3>&1 1>&2 2>&3)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			bootloader_id
@@ -92,7 +91,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Username
 	username () {
-		username=$(whiptail --inputbox "done=[ENTER], write your username." 8 60 noname --title "username" 3>&1 1>&2 2>&3)
+		username=$(whiptail --inputbox "" 8 60 noname --title "What's my username?" 3>&1 1>&2 2>&3)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			hostname
@@ -103,9 +102,9 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # User Password
 	user_pwd () {
 		while [ "$user_pwd" != "$user_pwd2" ]; do
-	  	user_pwd=$(whiptail --passwordbox "done=[ENTER], enter the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
-	  	user_pwd2=$(whiptail --passwordbox "done=[ENTER], re-enter the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
-			whiptail --msgbox "Passowrds did not match, please try again." --title "failed password" 8 60
+	  	user_pwd=$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for ${username}?" 3>&1 1>&2 2>&3)
+	  	user_pwd2=$(whiptail --passwordbox "" 8 60 --title "Re-enter the _sTR0nG_ password for ${username}." 3>&1 1>&2 2>&3)
+			whiptail --msgbox "Passowrds did not match, please try again." --title "They don't match!" 8 60
 		done
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
@@ -117,9 +116,9 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # Root Password
 	root_pwd () {
 		while [ "$root_pwd" != "$root_pwd2" ]; do
-			root_pwd=$(whiptail --passwordbox "done=[ENTER], enter the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
-			root_pwd2=$(whiptail --passwordbox "done=[ENTER], re-enter the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
-			whiptail --msgbox "Passowrds did not match, please try again." --title "failed password" 8 60
+			root_pwd=$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for root?" 3>&1 1>&2 2>&3)
+			root_pwd2=$(whiptail --passwordbox "" 8 60 --title "Re-enter the _sTR0nG_ password for root" 3>&1 1>&2 2>&3)
+			whiptail --msgbox "Passowrds did not match, please try again." --title "They don't match!" 8 60
 		done
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
@@ -128,15 +127,15 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	}
 	root_pwd
 
-	# Country
-		country () {
-			country=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "What's your country? Capital first letter." 3>&1 1>&2 2>&3)
-			exitstatus=$?
-			if [ "$exitstatus" == "1" ]; then
-				root_pwd
-			fi
-		}
-		county
+# Country
+	country () {
+		country=$(whiptail --inputbox "Examples: US, CA, DE..." 8 60 --title "What's my country code?" 3>&1 1>&2 2>&3)
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			root_pwd
+		fi
+	}
+	country
 
 # Timezone
  timezone () {
@@ -144,7 +143,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		choosing_timezone=true
     	while [ $choosing_timezone ]; do
         	if [ -d "/usr/share/zoneinfo"$(if [ -n $timezone ]; then echo "/$timezone/"; fi) ]; then
-             	tmp_timezone=$(whiptail --noitem --title "timezone" --menu "select/continue=[enter]" 30 40 22 $(for ZONE in $(find /usr/share/zoneinfo/$(if [ -n "$timezone" ]; then echo "$timezone/"; fi) -maxdepth 1 \
+             	tmp_timezone=$(whiptail --noitem --title "What timezone am I in?" --menu "" 30 40 22 $(for ZONE in $(find /usr/share/zoneinfo/$(if [ -n "$timezone" ]; then echo "$timezone/"; fi) -maxdepth 1 \
              	$([ -z "$timezone" ] && echo "-type d") -not -name right -not -name posix -not -name Etc -not -wholename "/usr/share/zoneinfo/$timezone/" -not -wholename "/usr/share/zoneinfo/$timezone" 2>/dev/null | sed "s#/usr/share/zoneinfo/$timezone##" | sed "s#/##"); do
                  	echo "$ZONE $ZONE"
              	done) 3>&1 1>&2 2>&3)
@@ -167,7 +166,8 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 	# language
 	language () {
-		language=$(eval 'whiptail --radiolist "select=[space], continue=[enter]. default=en_US.UTF-8 UTF-8" 40 60 30 --title "language" 3>&1 1>&2 2>&3' "$(perl -lne 'BEGIN{$\=" "} next unless /^#?[a-z]\S+\s\S+\s*$/; s/^#//; s/\s+$//; print "\"$_\" locale OFF" ' /etc/locale.gen)")
+    language=$(eval 'whiptail --radiolist "Default: en_US.UTF-8 UTF-8" 40 60 30 --title "What language do I use?" 3>&1 1>&2 2>&3' "$(sed -r '/^# /d;/^#$/d;s/#//;s/  //;s/.*/ "&/;s/$/" locale OFF&/;s/"en_US.UTF-8 UTF-8" locale OFF/"en_US.UTF-8 UTF-8" locale ON/' /etc/locale.gen | tr -d "\n"
+)")
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			timezone
@@ -177,10 +177,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Keymap
 	keymap () {
-		keymap=$(
-			keymaps=$(find /usr/share/kbd -name '*.map.gz' -type f -printf '%f\n' | cut -d. -f1 | sort)
-			eval "whiptail --radiolist 'select=[space], continue=[enter]. default=us' 40 60 30 --title 'keymap' 3>&1 1>&2 2>&3 $(printf '"%s" keymap OFF ' $keymaps)"
-		)
+		keymap=$(eval 'whiptail --radiolist "Default: us" 40 60 30 --title "What keymap do I use?" 3>&1 1>&2 2>&3' "$(find /usr/share/kbd -name '*.map.gz' -type f -printf '%f\n' | cut -d. -f1 | sort | sed -r 's/.*/ "&/;s/$/" keymap OFF&/;s/"us" keymap OFF/"us" keymap ON/g' | tr -d "\n")")
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			language
@@ -190,7 +187,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # desktop environment
 	desktop_env () {
-		desktop_env=$(whiptail --menu "select=[ENTER]" 18 80 10 --title "interface" 3>&1 1>&2 2>&3 "nodeorwm" "Comes with nothing and is nothing." "budgie" "Modern design, focuses on simplicity and elegance." "cinnamon" "Strives to provide a traditional user experience." "gnome" "An attractive and intuitive desktop." "kde" "Modern and familiar working environment." "lxde" "Strives to be less CPU and RAM intensive." "lxqt" "Lightweight, modular, blazing-fast and user-friendly." "mate" " Intuitive and attractive desktop using traditional metaphors." "xfce" "Traditional UNIX philosophy of modularity and re-usability." "i3wm" "Primarily targeted at developers and advanced users" "sway" "Drop-in replacement of i3/i3-gaps for Wayland")
+		desktop_env=$(whiptail --menu "" 18 80 11 --title "What desktop environment do I want?" 3>&1 1>&2 2>&3 "nodeorwm" "Comes with nothing and is nothing." "budgie" "Modern design, focuses on simplicity and elegance." "cinnamon" "Strives to provide a traditional user experience." "gnome" "An attractive and intuitive desktop." "kde" "Modern and familiar working environment." "lxde" "Strives to be less CPU and RAM intensive." "lxqt" "Lightweight, modular, blazing-fast and user-friendly." "mate" " Intuitive and attractive desktop using traditional metaphors." "xfce" "Traditional UNIX philosophy of modularity and re-usability." "i3-gaps" "Primarily targeted at developers and advanced users" "sway" "Drop-in replacement of i3/i3-gaps for Wayland")
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			keymap
@@ -200,7 +197,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Display manager
 	display_mgr () {
-		display_mgr=$(whiptail --menu "select=[ENTER]" 12 50 5 --title "display manager" 3>&1 1>&2 2>&3 "nodm" "Comes with nothing and is nothing." "gdm" "Recommended for Budgie & Gnome." "lightdm" "Recommended for XFCE." "lxdm" "Recommended for LXDE." "sddm" "Recommended for KDE & LXQT." "ly" "TUI based" "tty" "CLI based")
+		display_mgr=$(whiptail --menu "" 13 50 7 --title "What display manager do I want?" 3>&1 1>&2 2>&3 "nodm" "Comes with nothing and is nothing." "gdm" "Recommended for Budgie & Gnome." "lightdm" "Recommended for XFCE." "lxdm" "Recommended for LXDE." "sddm" "Recommended for KDE & LXQT." "ly" "TUI based" "tty" "CLI based")
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			desktop_env
@@ -210,7 +207,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # BlackArch
 	blackarch () {
-		blackarch=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "BlackArch" 3>&1 1>&2 2>&3 "false" "I DO NOT want the BlackArch repository." "true" "I want the BlackArch repository.")
+		blackarch=$(whiptail --menu "" 8 60 2 --title "Do I want the BlackArch repository?" 3>&1 1>&2 2>&3 "false" "I DO NOT want the BlackArch repository." "true" "I want the BlackArch repository.")
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			display_mgr
@@ -221,7 +218,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # BlackArch tools
 	blackarch_tools () {
 		if $blackarch; then
-			blackarch_tools=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "BlackArch Tools" 3>&1 1>&2 2>&3 "false" "DO NOT install BlackArch tools." "true" "Install BlackArch tools. (~50GB)")
+			blackarch_tools=$(whiptail --menu "" 8 60 2 --title "Do I want the 2000+ BlackArch tools" 3>&1 1>&2 2>&3 "false" "DO NOT install BlackArch tools." "true" "Install BlackArch tools. (~50GB)")
 		fi
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
@@ -232,7 +229,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Custom packages
 	custom_pkg () {
-		custom_pkg=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "firefox" "Web Browser" ON "atom" "IDE" ON "weechat" "IRC client" ON "libreoffice" "Office suite" ON "tor" "proxy" ON "deluge" "torrent manager" ON "gimp" "image manipulator" ON "audacity" "audio editor" ON "blender" "3d editor" ON "darktable" "photo editor" ON "inkscape" "vector editor" ON "krita" "drawing editor" ON "steam" "Game client" OFF "playonlinux" "wine manager" OFF "lutris" "wine manager" OFF)
+		custom_pkg=$(whiptail --separate-output --checklist "" 30 50 22 --title "What custom packages do I want?" 3>&1 1>&2 2>&3 "firefox" "Web Browser" ON "atom" "IDE" ON "weechat" "IRC client" ON "libreoffice" "Office suite" ON "tor" "proxy" ON "deluge" "torrent manager" ON "gimp" "image manipulator" ON "audacity" "audio editor" ON "blender" "3d editor" ON "darktable" "photo editor" ON "inkscape" "vector editor" ON "krita" "drawing editor" ON "steam" "Game client" OFF "playonlinux" "wine manager" OFF "lutris" "wine manager" OFF)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			blackarch_tools
@@ -242,7 +239,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Other custom packages
 	other_custom_pkg () {
-		other_custom_pkg=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "other custom packages" 3>&1 1>&2 2>&3)
+		other_custom_pkg=$(whiptail --inputbox "" 8 60 --title "Do I want any other custom packages?" 3>&1 1>&2 2>&3)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			custom_pkg
@@ -252,7 +249,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # AUR custom packages
 	aur_custom_pkg () {
-		aur_custom_pkg=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "discord" "discord" OFF "spotify" "spotify" OFF "polybar" "polybar" OFF)
+		aur_custom_pkg=$(whiptail --separate-output --checklist "" 30 50 22 --title "What AUR custom packages do I want?" 3>&1 1>&2 2>&3 "discord" "discord" OFF "spotify" "spotify" OFF "polybar" "polybar" OFF)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			other_custom_pkg
@@ -262,7 +259,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # AUR other custom packages
 	aur_other_custom_pkg () {
-		aur_other_custom_pkg=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "other custom packages" 3>&1 1>&2 2>&3)
+		aur_other_custom_pkg=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "Do I want any other AUR custom packages?" 3>&1 1>&2 2>&3)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			aur_custom_pkg
@@ -270,51 +267,54 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	}
 	aur_other_custom_pkg
 
-# DE/WM's
-	if [ "$desktop_env" == "budgie" ]; then
-		desktop_env_pkg="budgie-desktop budgie-extras baobab cheese eog epiphany evince file-roller gedit gnome-backgrounds gnome-calculator gnome-calendar gnome-characters gnome-clocks gnome-color-manager gnome-contacts gnome-control-center gnome-dictionary gnome-disk-utility gnome-documents gnome-font-viewer gnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orca rygel sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp gnome-boxes gnome-software simple-scan"
-	elif [ "$desktop_env" == "cinnamon" ]; then
-		desktop_env_pkg="cinnamon"
-	elif [ "$desktop_env" == "gnome" ]; then
-		desktop_env_pkg="baobab cheese eog epiphany evince file-roller gedit gnome-backgrounds gnome-calculator gnome-calendar gnome-characters gnome-clocks gnome-color-manager gnome-contacts gnome-control-center gnome-dictionary gnome-disk-utility gnome-documents gnome-font-viewer gnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orca rygel sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp gnome-boxes gnome-software simple-scan accerciser brasero dconf-editor devhelp evolution five-or-more four-in-a-row gnome-builder gnome-chess gnome-devel-docs gnome-klotski gnome-mahjongg gnome-mines gnome-nettool gnome-nibbles gnome-robots gnome-sound-recorder gnome-sudoku gnome-taquin gnome-tetravex gnome-tweaks gnome-weather hitori iagno lightsoff nautilus-sendto polari quadrapassel swell-foop sysprof tali gedit-code-assistance gnome-code-assistance gnome-multi-writer gnome-recipes gnome-usage"
-	elif [ "$desktop_env" == "kde" ]; then
-		desktop_env_pkg="plasma-meta kde-applications-meta"
-	elif [ "$desktop_env" == "lxde" ]; then
-		desktop_env_pkg="gpicview lxappearance lxappearance-obconf lxde-common lxde-icon-theme lxhotkey lxinput lxlauncher lxmusic lxpanel lxrandr lxsession lxtask lxterminal openbox pcmanfm"
-	elif [ "$desktop_env" == "lxqt" ]; then
-		desktop_env_pkg="lximage-qt lxqt-about lxqt-admin lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-openssh-askpass lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo lxqt-themes obconf-qt openbox pcmanfm-qt qterminal"
-	elif [ "$desktop_env" == "mate" ]; then
-		desktop_env_pkg="caja marco mate-backgrounds mate-control-center mate-desktop mate-icon-theme mate-menus mate-notification-daemon mate-panel mate-polkit mate-session-manager mate-settings-daemon mate-themes mate-user-guide atril caja-image-converter caja-open-terminal caja-sendto caja-share caja-wallpaper caja-xattr-tags engrampa eom mate-applets mate-calc mate-icon-theme-faenza mate-media mate-netbook mate-power-manager mate-screensaver mate-sensors-applet mate-system-monitor mate-terminal mate-user-share mate-utils mozo pluma"
-	elif [ "$desktop_env" == "xfce" ]; then
-		desktop_env_pkg="exo garcon gtk-xfce-engine thunar thunar-volman tumbler xfce4-appfinder xfce4-panel xfce4-power-manager xfce4-session xfce4-settings xfce4-terminal xfconf xfdesktop xfwm4 xfwm4-themes mousepad orage thunar-archive-plugin thunar-media-tags-plugin xfburn xfce4-artwork xfce4-battery-plugin xfce4-clipman-plugin xfce4-cpufreq-plugin xfce4-cpugraph-plugin xfce4-datetime-plugin xfce4-dict xfce4-diskperf-plugin xfce4-eyes-plugin xfce4-fsguard-plugin xfce4-genmon-plugin xfce4-mailwatch-plugin xfce4-mount-plugin xfce4-mpc-plugin xfce4-netload-plugin xfce4-notes-plugin xfce4-notifyd xfce4-pulseaudio-plugin xfce4-screenshooter xfce4-sensors-plugin xfce4-smartbookmark-plugin xfce4-systemload-plugin xfce4-taskmanager xfce4-time-out-plugin xfce4-timer-plugin xfce4-verve-plugin xfce4-wavelan-plugin xfce4-weather-plugin xfce4-xkb-plugin parole ristretto xfce4-whiskermenu-plugin"
-	elif [ "$desktop_env" == "i3wm" ]; then
-		desktop_env_pkg="i3-gaps rofi rxvt-unicode ranger mc pcurses neofetch cmus calcurse bc maim xclip xsel"
-	elif [ "$desktop_env" == "sway" ]; then
-		desktop_env_pkg="sway rofi rxvt-unicode ranger mc pcurses neofetch cmus calcurse bc maim xclip xsel"
-	elif [ "$desktop_env" == "nodeorwm" ]; then
-		desktop_env_pkg=""
-	fi
+# Desktop environment
 
-# DM's
-	if [ "$display_mgr" == "nodeorwm" ]; then
-		display_mgr_pkg=""
-		aur_display_mgr_pkg=""
-	elif [ "$display_mgr" == "gdm" ]; then
-		display_mgr_pkg="gdm"
-		aur_display_mgr_pkg=""
-	elif [ "$display_mgr" == "lightdm" ]; then
-		display_mgr_pkg="lightdm lightdm-gtk-greeter"
-		aur_display_mgr_pkg=""
-	elif [ "$display_mgr" == "lxdm" ]; then
-		display_mgr_pkg="lxdm"
-		aur_display_mgr_pkg=""
-	elif [ "$display_mgr" == "sddm" ]; then
-		display_mgr_pkg="sddm"
-		aur_display_mgr_pkg=""
-	elif [ "$display_mgr" == "ly" ]; then
-		aur_display_mgr_pkg="ly-git"
-		display_mgr_pkg=""
-	fi
+	case $desktop_env in
+		"budgie" )
+			desktop_env_pkg="budgie-desktop budgie-extras baobab cheese eog epiphany evince file-roller gedit gnome-backgrounds gnome-calculator gnome-calendar gnome-characters gnome-clocks gnome-color-manager gnome-contacts gnome-control-center gnome-dictionary gnome-disk-utility gnome-documents gnome-font-viewer gnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orca rygel sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp gnome-boxes gnome-software simple-scan"
+		"cinnamon" )
+			desktop_env_pkg="cinnamon"
+		"gnome" )
+			desktop_env_pkg="baobab cheese eog epiphany evince file-roller gedit gnome-backgrounds gnome-calculator gnome-calendar gnome-characters gnome-clocks gnome-color-manager gnome-contacts gnome-control-center gnome-dictionary gnome-disk-utility gnome-documents gnome-font-viewer gnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orca rygel sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp gnome-boxes gnome-software simple-scan accerciser brasero dconf-editor devhelp evolution five-or-more four-in-a-row gnome-builder gnome-chess gnome-devel-docs gnome-klotski gnome-mahjongg gnome-mines gnome-nettool gnome-nibbles gnome-robots gnome-sound-recorder gnome-sudoku gnome-taquin gnome-tetravex gnome-tweaks gnome-weather hitori iagno lightsoff nautilus-sendto polari quadrapassel swell-foop sysprof tali gedit-code-assistance gnome-code-assistance gnome-multi-writer gnome-recipes gnome-usage"
+		"kde" )
+			desktop_env_pkg="plasma-meta kde-applications-meta"
+		"lxde" )
+			desktop_env_pkg="gpicview lxappearance lxappearance-obconf lxde-common lxde-icon-theme lxhotkey lxinput lxlauncher lxmusic lxpanel lxrandr lxsession lxtask lxterminal openbox pcmanfm"
+		"lxqt" )
+			desktop_env_pkg="lximage-qt lxqt-about lxqt-admin lxqt-config lxqt-globalkeys lxqt-notificationd lxqt-openssh-askpass lxqt-panel lxqt-policykit lxqt-powermanagement lxqt-qtplugin lxqt-runner lxqt-session lxqt-sudo lxqt-themes obconf-qt openbox pcmanfm-qt qterminal"
+		"mate" )
+			desktop_env_pkg="caja marco mate-backgrounds mate-control-center mate-desktop mate-icon-theme mate-menus mate-notification-daemon mate-panel mate-polkit mate-session-manager mate-settings-daemon mate-themes mate-user-guide atril caja-image-converter caja-open-terminal caja-sendto caja-share caja-wallpaper caja-xattr-tags engrampa eom mate-applets mate-calc mate-icon-theme-faenza mate-media mate-netbook mate-power-manager mate-screensaver mate-sensors-applet mate-system-monitor mate-terminal mate-user-share mate-utils mozo pluma"
+		"xfce" )
+			desktop_env_pkg="exo garcon gtk-xfce-engine thunar thunar-volman tumbler xfce4-appfinder xfce4-panel xfce4-power-manager xfce4-session xfce4-settings xfce4-terminal xfconf xfdesktop xfwm4 xfwm4-themes mousepad orage thunar-archive-plugin thunar-media-tags-plugin xfburn xfce4-artwork xfce4-battery-plugin xfce4-clipman-plugin xfce4-cpufreq-plugin xfce4-cpugraph-plugin xfce4-datetime-plugin xfce4-dict xfce4-diskperf-plugin xfce4-eyes-plugin xfce4-fsguard-plugin xfce4-genmon-plugin xfce4-mailwatch-plugin xfce4-mount-plugin xfce4-mpc-plugin xfce4-netload-plugin xfce4-notes-plugin xfce4-notifyd xfce4-pulseaudio-plugin xfce4-screenshooter xfce4-sensors-plugin xfce4-smartbookmark-plugin xfce4-systemload-plugin xfce4-taskmanager xfce4-time-out-plugin xfce4-timer-plugin xfce4-verve-plugin xfce4-wavelan-plugin xfce4-weather-plugin xfce4-xkb-plugin parole ristretto xfce4-whiskermenu-plugin"
+		"i3-gaps" )
+			desktop_env_pkg="i3-gaps rofi rxvt-unicode ranger mc pcurses neofetch cmus calcurse bc maim xclip xsel"
+		"sway" )
+			desktop_env_pkg="sway rofi rxvt-unicode ranger mc pcurses neofetch cmus calcurse bc maim xclip xsel"
+		"nodeorwm" )
+			desktop_env_pkg=""
+	esac
+
+# Display manager
+	case $display_mgr in
+		"nodm" )
+			display_mgr_pkg=""
+			aur_display_mgr_pkg=""
+		"gdm" )
+			display_mgr_pkg="gdm"
+			aur_display_mgr_pkg=""
+		"lightdm" )
+			display_mgr_pkg="lightdm lightdm-gtk-greeter"
+			aur_display_mgr_pkg=""
+		"lxdm" )
+			display_mgr_pkg="lxdm"
+			aur_display_mgr_pkg=""
+		"sddm" )
+			display_mgr_pkg="sddm"
+			aur_display_mgr_pkg=""
+		"ly" )
+			aur_display_mgr_pkg="ly-git"
+			display_mgr_pkg=""
+	esac
 
 # Nvidia (i)GPU
 	if $(lspci | grep -i "VGA compatible controller: NVIDIA Corporation" > /dev/null 2>&1); then
@@ -437,7 +437,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	mkdir /mnt/home/${username}/Pictures
 	mkdir /mnt/home/${username}/Videos
 	mkdir /mnt/home/${username}/GitHub
-	if [ "$desktop_env" != "i3wm" -o "$desktop_env" != "sway" ]; then
+	if [ "$desktop_env" != "i3-gaps" -o "$desktop_env" != "sway" ]; then
 		mkdir /mnt/home/${username}/Desktop
 	fi
 
