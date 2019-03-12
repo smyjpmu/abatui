@@ -8,7 +8,7 @@ If the first link doesn't work;
 
 ![alt text](https://raw.githubusercontent.com/smyjpmu/abatui/master/screenshots/1.png)
 ![alt text](https://raw.githubusercontent.com/smyjpmu/abatui/master/screenshots/2.png)
-![alt text](https://raw.githubusercontent.com/smyjpmu/abatui master/screenshots/3.png)
+![alt text](https://raw.githubusercontent.com/smyjpmu/abatui/master/screenshots/3.png)
 ![alt text](https://raw.githubusercontent.com/smyjpmu/abatui/master/screenshots/4.png)
 ![alt text](https://raw.githubusercontent.com/smyjpmu/abatui/master/screenshots/5.png)
 ![alt text](https://raw.githubusercontent.com/smyjpmu/abatui/master/screenshots/6.png)
