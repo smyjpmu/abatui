@@ -164,10 +164,9 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	}
 	timezone
 
-	# language
+# language
 	language () {
-    language=$(eval 'whiptail --radiolist "Default: en_US.UTF-8 UTF-8" 40 60 30 --title "What language do I use?" 3>&1 1>&2 2>&3' "$(sed -r '/^# /d;/^#$/d;s/#//;s/  //;s/.*/ "&/;s/$/" locale OFF&/;s/"en_US.UTF-8 UTF-8" locale OFF/"en_US.UTF-8 UTF-8" locale ON/' /etc/locale.gen | tr -d "\n"
-)")
+    language=$(eval 'whiptail --radiolist "Default: en_US.UTF-8 UTF-8" 40 60 30 --title "What language do I use?" 3>&1 1>&2 2>&3' "$(sed -r '/^# /d;/^#$/d;s/#//;s/  //;s/.*/ "&/;s/$/" locale OFF&/;s/"en_US.UTF-8 UTF-8" locale OFF/"en_US.UTF-8 UTF-8" locale ON/' /etc/locale.gen | tr -d "\n")")
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			timezone

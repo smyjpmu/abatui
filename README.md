@@ -8,5 +8,3 @@ To run the scrip;
 
 If the first link doesn't work;
 `wget raw.githubusercontent.com/smyjpmu/abatui/master/abatui.sh && chmod +x abatui.sh && ./abatui.sh`
-
-Based on https://git.hexlizard.net/dr.fr4nk3n5731n/InstallArch
