@@ -41,7 +41,7 @@ wizard () {
 
 # Erase drive
 	erase () {
-		encrypt=$(whiptail --menu "" 8 60 2 --title "Do I rewrite/erase my drive with zeros?" 3>&1 1>&2 2>&3 "false" "I don't want to erase my drive." "true" "I want to erase my drive.")
+		erase=$(whiptail --menu "" 8 60 2 --title "Do I rewrite/erase my drive with zeros?" 3>&1 1>&2 2>&3 "false" "I don't want to erase my drive." "true" "I want to erase my drive.")
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			nvme
@@ -101,6 +101,7 @@ wizard () {
 
 # User Password
 	user_pwd () {
+		user_pwd2="something"
 		while [ "$user_pwd" != "$user_pwd2" ]; do
 	  	user_pwd=$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for ${username}?" 3>&1 1>&2 2>&3)
 	  	user_pwd2=$(whiptail --passwordbox "" 8 60 --title "Re-enter the _sTR0nG_ password for ${username}." 3>&1 1>&2 2>&3)
@@ -115,6 +116,7 @@ wizard () {
 
 # Root Password
 	root_pwd () {
+		root_pwd2="something"
 		while [ "$root_pwd" != "$root_pwd2" ]; do
 			root_pwd=$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for root?" 3>&1 1>&2 2>&3)
 			root_pwd2=$(whiptail --passwordbox "" 8 60 --title "Re-enter the _sTR0nG_ password for root" 3>&1 1>&2 2>&3)
@@ -553,6 +555,5 @@ wizard
 	if echo $custom_pkg | grep -q 'tor'; then
 	   arch-chroot /mnt systemctl enable tor
 	fi
-
 
 echo "-==Arch Is Ready==-"
