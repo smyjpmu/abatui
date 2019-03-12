@@ -13,7 +13,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this script.  If not, see <https://www.gnu.org/licenses/>.
 "
-
+wizard () {
 # GNU G.P.L v3
 	gnugpl () {
 		whiptail --msgbox "$GNUGPL" --title "GNU General Public License v3" 18 78
@@ -204,12 +204,22 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	}
 	display_mgr
 
+# Multilib
+	multilib () {
+		multilib=$(whiptail --menu "" 8 60 2 --title "Do I want the Multilib repository?" 3>&1 1>&2 2>&3 "false" "I DO NOT want the Multilib repository." "true" "I want the Multilib repository.")
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			display_mgr
+		fi
+	}
+	multilib
+
 # BlackArch
 	blackarch () {
 		blackarch=$(whiptail --menu "" 8 60 2 --title "Do I want the BlackArch repository?" 3>&1 1>&2 2>&3 "false" "I DO NOT want the BlackArch repository." "true" "I want the BlackArch repository.")
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
-			display_mgr
+			multilib
 		fi
 	}
 	blackarch
@@ -238,7 +248,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Other custom packages
 	other_custom_pkg () {
-		other_custom_pkg=$(whiptail --inputbox "" 8 60 --title "Do I want any other custom packages?" 3>&1 1>&2 2>&3)
+		other_custom_pkg=$(whiptail --inputbox "Example: package package1 package2 package3" 8 60 --title "Do I want any other custom packages?" 3>&1 1>&2 2>&3)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			custom_pkg
@@ -258,16 +268,24 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # AUR other custom packages
 	aur_other_custom_pkg () {
-		aur_other_custom_pkg=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "Do I want any other AUR custom packages?" 3>&1 1>&2 2>&3)
+		aur_other_custom_pkg=$(whiptail --inputbox "Example: aur-package aur-package1 aur-package2 aur-package3" 8 60 --title "Do I want any other AUR custom packages?" 3>&1 1>&2 2>&3)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			aur_custom_pkg
 		fi
 	}
 	aur_other_custom_pkg
+}
+wizard
+
+# Confirmation
+	whiptail --yesno "Did you make any mistake during the wizard? You can still go back by selecting \"yes\"" 8 60 --title "Did I make mistakes?" 3>&1 1>&2 2>&3
+	exitstatus=$?
+	if [ "$exitstatus" == "0" ]; then
+		wizard
+	fi
 
 # Desktop environment
-
 	case $desktop_env in
 		"budgie" )
 			desktop_env_pkg="budgie-desktop budgie-extras baobab cheese eog epiphany evince file-roller gedit gnome-backgrounds gnome-calculator gnome-calendar gnome-characters gnome-clocks gnome-color-manager gnome-contacts gnome-control-center gnome-dictionary gnome-disk-utility gnome-documents gnome-font-viewer gnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orca rygel sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp gnome-boxes gnome-software simple-scan"
@@ -337,6 +355,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg $blackarch_pkg linux-headers mesa xorg-server networkmanager network-manager-applet grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh vim openvpn networkmanager-openvpn arandr udiskie ntp"
 	aur_pkg="$aur_desktop_env_pkg $aur_display_mgr_pkg $aur_custom_pkg $aur_other_custom_pkg"
 
+Installation () {
 # unmounting drives
 	echo "-==Unmounting Drives==-"
 	if $nvme; then
@@ -451,8 +470,10 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	echo "-==New Mirrorlist Created==-"
 
 # Enabling multilib repo
-	echo "[community]" >> /mnt/etc/pacman.conf
-	echo "Include = /etc/pacman.d/mirrorlist" >> /mnt/etc/pacman.conf
+	if $multilib; then
+		echo "[community]" >> /mnt/etc/pacman.conf
+		echo "Include = /etc/pacman.d/mirrorlist" >> /mnt/etc/pacman.conf
+	fi
 
 # Installing blackarch
 	if $blackarch; then
@@ -533,5 +554,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	if echo $custom_pkg | grep -q 'tor'; then
 	   arch-chroot /mnt systemctl enable tor
 	fi
+}
+installation
 
 echo "-==Arch Is Ready==-"
