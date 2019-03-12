@@ -14,102 +14,261 @@ You should have received a copy of the GNU General Public License
 along with this script.  If not, see <https://www.gnu.org/licenses/>.
 "
 
-# GNU G.P.L
-	whiptail --msgbox "$GNUGPL" --title "GNU General Public License v3" 18 78
+# GNU G.P.L v3
+	gnugpl () {
+		whiptail --msgbox "$GNUGPL" --title "GNU General Public License v3" 18 78
+	}
+	gnugpl
 
 # Target drive
 	LSBLK="$(lsblk)"
-	drive=$(whiptail --inputbox "/dev/sd* (replace the * with the drive letter) $LSBLK" 20 60 /dev/ --title "target drive" 3>&1 1>&2 2>&3)
-
-# File System
-	filesystem=$(whiptail --menu "select=[ENTER]" 12 50 5 --title "file systems" 3>&1 1>&2 2>&3 "ext4" "Recommended and is nearly indestructible." "btrfs" "Use only if you need certain features.")
-
-# Bootloader ID
-	bootloader_id=$(whiptail --inputbox "done=[ENTER], write the bootloader ID." 8 60 Arch\ Linux --title "bootloader id" 3>&1 1>&2 2>&3)
-
-# Hostname
-	hostname=$(whiptail --inputbox "done=[ENTER], write the hostname (PC name)." 8 60 archlinux --title "hostname" 3>&1 1>&2 2>&3)
-
-# Username
-	username=$(whiptail --inputbox "done=[ENTER], write your username." 8 60 noname --title "username" 3>&1 1>&2 2>&3)
-
-# User Password
-	while [ "$user_pwd" != "$user_pwd2" ]; do
-	  user_pwd=$(whiptail --passwordbox "done=[ENTER], enter the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
-	  user_pwd2=$(whiptail --passwordbox "done=[ENTER], re-enter the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
-		whiptail --msgbox "Passowrds did not match, please try again." --title "failed password" 8 60
-	done
-
-# Root Password
-	while [ "$root_pwd" != "$root_pwd2" ]; do
-		root_pwd=$(whiptail --passwordbox "done=[ENTER], enter the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
-		root_pwd2=$(whiptail --passwordbox "done=[ENTER], re-enter the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
-		whiptail --msgbox "Passowrds did not match, please try again." --title "failed password" 8 60
-	done
-
-# desktop environment
-	desktop_env=$(whiptail --menu "select=[ENTER]" 18 80 10 --title "interface" 3>&1 1>&2 2>&3 "nodeorwm" "Comes with nothing and is nothing." "budgie" "Modern design, focuses on simplicity and elegance." "cinnamon" "Strives to provide a traditional user experience." "gnome" "An attractive and intuitive desktop." "kde" "Modern and familiar working environment." "lxde" "Strives to be less CPU and RAM intensive." "lxqt" "Lightweight, modular, blazing-fast and user-friendly." "mate" " Intuitive and attractive desktop using traditional metaphors." "xfce" "Traditional UNIX philosophy of modularity and re-usability." "i3wm" "Primarily targeted at developers and advanced users" "sway" "Drop-in replacement of i3/i3-gaps for Wayland")
-
-# Display manager
-	display_mgr=$(whiptail --menu "select=[ENTER]" 12 50 5 --title "display manager" 3>&1 1>&2 2>&3 "nodm" "Comes with nothing and is nothing." "gdm" "Recommended for Budgie & Gnome." "lightdm" "Recommended for XFCE." "lxdm" "Recommended for LXDE." "sddm" "Recommended for KDE & LXQT." "ly" "TUI based" "tty" "CLI based")
-
-# BlackArch
-	blackarch=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "BlackArch" 3>&1 1>&2 2>&3 "false" "I DO NOT want the BlackArch repository." "true" "I want the BlackArch repository.")
-
-# BlackArch tools
-	if $blackarch; then
-		blackarch_tools=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "BlackArch Tools" 3>&1 1>&2 2>&3 "false" "DO NOT install BlackArch tools." "true" "Install BlackArch tools. (~50GB)")
-	fi
-
-# Custom packages
-	custom_pkg=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "firefox" "Web Browser" ON "atom" "IDE" ON "weechat" "IRC client" ON "libreoffice" "Office suite" ON "tor" "proxy" ON "deluge" "torrent manager" ON "gimp" "image manipulator" ON "audacity" "audio editor" ON "blender" "3d editor" ON "darktable" "photo editor" ON "inkscape" "vector editor" ON "krita" "drawing editor" ON "steam" "Game client" OFF "playonlinux" "wine manager" OFF "lutris" "wine manager" OFF)
-
-# Other custom packages
-	other_custom_pkg=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "other custom packages" 3>&1 1>&2 2>&3)
-
-# Custom packages
-	aur_custom_pkg=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "discord" "discord" OFF "spotify" "spotify" OFF "polybar" "polybar" OFF)
-
-# Other custom packages
-	aur_other_custom_pkg=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "other custom packages" 3>&1 1>&2 2>&3)
+	drive () {
+		drive=$(whiptail --inputbox "/dev/sd* (replace the * with the drive letter) $LSBLK" 20 60 /dev/ --title "target drive" 3>&1 1>&2 2>&3)
+		if [ "$exitstatus" == "1" ]; then
+			exit
+		fi
+	}
+	drive
 
 # Nvme drive
-	nvme=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "nvme" 3>&1 1>&2 2>&3 "false" "I don't have an Nvme SSD." "true" "I have an Nvme SSD.")
+	nvme () {
+		nvme=$(whiptail --menu "select=[ENTER]" 8 60 2 --title "nvme" 3>&1 1>&2 2>&3 "false" "I don't have an Nvme SSD." "true" "I have an Nvme SSD.")
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			drive
+		fi
+	}
+	nvme
+
+# Erase drive
+	erase () {
+		encrypt=$(whiptail --menu "select=[ENTER]" 8 60 2 --title "erase drive" 3>&1 1>&2 2>&3 "false" "I don't want to erase my drive." "true" "erase my drive.")
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			nvme
+		fi
+	}
+	erase
 
 # Encrypt drive
-	encrypt=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "drive encryption" 3>&1 1>&2 2>&3 "false" "I don't want to encrypt my drive." "true" "I want to encrypt my drive.")
+	encrypt () {
+		encrypt=$(whiptail --menu "select=[ENTER]" 8 60 2 --title "drive encryption" 3>&1 1>&2 2>&3 "false" "I don't want to encrypt my drive." "true" "I want to encrypt my drive.")
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			erase
+		fi
+	}
+	encrypt
 
-# Country
-	country=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "What's your country? Capital first letter." 3>&1 1>&2 2>&3)
+# File System
+	filesystem () {
+		filesystem=$(whiptail --menu "select=[ENTER]" 12 50 5 --title "file systems" 3>&1 1>&2 2>&3 "ext4" "Recommended and is nearly indestructible." "btrfs" "Use only if you need certain features.")
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			encrypt
+		fi
+	}
+	filesystem
+
+# Bootloader ID
+	bootloader_id () {
+		bootloader_id=$(whiptail --inputbox "done=[ENTER], write the bootloader ID." 8 60 Arch\ Linux --title "bootloader id" 3>&1 1>&2 2>&3)
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			filesystem
+		fi
+	}
+	bootloader_id
+
+# Hostname
+	hostname () {
+		hostname=$(whiptail --inputbox "done=[ENTER], write the hostname (PC name)." 8 60 archlinux --title "hostname" 3>&1 1>&2 2>&3)
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			bootloader_id
+		fi
+	}
+	hostname
+
+# Username
+	username () {
+		username=$(whiptail --inputbox "done=[ENTER], write your username." 8 60 noname --title "username" 3>&1 1>&2 2>&3)
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			hostname
+		fi
+	}
+	username
+
+# User Password
+	user_pwd () {
+		while [ "$user_pwd" != "$user_pwd2" ]; do
+	  	user_pwd=$(whiptail --passwordbox "done=[ENTER], enter the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
+	  	user_pwd2=$(whiptail --passwordbox "done=[ENTER], re-enter the password for user." 8 60 --title "password for user" 3>&1 1>&2 2>&3)
+			whiptail --msgbox "Passowrds did not match, please try again." --title "failed password" 8 60
+		done
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			username
+		fi
+	}
+	user_pwd
+
+# Root Password
+	root_pwd () {
+		while [ "$root_pwd" != "$root_pwd2" ]; do
+			root_pwd=$(whiptail --passwordbox "done=[ENTER], enter the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
+			root_pwd2=$(whiptail --passwordbox "done=[ENTER], re-enter the password for root." 8 60 --title "password for root" 3>&1 1>&2 2>&3)
+			whiptail --msgbox "Passowrds did not match, please try again." --title "failed password" 8 60
+		done
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			user_pwd
+		fi
+	}
+	root_pwd
+
+	# Country
+		country () {
+			country=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "What's your country? Capital first letter." 3>&1 1>&2 2>&3)
+			exitstatus=$?
+			if [ "$exitstatus" == "1" ]; then
+				root_pwd
+			fi
+		}
+		county
 
 # Timezone
-	timezone=""
-	choosing_timezone=true
-    while [ $choosing_timezone ]; do
-        if [ -d "/usr/share/zoneinfo"$(if [ -n $timezone ]; then echo "/$timezone/"; fi) ]; then
-             tmp_timezone=$(whiptail --noitem --title "timezone" --menu "select/continue=[enter]" 30 40 22 $(for ZONE in $(find /usr/share/zoneinfo/$(if [ -n "$timezone" ]; then echo "$timezone/"; fi) -maxdepth 1 \
-             $([ -z "$timezone" ] && echo "-type d") -not -name right -not -name posix -not -name Etc -not -wholename "/usr/share/zoneinfo/$timezone/" -not -wholename "/usr/share/zoneinfo/$timezone" 2>/dev/null | sed "s#/usr/share/zoneinfo/$timezone##" | sed "s#/##"); do
-                 echo "$ZONE $ZONE"
-             done) 3>&1 1>&2 2>&3)
-             if [ -z $timezone ]; then
-                 timezone="$tmp_timezone"
-             else
-                 timezone=$timezone/$tmp_timezone
-             fi
-        else
-            choosing_timezone=false
-            break
-        fi
-    done
+ timezone () {
+		timezone=""
+		choosing_timezone=true
+    	while [ $choosing_timezone ]; do
+        	if [ -d "/usr/share/zoneinfo"$(if [ -n $timezone ]; then echo "/$timezone/"; fi) ]; then
+             	tmp_timezone=$(whiptail --noitem --title "timezone" --menu "select/continue=[enter]" 30 40 22 $(for ZONE in $(find /usr/share/zoneinfo/$(if [ -n "$timezone" ]; then echo "$timezone/"; fi) -maxdepth 1 \
+             	$([ -z "$timezone" ] && echo "-type d") -not -name right -not -name posix -not -name Etc -not -wholename "/usr/share/zoneinfo/$timezone/" -not -wholename "/usr/share/zoneinfo/$timezone" 2>/dev/null | sed "s#/usr/share/zoneinfo/$timezone##" | sed "s#/##"); do
+                 	echo "$ZONE $ZONE"
+             	done) 3>&1 1>&2 2>&3)
+             	if [ -z $timezone ]; then
+                 	timezone="$tmp_timezone"
+             	else
+                 	timezone=$timezone/$tmp_timezone
+             	fi
+        	else
+            	choosing_timezone=false
+            	break
+        	fi
+    	done
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			country
+		fi
+	}
+	timezone
 
-# Locale
-	locale=$(eval 'whiptail --radiolist "select=[space], continue=[enter]. default=en_US.UTF-8 UTF-8" 40 60 30 --title "locale" 3>&1 1>&2 2>&3' "$(perl -lne 'BEGIN{$\=" "} next unless /^#?[a-z]\S+\s\S+\s*$/; s/^#//; s/\s+$//; print "\"$_\" locale OFF" ' /etc/locale.gen)")
+	# language
+	language () {
+		language=$(eval 'whiptail --radiolist "select=[space], continue=[enter]. default=en_US.UTF-8 UTF-8" 40 60 30 --title "language" 3>&1 1>&2 2>&3' "$(perl -lne 'BEGIN{$\=" "} next unless /^#?[a-z]\S+\s\S+\s*$/; s/^#//; s/\s+$//; print "\"$_\" locale OFF" ' /etc/locale.gen)")
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			timezone
+		fi
+	}
+	language
 
 # Keymap
-	keymap=$(
-		keymaps=$(find /usr/share/kbd -name '*.map.gz' -type f -printf '%f\n' | cut -d. -f1 | sort)
-		eval "whiptail --radiolist 'select=[space], continue=[enter]. default=us' 40 60 30 --title 'keymap' 3>&1 1>&2 2>&3 $(printf '"%s" keymap OFF ' $keymaps)"
-	)
+	keymap () {
+		keymap=$(
+			keymaps=$(find /usr/share/kbd -name '*.map.gz' -type f -printf '%f\n' | cut -d. -f1 | sort)
+			eval "whiptail --radiolist 'select=[space], continue=[enter]. default=us' 40 60 30 --title 'keymap' 3>&1 1>&2 2>&3 $(printf '"%s" keymap OFF ' $keymaps)"
+		)
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			language
+		fi
+	}
+	keymap
+
+# desktop environment
+	desktop_env () {
+		desktop_env=$(whiptail --menu "select=[ENTER]" 18 80 10 --title "interface" 3>&1 1>&2 2>&3 "nodeorwm" "Comes with nothing and is nothing." "budgie" "Modern design, focuses on simplicity and elegance." "cinnamon" "Strives to provide a traditional user experience." "gnome" "An attractive and intuitive desktop." "kde" "Modern and familiar working environment." "lxde" "Strives to be less CPU and RAM intensive." "lxqt" "Lightweight, modular, blazing-fast and user-friendly." "mate" " Intuitive and attractive desktop using traditional metaphors." "xfce" "Traditional UNIX philosophy of modularity and re-usability." "i3wm" "Primarily targeted at developers and advanced users" "sway" "Drop-in replacement of i3/i3-gaps for Wayland")
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			keymap
+		fi
+	}
+	desktop_env
+
+# Display manager
+	display_mgr () {
+		display_mgr=$(whiptail --menu "select=[ENTER]" 12 50 5 --title "display manager" 3>&1 1>&2 2>&3 "nodm" "Comes with nothing and is nothing." "gdm" "Recommended for Budgie & Gnome." "lightdm" "Recommended for XFCE." "lxdm" "Recommended for LXDE." "sddm" "Recommended for KDE & LXQT." "ly" "TUI based" "tty" "CLI based")
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			desktop_env
+		fi
+	}
+	display_mgr
+
+# BlackArch
+	blackarch () {
+		blackarch=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "BlackArch" 3>&1 1>&2 2>&3 "false" "I DO NOT want the BlackArch repository." "true" "I want the BlackArch repository.")
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			display_mgr
+		fi
+	}
+	blackarch
+
+# BlackArch tools
+	blackarch_tools () {
+		if $blackarch; then
+			blackarch_tools=$(whiptail --menu "select=[ENTER], default=(false)" 8 60 2 --title "BlackArch Tools" 3>&1 1>&2 2>&3 "false" "DO NOT install BlackArch tools." "true" "Install BlackArch tools. (~50GB)")
+		fi
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			blackarch
+		fi
+	}
+	blackarch_tools
+
+# Custom packages
+	custom_pkg () {
+		custom_pkg=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "firefox" "Web Browser" ON "atom" "IDE" ON "weechat" "IRC client" ON "libreoffice" "Office suite" ON "tor" "proxy" ON "deluge" "torrent manager" ON "gimp" "image manipulator" ON "audacity" "audio editor" ON "blender" "3d editor" ON "darktable" "photo editor" ON "inkscape" "vector editor" ON "krita" "drawing editor" ON "steam" "Game client" OFF "playonlinux" "wine manager" OFF "lutris" "wine manager" OFF)
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			blackarch_tools
+		fi
+	}
+	custom_pkg
+
+# Other custom packages
+	other_custom_pkg () {
+		other_custom_pkg=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "other custom packages" 3>&1 1>&2 2>&3)
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			custom_pkg
+		fi
+	}
+	other_custom_pkg
+
+# AUR custom packages
+	aur_custom_pkg () {
+		aur_custom_pkg=$(whiptail --separate-output --checklist "select=[space], done=[enter]" 30 50 22 --title "custom packages" 3>&1 1>&2 2>&3 "discord" "discord" OFF "spotify" "spotify" OFF "polybar" "polybar" OFF)
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			other_custom_pkg
+		fi
+	}
+	aur_custom_pkg
+
+# AUR other custom packages
+	aur_other_custom_pkg () {
+		aur_other_custom_pkg=$(whiptail --inputbox "done=[ENTER]" 8 60 --title "other custom packages" 3>&1 1>&2 2>&3)
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			aur_custom_pkg
+		fi
+	}
+	aur_other_custom_pkg
 
 # DE/WM's
 	if [ "$desktop_env" == "budgie" ]; then
@@ -189,6 +348,12 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		umount ${drive}2 /mnt/
 	fi
 
+# Erasing drives
+	if $erase; then
+		echo "-==Erasing Drives==-"
+		dd if=/dev/zero of=$drive bs=1M status=progress
+	fi
+
 # installing arch
 	echo "-==Starting Arch Installation==-"
 	timedatectl set-ntp true
@@ -233,7 +398,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 			mkfs.$filesystem $drive$system_partition
 		fi
 	fi
-	sgdisk -p ${drive}
+	sgdisk -p $drive
 	echo "-==Mouting Formatted Drives==-"
 	if $encrypt; then
 		mount /dev/mapper/cryptroot /mnt
@@ -253,15 +418,12 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		fi
 	fi
 
-# Ranking mirrors
-	echo "-==installing neccesarry packages to rank mirrors==-"
-	pacman -Sy
-	pacman -S --noconfirm pacman-contrib
-	echo "-==backing up old mirrorlist==-"
-	cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-	echo "-==creating list of 5 fastest Mirrors for ${country}this might take a bit==-"
-	curl -s "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=https&use_mirror_status=on" | sed -e 's/^#S/S/' | rankmirrors -n 5 - > /etc/pacman.d/mirrorlist
-	echo "-==New Mirrorlist Created==-"
+# Encrypt drive
+	if $encrypt; then
+		echo "-==configuring mkinitcpio.conf and grub config for encryption==-"
+		sed -i "s/^HOOKS=.*/HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)/" /mnt/etc/mkinitcpio.conf
+		sed -ir "s/^GRUB_CMDLINE_LINUX_DEFAULT=\"([^\s\s]*)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 cryptdevice=UUID=device-UUID:cryptroot$(if $ssd; then echo ":allow-discards"; fi) root=\/dev\/mapper\/cryptroot\"/" /mnt/etc/default/grub
+	fi
 
 # Add user
 	echo "-==Adding Normal User==-"
@@ -279,6 +441,20 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		mkdir /mnt/home/${username}/Desktop
 	fi
 
+# Ranking mirrors
+	echo "-==installing neccesarry packages to rank mirrors==-"
+	pacman -Sy
+	pacman -S --noconfirm pacman-contrib
+	echo "-==backing up old mirrorlist==-"
+	cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
+	echo "-==creating list of 5 fastest Mirrors for ${country}this might take a bit==-"
+	curl -s "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=https&use_mirror_status=on" | sed -e 's/^#S/S/' | rankmirrors -n 5 - > /etc/pacman.d/mirrorlist
+	echo "-==New Mirrorlist Created==-"
+
+# Enabling multilib repo
+	echo "[community]" >> /mnt/etc/pacman.conf
+	echo "Include = /etc/pacman.d/mirrorlist" >> /mnt/etc/pacman.conf
+
 # Installing blackarch
 	if $blackarch; then
 		echo "-==Adding BlackArch Repository==-"
@@ -292,9 +468,8 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		fi
 	fi
 
-
 # Install packages
-	echo "-==Installing Base Packages==-"
+	echo "-==Installing Packages==-"
 	if [ "$desktop_env" == "KDE" -a  "$display_mgr" == "$sddm" ]; then
   	pacstrap /mnt $pkgs sddm-kcm
 	else
@@ -305,7 +480,10 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	echo "-==Installing Yay==-"
 	git clone https://aur.archlinux.org/yay.git /mnt/home/${username}/GitHub/
 	arch-chroot /mnt/home/${username}/GitHub/yay/ makepkg -si
-	arch-chroot /mnt su $username -c yes $user_pwd | yay -S $aur_pkg
+	if [ "$aur_pkg" != "" ]; then
+		echo "-==Installing AUR Packages==-"
+		arch-chroot /mnt su $username -c yes $user_pwd | yay -S $aur_pkg
+	fi
 
 # Installing Oh-My-ZSH
 	echo "-==Installing Oh-My-ZSH==-"
@@ -327,9 +505,9 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Configure locale
 	echo "-==Configuring Locale==-"
-	echo "$locale" >> /mnt/etc/locale.gen
+	echo "$language" >> /mnt/etc/locale.gen
 	arch-chroot /mnt locale-gen
-	echo "LANG=$(echo $locale | cut -d' ' -f1)" >> /mnt/etc/locale.conf
+	echo "LANG=$(echo $language | cut -d' ' -f1)" >> /mnt/etc/locale.conf
 	echo "KEYMAP=$keymap" >> /mnt/etc/vconsole.conf
 
 # Set hostname
@@ -355,13 +533,6 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	arch-chroot /mnt systemctl enable ntpd
 	if echo $custom_pkg | grep -q 'tor'; then
 	   arch-chroot /mnt systemctl enable tor
-	fi
-
-# Encrypt drive
-	if $encrypt; then
-		echo "-==configuring mkinitcpio.conf and grub config for encryption==-"
-		sed -i "s/^HOOKS=.*/HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)/" /mnt/etc/mkinitcpio.conf
-		sed -ir "s/^GRUB_CMDLINE_LINUX_DEFAULT=\"([^\s\s]*)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 cryptdevice=UUID=device-UUID:cryptroot$(if $ssd; then echo ":allow-discards"; fi) root=\/dev\/mapper\/cryptroot\"/" /mnt/etc/default/grub
 	fi
 
 echo "-==Arch Is Ready==-"
