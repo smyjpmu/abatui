@@ -91,7 +91,6 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	}
 
 # User Password
-user_pwd2="something"
 	user_pwd_wiz () {
 		while [ "$user_pwd" != "$user_pwd2" ]; do
 	  	user_pwd=$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for ${username}?" 3>&1 1>&2 2>&3)
@@ -105,7 +104,6 @@ user_pwd2="something"
 	}
 
 # Root Password
-root_pwd2="something"
 	root_pwd_wiz () {
 		while [ "$root_pwd" != "$root_pwd2" ]; do
 			root_pwd=$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for root?" 3>&1 1>&2 2>&3)
@@ -605,7 +603,9 @@ root_pwd2="something"
 		bootloader_id_wiz
 		hostname_wiz
 		username_wiz
+		user_pwd2="something"
 		user_pwd_wiz
+		root_pwd2="something"
 		root_pwd_wiz
 		country_wiz
 		timezone_wiz
