@@ -92,28 +92,30 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # User Password
 	user_pwd_wiz () {
-		while [ "$user_pwd" != "$user_pwd2" ]; do
-	  	user_pwd=$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for ${username}?" 3>&1 1>&2 2>&3)
-	  	user_pwd2=$(whiptail --passwordbox "" 8 60 --title "Re-enter the _sTR0nG_ password for ${username}." 3>&1 1>&2 2>&3)
-			whiptail --msgbox "Passowrds did not match, please try again." --title "They don't match!" 8 60
-		done
-		exitstatus=$?
-		if [ "$exitstatus" == "1" ]; then
-			username_wiz
-		fi
+		#while [ "$user_pwd" != "$user_pwd2" ]; do
+	  #	user_pwd=$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for ${username}?" 3>&1 1>&2 2>&3)
+	  #	user_pwd2=$(whiptail --passwordbox "" 8 60 --title "Re-enter the _sTR0nG_ password for ${username}." 3>&1 1>&2 2>&3)
+		#	whiptail --msgbox "Passowrds did not match, please try again." --title "They don't match!" 8 60
+		#done
+		#exitstatus=$?
+		#if [ "$exitstatus" == "1" ]; then
+		#	username_wiz
+		#fi
+		user_pwd="123"
 	}
 
 # Root Password
 	root_pwd_wiz () {
-		while [ "$root_pwd" != "$root_pwd2" ]; do
-			root_pwd=$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for root?" 3>&1 1>&2 2>&3)
-			root_pwd2=$(whiptail --passwordbox "" 8 60 --title "Re-enter the _sTR0nG_ password for root" 3>&1 1>&2 2>&3)
-			whiptail --msgbox "Passowrds did not match, please try again." --title "They don't match!" 8 60
-		done
-		exitstatus=$?
-		if [ "$exitstatus" == "1" ]; then
-			user_pwd_wiz
-		fi
+		#while [ "$root_pwd" != "$root_pwd2" ]; do
+		#	root_pwd=$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for root?" 3>&1 1>&2 2>&3)
+		#	root_pwd2=$(whiptail --passwordbox "" 8 60 --title "Re-enter the _sTR0nG_ password for root" 3>&1 1>&2 2>&3)
+		#	whiptail --msgbox "Passowrds did not match, please try again." --title "They don't match!" 8 60
+		#done
+		#exitstatus=$?
+		#if [ "$exitstatus" == "1" ]; then
+		#	user_pwd_wiz
+		#fi
+		root_pwd="123"
 	}
 
 # Country
@@ -348,10 +350,6 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		fi
 	}
 
-# installing arch
-	echo "-==Starting Arch Installation==-"
-	timedatectl set-ntp true
-
 # EFI?
 	system_efi () {
 		echo "-==Checking If System Is Capeable Of EFI==-"
@@ -423,7 +421,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 			if $nvme; then
 					mount ${drive}p$system_partition /mnt/
 			else
-					mount $drive$system_partition /mnt/
+					mount ${drive}$system_partition /mnt/
 			fi
 		fi
 			if $efi; then
@@ -483,7 +481,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		fi
 	}
 
-# Installing blackarch
+# Enable blackarch
 	enable_blackarch () {
 		if $blackarch; then
 			echo "-==Adding BlackArch Repository==-"
@@ -578,6 +576,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # Enable services
 	enable_services () {
 		echo "-==Enabling Services==-"
+		timedatectl set-ntp true
 		arch-chroot /mnt systemctl enable NetworkManager
 		if [ "$display_mgr" == "tty" ]; then
 			echo "if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then" >> /mnt/home/${username}/.zprofile
@@ -603,9 +602,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		bootloader_id_wiz
 		hostname_wiz
 		username_wiz
-		user_pwd2="something"
 		user_pwd_wiz
-		root_pwd2="something"
 		root_pwd_wiz
 		country_wiz
 		timezone_wiz
