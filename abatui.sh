@@ -481,14 +481,17 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		fi
 	}
 
-# Enable blackarch
-	enable_blackarch () {
+# install blackarch
+	install_blackarch () {
 		if $blackarch; then
 			echo "-==Adding BlackArch Repository==-"
 			arch-chroot /mnt/home/${username}/Downloads curl -O https://blackarch.org/strap.sh
 			arch-chroot /mnt/home/${username}/Downloads chmod +x strap.sh
 			arch-chroot /mnt/home/${username}/Downloads ./strap.sh
 			arch-chroot /mnt/home/${username}/Downloads rm -f strap.sh
+		fi
+		if $blackarch_tools; then
+			pacman -S blackarch
 		fi
 	}
 
@@ -501,7 +504,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		fi
 		BASE="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vi which xfsprogs"
 		BASE_DEVEL="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
-		pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg $blackarch_pkg linux-headers mesa xorg-server networkmanager network-manager-applet grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh vim openvpn networkmanager-openvpn arandr udiskie ntp"
+		pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg linux-headers mesa xorg-server networkmanager network-manager-applet grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh vim openvpn networkmanager-openvpn arandr udiskie ntp"
 		aur_pkg="$aur_desktop_env_pkg $aur_display_mgr_pkg $aur_custom_pkg $aur_other_custom_pkg"
 		echo "-==Installing Packages==-"
 		if [ "$desktop_env" == "KDE" -a  "$display_mgr" == "$sddm" ]; then
@@ -628,15 +631,15 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		drive_ssd
 		format_drive
 		mount_drive
-		add_user
 		enable_multilib
-		enable_blackarch
 		desktop_env_pkg
 		display_mgr_pkg
 		nvidia_pkg
 		amd_pkg
 		install_pkg
+		add_user
 		install_yay
+		enable_blackarch
 		install_omzsh
 		gen_fstab
 		config_timezone
