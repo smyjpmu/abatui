@@ -92,30 +92,34 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # User Password
 	user_pwd_wiz () {
-		#while [ "$user_pwd" != "$user_pwd2" ]; do
-	  #	user_pwd=$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for ${username}?" 3>&1 1>&2 2>&3)
-	  #	user_pwd2=$(whiptail --passwordbox "" 8 60 --title "Re-enter the _sTR0nG_ password for ${username}." 3>&1 1>&2 2>&3)
-		#	whiptail --msgbox "Passowrds did not match, please try again." --title "They don't match!" 8 60
-		#done
-		#exitstatus=$?
-		#if [ "$exitstatus" == "1" ]; then
-		#	username_wiz
-		#fi
-		user_pwd="123"
+		user_pwd1="$GNUGPL"
+		while [ "$user_pwd" != "$user_pwd1" ]; do
+			user_pwd="$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for ${username}?" 3>&1 1>&2 2>&3)"
+			user_pwd1="$(whiptail --passwordbox "" 8 60 --title "Re-enter the _sTR0nG_ password for ${username}." 3>&1 1>&2 2>&3)"
+			if [ "$user_pwd" != "$user_pwd1" ]; then
+				whiptail --msgbox "Passowrds did not match, please try again." --title "They don't match!" 8 60
+			fi
+		done
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			username_wiz
+		fi
 	}
 
 # Root Password
 	root_pwd_wiz () {
-		#while [ "$root_pwd" != "$root_pwd2" ]; do
-		#	root_pwd=$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for root?" 3>&1 1>&2 2>&3)
-		#	root_pwd2=$(whiptail --passwordbox "" 8 60 --title "Re-enter the _sTR0nG_ password for root" 3>&1 1>&2 2>&3)
-		#	whiptail --msgbox "Passowrds did not match, please try again." --title "They don't match!" 8 60
-		#done
-		#exitstatus=$?
-		#if [ "$exitstatus" == "1" ]; then
-		#	user_pwd_wiz
-		#fi
-		root_pwd="123"
+		root_pwd1="$GNUGPL"
+		while [ "$root_pwd" != "$root_pwd1" ]; do
+			root_pwd="$(whiptail --passwordbox "" 8 60 --title "What's the _sTR0nG_ password for root?" 3>&1 1>&2 2>&3)"
+			root_pwd1="$(whiptail --passwordbox "" 8 60 --title "Re-enter the _sTR0nG_ password for root" 3>&1 1>&2 2>&3)"
+			if [ "$root_pwd" != "$root_pwd1" ]; then
+				whiptail --msgbox "Passowrds did not match, please try again." --title "They don't match!" 8 60
+			fi
+		done
+		exitstatus=$?
+		if [ "$exitstatus" == "1" ]; then
+			user_pwd_wiz
+		fi
 	}
 
 # Country
@@ -450,14 +454,10 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		echo "root:$root_pwd" | chpasswd -R /mnt
 		echo "$username:$user_pwd" | chpasswd -R /mnt
 		arch-chroot /mnt echo "$username ALL=(ALL) ALL" >> /etc/sudoers
-		mkdir /mnt/home/${username}/Documents
-		mkdir /mnt/home/${username}/Downloads
-		mkdir /mnt/home/${username}/Music
-		mkdir /mnt/home/${username}/Pictures
-		mkdir /mnt/home/${username}/Videos
-		mkdir /mnt/home/${username}/GitHub
 		if [ "$desktop_env" != "i3-gaps" -o "$desktop_env" != "sway" ]; then
-			mkdir /mnt/home/${username}/Desktop
+			mkdir /mnt/home/${username}/Documents /mnt/home/${username}/Downloads /mnt/home/${username}/Music /mnt/home/${username}/Pictures /mnt/home/${username}/Videos /mnt/home/${username}/GitHub /mnt/home/${username}/Desktop
+		else
+			mkdir /mnt/home/${username}/Documents /mnt/home/${username}/Downloads /mnt/home/${username}/Music /mnt/home/${username}/Pictures /mnt/home/${username}/Videos /mnt/home/${username}/GitHub
 		fi
 	}
 
@@ -494,15 +494,15 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Install packages
 	install_pkg () {
-		BASE="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vi which xfsprogs"
-		BASE_DEVEL="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
-		pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg $blackarch_pkg linux-headers mesa xorg-server networkmanager network-manager-applet grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh vim openvpn networkmanager-openvpn arandr udiskie ntp"
-		aur_pkg="$aur_desktop_env_pkg $aur_display_mgr_pkg $aur_custom_pkg $aur_other_custom_pkg"
 		if $blackarch_tools; then
 			blackarch_pkg="blackarch"
 		else
 			blackarch_pkg=""
 		fi
+		BASE="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vi which xfsprogs"
+		BASE_DEVEL="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
+		pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg $blackarch_pkg linux-headers mesa xorg-server networkmanager network-manager-applet grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh vim openvpn networkmanager-openvpn arandr udiskie ntp"
+		aur_pkg="$aur_desktop_env_pkg $aur_display_mgr_pkg $aur_custom_pkg $aur_other_custom_pkg"
 		echo "-==Installing Packages==-"
 		if [ "$desktop_env" == "KDE" -a  "$display_mgr" == "$sddm" ]; then
   		pacstrap /mnt $pkgs sddm-kcm
@@ -514,7 +514,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # Installing yay
 	install_yay () {
 		echo "-==Installing Yay==-"
-		git clone https://aur.archlinux.org/yay.git /mnt/home/${username}/GitHub/
+		git clone https://aur.archlinux.org/yay.git /mnt/home/${username}/GitHub/yay
 		arch-chroot /mnt/home/${username}/GitHub/yay/ makepkg -si
 		if [ "$aur_pkg" != "" ]; then
 			echo "-==Installing AUR Packages==-"
@@ -567,7 +567,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		echo "-==Installing GRUB==-"
 		arch-chroot /mnt mkinitcpio -p linux
 		arch-chroot /mnt grub-install --recheck $(if $efi; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=$bootloader_id"; else echo "--target=i386-pc $drive"; fi)
-		git clone https://github.com/fghibellini/arch-silence.git /mnt/home/${username}/GitHub/
+		git clone https://github.com/fghibellini/arch-silence.git /mnt/home/${username}/GitHub/arch-silence
 		cp -r /mnt/home/${username}/GitHub/arch-silence/theme /mnt/boot/grub/themes/arch-silence
 		echo "GRUB_THEME="/boot/grub/themes/arch-silence/theme.txt"" >> /mnt/etc/default/grub
 		arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
@@ -622,28 +622,28 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # Installation
 	installation () {
 		rank_mirrors
-		system_efi
-		drive_ssd
 		unmount_drive
 		erase_drive
+		system_efi
+		drive_ssd
 		format_drive
 		mount_drive
+		add_user
+		enable_multilib
+		enable_blackarch
 		desktop_env_pkg
 		display_mgr_pkg
 		nvidia_pkg
 		amd_pkg
 		install_pkg
-		encrypt_drive
+		install_yay
+		install_omzsh
 		gen_fstab
 		config_timezone
 		config_locale
-		add_user
-		enable_multilib
-		enable_blackarch
-		install_yay
-		install_omzsh
 		set_hostname
 		install_grub
+		encrypt_drive
 		enable_services
 	}
 
