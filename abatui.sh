@@ -258,7 +258,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	confirmation () {
 		whiptail --yesno "Do you want to restart the wizard?" 8 60 --title "Did I make mistakes?" 3>&1 1>&2 2>&3
 		exitstatus=$?
-		if [ "$exitstatus" == "1" ]; then
+		if [ "$exitstatus" == "0" ]; then
 			wizard
 		fi
 	}
@@ -341,10 +341,10 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # unmounting drives
 	unmount_drive () {
 		echo "-==Unmounting Drives==-"
-		if grep -qs '/mnt/boot ' /proc/mounts && $nvme; then
+		if $nvme; then
 			umount ${drive}p1 /mnt/boot
-			umount ${drive}p2 /mnt/else
-		elif grep -qs '/mnt/boot ' /proc/mounts; then
+			umount ${drive}p2 /mnt/
+		else
 			umount ${drive}1 /mnt/boot
 			umount ${drive}2 /mnt/
 		fi
@@ -406,7 +406,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 				cryptsetup open $(if $ssd; then echo "--allow-discards"; fi) $drive$system_partition cryptroot
 				mkfs.$filesystem /dev/mapper/cryptroot
 			else
-				mkfs.$filesystem $drive$system_partition
+				mkfs.$filesystem ${drive}$system_partition
 			fi
 		fi
 		sgdisk -p $drive
@@ -621,27 +621,27 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Installation
 	installation () {
+		rank_mirrors
+		system_efi
+		drive_ssd
+		unmount_drive
+		erase_drive
+		format_drive
+		mount_drive
 		desktop_env_pkg
 		display_mgr_pkg
 		nvidia_pkg
 		amd_pkg
-		unmount_drive
-		system_efi
-		drive_ssd
-		erase_drive
-		format_drive
-		mount_drive
-		encrypt_drive
-		add_user
-		rank_mirrors
-		enable_multilib
-		enable_blackarch
 		install_pkg
-		install_yay
-		install_omzsh
+		encrypt_drive
 		gen_fstab
 		config_timezone
 		config_locale
+		add_user
+		enable_multilib
+		enable_blackarch
+		install_yay
+		install_omzsh
 		set_hostname
 		install_grub
 		enable_services
