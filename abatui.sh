@@ -132,25 +132,25 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	}
 
 # Timezone
- timezone_wiz () {
+	timezone_wiz () {
 		timezone=""
 		choosing_timezone=true
-    	while [ $choosing_timezone ]; do
-        	if [ -d "/usr/share/zoneinfo"$(if [ -n $timezone ]; then echo "/$timezone/"; fi) ]; then
-             	tmp_timezone=$(whiptail --noitem --title "What timezone am I in?" --menu "" 30 40 22 $(for ZONE in $(find /usr/share/zoneinfo/$(if [ -n "$timezone" ]; then echo "$timezone/"; fi) -maxdepth 1 \
-             	$([ -z "$timezone" ] && echo "-type d") -not -name right -not -name posix -not -name Etc -not -wholename "/usr/share/zoneinfo/$timezone/" -not -wholename "/usr/share/zoneinfo/$timezone" 2>/dev/null | sed "s#/usr/share/zoneinfo/$timezone##" | sed "s#/##"); do
-                 	echo "$ZONE $ZONE"
-             	done) 3>&1 1>&2 2>&3)
-             	if [ -z $timezone ]; then
-                 	timezone="$tmp_timezone"
-             	else
-                 	timezone=$timezone/$tmp_timezone
-             	fi
-        	else
-            	choosing_timezone=false
-            	break
-        	fi
-    	done
+		while [ $choosing_timezone ]; do
+			if [ -d "/usr/share/zoneinfo"$(if [ -n $timezone ]; then echo "/$timezone/"; fi) ]; then
+				tmp_timezone=$(whiptail --noitem --title "What timezone am I in?" --menu "" 30 40 22 $(for ZONE in $(find /usr/share/zoneinfo/$(if [ -n "$timezone" ]; then echo "$timezone/"; fi) -maxdepth 1 \
+				$([ -z "$timezone" ] && echo "-type d") -not -name right -not -name posix -not -name Etc -not -wholename "/usr/share/zoneinfo/$timezone/" -not -wholename "/usr/share/zoneinfo/$timezone" 2>/dev/null | sed "s#/usr/share/zoneinfo/$timezone##" | sed "s#/##"); do
+				echo "$ZONE $ZONE"
+				done) 3>&1 1>&2 2>&3)
+				if [ -z $timezone ]; then
+					timezone="$tmp_timezone"
+				else
+					timezone=$timezone/$tmp_timezone
+				fi
+			else
+				choosing_timezone=false
+				break
+			fi
+		done
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			country_wiz
@@ -159,7 +159,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # language
 	language_wiz () {
-    language=$(eval 'whiptail --radiolist "Default: en_US.UTF-8 UTF-8" 40 60 30 --title "What language do I use?" 3>&1 1>&2 2>&3' "$(sed -r '/^# /d;/^#$/d;s/#//;s/  //;s/.*/ "&/;s/$/" locale OFF&/;s/"en_US.UTF-8 UTF-8" locale OFF/"en_US.UTF-8 UTF-8" locale ON/' /etc/locale.gen | tr -d "\n")")
+		language=$(eval 'whiptail --radiolist "Default: en_US.UTF-8 UTF-8" 40 60 30 --title "What language do I use?" 3>&1 1>&2 2>&3' "$(sed -r '/^# /d;/^#$/d;s/#//;s/  //;s/.*/ "&/;s/$/" locale OFF&/;s/"en_US.UTF-8 UTF-8" locale OFF/"en_US.UTF-8 UTF-8" locale ON/' /etc/locale.gen | tr -d "\n")")
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			timezone_wiz
@@ -377,16 +377,18 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	erase_drive () {
 		if $erase; then
 			echo "-==Erasing ${drive}==-"
-			dd if=/dev/zero of=$drive bs=1M status=progress
+			dd if=/dev/zero of=$drive bs=4M status=progress
 		fi
 	}
 
 # Formatting drive
 	format_drive () {
 		echo "-==Formatting Drives/Partitions==-"
-		sgdisk -og $drive
+		sgdisk -Zog $drive
 		if $efi; then
 			sgdisk -n 1:0:+512M -c 1:"EFI" -t 1:ef00 $drive
+		else
+			printf '\200\0\0\0\0\0\0\0\0\0\0\0\001\0\0\0' | dd of=$drive bs=1 seek=462
 		fi
 		system_partition=$(if $efi; then echo 2; else echo 1; fi)
 		sgdisk -n $system_partition:0:0 -c $system_partition:"System" -t $system_partition:8300 $drive
@@ -423,19 +425,19 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 			mount /dev/mapper/cryptroot /mnt
 		else
 			if $nvme; then
-					mount ${drive}p$system_partition /mnt/
+				mount ${drive}p$system_partition /mnt/
 			else
-					mount ${drive}$system_partition /mnt/
+				mount ${drive}$system_partition /mnt/
 			fi
 		fi
-			if $efi; then
-				mkdir /mnt/boot/
-				if $nvme; then
-					mount ${drive}p1 /mnt/boot
-				else
-					mount ${drive}1 /mnt/boot
-				fi
+		if $efi; then
+			mkdir /mnt/boot/
+			if $nvme; then
+				mount ${drive}p1 /mnt/boot
+			else
+				mount ${drive}1 /mnt/boot
 			fi
+		fi
 	}
 
 # Encrypt drive
@@ -491,24 +493,20 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 			arch-chroot /mnt/home/${username}/Downloads rm -f strap.sh
 		fi
 		if $blackarch_tools; then
-			pacman -S blackarch
+			blackarch_pkg="blackarch"
+		else
+			blackarch_pkg=""
 		fi
 	}
 
 # Install packages
 	install_pkg () {
-		if $blackarch_tools; then
-			blackarch_pkg="blackarch"
-		else
-			blackarch_pkg=""
-		fi
 		BASE="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vi which xfsprogs"
 		BASE_DEVEL="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
 		pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg linux-headers mesa xorg-server networkmanager network-manager-applet grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh vim openvpn networkmanager-openvpn arandr udiskie ntp"
-		aur_pkg="$aur_desktop_env_pkg $aur_display_mgr_pkg $aur_custom_pkg $aur_other_custom_pkg"
 		echo "-==Installing Packages==-"
 		if [ "$desktop_env" == "KDE" -a  "$display_mgr" == "$sddm" ]; then
-  		pacstrap /mnt $pkgs sddm-kcm
+			pacstrap /mnt $pkgs sddm-kcm
 		else
 			pacstrap /mnt $pkgs
 		fi
@@ -517,12 +515,11 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # Installing yay
 	install_yay () {
 		echo "-==Installing Yay==-"
+		aur_pkg="$aur_desktop_env_pkg $aur_display_mgr_pkg $aur_custom_pkg $aur_other_custom_pkg"
 		git clone https://aur.archlinux.org/yay.git /mnt/home/${username}/GitHub/yay
 		arch-chroot /mnt/home/${username}/GitHub/yay/ makepkg -si
-		if [ "$aur_pkg" != "" ]; then
-			echo "-==Installing AUR Packages==-"
-			arch-chroot /mnt su $username -c yay -S --noconfirm $aur_pkg
-		fi
+		echo "-==Installing AUR Packages==-"
+		arch-chroot /mnt su $username -c yay -S --noconfirm $aur_pkg
 	}
 
 # Installing Oh-My-ZSH
@@ -572,7 +569,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		arch-chroot /mnt grub-install --recheck $(if $efi; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=$bootloader_id"; else echo "--target=i386-pc $drive"; fi)
 		git clone https://github.com/fghibellini/arch-silence.git /mnt/home/${username}/GitHub/arch-silence
 		cp -r /mnt/home/${username}/GitHub/arch-silence/theme /mnt/boot/grub/themes/arch-silence
-		echo "GRUB_THEME="/boot/grub/themes/arch-silence/theme.txt"" >> /mnt/etc/default/grub
+		echo "GRUB_THEME=\"/boot/grub/themes/arch-silence/theme.txt\"" >> /mnt/etc/default/grub
 		arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 	}
 
@@ -583,7 +580,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		arch-chroot /mnt systemctl enable NetworkManager
 		if [ "$display_mgr" == "tty" ]; then
 			echo "if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then" >> /mnt/home/${username}/.zprofile
-  		echo "exec startx" >> /mnt/home/${username}/.zprofile
+			echo "exec startx" >> /mnt/home/${username}/.zprofile
 			echo "fi" >> /mnt/home/${username}/.zprofile
 			echo "exec $display_mgr" >> /mnt/home/${username}/.xinitrc
 		elif [ "$display_mgr" != "nodm" ]; then
@@ -591,7 +588,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		fi
 		arch-chroot /mnt systemctl enable ntpd
 		if echo $custom_pkg | grep -q 'tor'; then
-	   	arch-chroot /mnt systemctl enable tor
+			arch-chroot /mnt systemctl enable tor
 		fi
 }
 
@@ -638,9 +635,9 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		amd_pkg
 		install_pkg
 		add_user
-		install_yay
-		enable_blackarch
-		install_omzsh
+		#install_yay
+		install_blackarch
+		#install_omzsh
 		gen_fstab
 		config_timezone
 		config_locale
