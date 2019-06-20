@@ -454,12 +454,12 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		echo "-==Adding ${username}==-"
 		arch-chroot /mnt useradd -m -g users -G wheel -s /bin/bash $username
 		echo "root:$root_pwd" | chpasswd -R /mnt
-		echo "$username:$user_pwd" | chpasswd -R /mnt
-		arch-chroot /mnt echo "$username ALL=(ALL) ALL" >> /etc/sudoers
-		if [ "$desktop_env" != "i3-gaps" -o "$desktop_env" != "sway" ]; then
-			mkdir /mnt/home/${username}/Documents /mnt/home/${username}/Downloads /mnt/home/${username}/Music /mnt/home/${username}/Pictures /mnt/home/${username}/Videos /mnt/home/${username}/GitHub /mnt/home/${username}/Desktop
-		else
+		echo "${username}:$user_pwd" | chpasswd -R /mnt
+		echo "$username ALL=(ALL) ALL" >> /mnt/etc/sudoers
+		if [ "$desktop_env" == "i3-gaps" -o "$desktop_env" == "sway" ]; then
 			mkdir /mnt/home/${username}/Documents /mnt/home/${username}/Downloads /mnt/home/${username}/Music /mnt/home/${username}/Pictures /mnt/home/${username}/Videos /mnt/home/${username}/GitHub
+		else
+			mkdir /mnt/home/${username}/Documents /mnt/home/${username}/Downloads /mnt/home/${username}/Music /mnt/home/${username}/Pictures /mnt/home/${username}/Videos /mnt/home/${username}/GitHub /mnt/home/${username}/Desktop
 		fi
 	}
 
@@ -590,7 +590,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		if echo $custom_pkg | grep -q 'tor'; then
 			arch-chroot /mnt systemctl enable tor
 		fi
-}
+	}
 
 # Wizard
 	wizard () {
