@@ -215,7 +215,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Custom packages
 	custom_pkg_wiz () {
-		custom_pkg=$(whiptail --separate-output --checklist "" 30 50 22 --title "What custom packages do I want?" 3>&1 1>&2 2>&3 "firefox" "Web Browser" OFF "atom" "IDE" OFF "weechat" "IRC client" OFF "libreoffice" "Office suite" OFF "tor" "proxy" OFF "deluge" "torrent manager" OFF "gimp" "image manipulator" OFF "audacity" "audio editor" OFF "blender" "3d editor" OFF "darktable" "photo editor" OFF "inkscape" "vector editor" OFF "krita" "drawing editor" OFF "steam" "Game client" OFF "playonlinux" "wine manager" OFF "lutris" "wine manager" OFF)
+		custom_pkg=$(whiptail --separate-output --checklist "" 30 50 22 --title "What custom packages do I want?" 3>&1 1>&2 2>&3 "tor" "proxy" OFF "zsh" "shell" OFF "openssh" "ssh client" OFF "vim" "text editor" OFF "nvim" "text editor" OFF "firefox" "Web Browser" OFF "weechat" "IRC client" OFF "libreoffice" "Office suite" OFF "deluge" "torrent manager" OFF "gimp" "image manipulator" OFF "audacity" "audio editor" OFF "blender" "3d editor" OFF "darktable" "photo editor" OFF "inkscape" "vector editor" OFF "krita" "drawing editor" OFF "steam" "Game client" OFF "playonlinux" "wine manager" OFF "lutris" "wine manager" OFF)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			blackarch_tools_wiz
@@ -442,8 +442,11 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	install_pkg () {
 		BASE="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vi which xfsprogs"
 		BASE_DEVEL="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
-		pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg linux-headers mesa xorg-server networkmanager network-manager-applet grub efibootmgr go unzip p7zip unrar curl wget git pulseaudio vlc zsh openssh vim openvpn networkmanager-openvpn arandr udiskie ntp"
+		pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg $efi_pkg linux-headers mesa xorg-server networkmanager network-manager-applet grub go unzip p7zip unrar curl wget git pulseaudio vlc openvpn networkmanager-openvpn udiskie ntp"
 		echo "-==Installing Packages==-"
+		if $efi; then
+			efi_pkg=efibootmgr
+		fi
 		if [ "$desktop_env" == "KDE" -a  "$display_mgr" == "$sddm" ]; then
 			pacstrap /mnt $pkgs sddm-kcm
 		else
@@ -575,7 +578,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		add_user
 		#install_yay
 		install_blackarch
-		#install_omzsh
+		install_omzsh
 		gen_fstab
 		config_timezone
 		config_locale
