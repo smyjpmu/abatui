@@ -45,15 +45,6 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		fi
 	}
 
-# Encrypt drive
-	encrypt_wiz () {
-		encrypt=$(whiptail --menu "" 8 60 2 --title "Do I encrypt ${drive}?" 3>&1 1>&2 2>&3 "false" "I don't want to encrypt ${drive}." "true" "I want to encrypt ${drive}.")
-		exitstatus=$?
-		if [ "$exitstatus" == "1" ]; then
-			erase_wiz
-		fi
-	}
-
 # File System
 	filesystem_wiz () {
 		filesystem=$(whiptail --menu "" 8 60 2 --title "What filesystem do I need?" 3>&1 1>&2 2>&3 "ext4" "Recommended and is nearly indestructible." "btrfs" "Use only if you need certain features.")
@@ -359,17 +350,10 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		echo "-==Checking If System Is Capeable Of EFI==-"
 		if ls /sys/firmware/efi/efivars > /dev/null 2>&1; then
 			efi=true
+			label=gpt
 		else
 			efi=false
-		fi
-	}
-
-# SSD?
-	drive_ssd () {
-		echo "-==Checking If $drive Is An SSD==-"
-		if [ "$(cat /sys/block/$(echo $drive | cut -d'/' -f3)/queue/rotational)" = "0" ]; then
-			ssd=true
-			echo "-==$drive Is An SSD, Trim Will Be Enabled For Cryptsetup==-"
+			label=msdos
 		fi
 	}
 
@@ -384,68 +368,19 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # Formatting drive
 	format_drive () {
 		echo "-==Formatting Drives/Partitions==-"
-		sgdisk -Zog $drive
-		if $efi; then
-			sgdisk -n 1:0:+512M -c 1:"EFI" -t 1:ef00 $drive
-		else
-			printf '\200\0\0\0\0\0\0\0\0\0\0\0\001\0\0\0' | dd of=$drive bs=1 seek=462
-		fi
-		system_partition=$(if $efi; then echo 2; else echo 1; fi)
-		sgdisk -n $system_partition:0:0 -c $system_partition:"System" -t $system_partition:8300 $drive
-		if $nvme; then
-			if $efi; then
-				mkfs.fat -F32 ${drive}p1
-			fi
-			if $encrypt; then
-				cryptsetup -y -v luksFormat --type luks2 ${drive}p$system_partition
-				cryptsetup open $(if $ssd; then echo "--allow-discards"; fi) ${drive}p$system_partition cryptroot
-				mkfs.$filesystem /dev/mapper/cryptroot
-			else
-				mkfs.$filesystem ${drive}p$system_partition
-			fi
-		else
-			if $efi; then
-				mkfs.fat -F32 ${drive}1
-			fi
-			if $encrypt; then
-				cryptsetup -y -v luksFormat --type luks2 ${drive}2
-				cryptsetup open $(if $ssd; then echo "--allow-discards"; fi) $drive$system_partition cryptroot
-				mkfs.$filesystem /dev/mapper/cryptroot
-			else
-				mkfs.$filesystem ${drive}$system_partition
-			fi
-		fi
-		sgdisk -p $drive
+		parted -sa optimal $drive mklabel $label mkpart primary $filesystem 1MiB 512MiB mkpart primary $filesystem 512MiB 100%
 	}
 
 # Mounting drive
 	mount_drive () {
 		echo "-==Mouting Formatted Drive==-"
-		if $encrypt; then
-			mount /dev/mapper/cryptroot /mnt
-		else
-			if $nvme; then
-				mount ${drive}p$system_partition /mnt/
-			else
-				mount ${drive}$system_partition /mnt/
-			fi
-		fi
-		if $efi; then
 			mkdir /mnt/boot/
-			if $nvme; then
-				mount ${drive}p1 /mnt/boot
-			else
-				mount ${drive}1 /mnt/boot
-			fi
-		fi
-	}
-
-# Encrypt drive
-	encrypt_drive () {
-		if $encrypt; then
-			echo "-==configuring mkinitcpio.conf and grub config for encryption==-"
-			sed -i "s/^HOOKS=.*/HOOKS=(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck)/" /mnt/etc/mkinitcpio.conf
-			sed -ir "s/^GRUB_CMDLINE_LINUX_DEFAULT=\"([^\s\s]*)\"/GRUB_CMDLINE_LINUX_DEFAULT=\"\1 cryptdevice=UUID=device-UUID:cryptroot$(if $ssd; then echo ":allow-discards"; fi) root=\/dev\/mapper\/cryptroot\"/" /mnt/etc/default/grub
+		if $nvme; then
+			mount ${drive}p1 /mnt/boot
+			mount ${drive}p2 /mnt/
+		else
+			mount ${drive}1 /mnt/boot
+			mount ${drive}2 /mnt/
 		fi
 	}
 
