@@ -532,7 +532,6 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		drive_wiz
 		nvme_wiz
 		erase_wiz
-		encrypt_wiz
 		filesystem_wiz
 		bootloader_id_wiz
 		hostname_wiz
@@ -578,7 +577,6 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		config_locale
 		set_hostname
 		install_grub
-		encrypt_drive
 		enable_services
 	}
 
