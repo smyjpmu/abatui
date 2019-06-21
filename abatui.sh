@@ -382,6 +382,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 			mount ${drive}1 /mnt/boot
 			mount ${drive}2 /mnt/
 		fi
+		lsblk
 	}
 
 # Add user
