@@ -338,10 +338,10 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		echo "-==Unmounting Drives==-"
 		if $nvme; then
 			umount ${drive}p1 /mnt/boot
-			umount ${drive}p2 /mnt/
+			umount ${drive}p2 /mnt
 		else
 			umount ${drive}1 /mnt/boot
-			umount ${drive}2 /mnt/
+			umount ${drive}2 /mnt
 		fi
 	}
 
@@ -377,12 +377,13 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 			mkdir /mnt/boot/
 		if $nvme; then
 			mount ${drive}p1 /mnt/boot
-			mount ${drive}p2 /mnt/
+			mount ${drive}p2 /mnt
 		else
 			mount ${drive}1 /mnt/boot
-			mount ${drive}2 /mnt/
+			mount ${drive}2 /mnt
 		fi
 		lsblk
+		sleep 1m
 	}
 
 # Add user
