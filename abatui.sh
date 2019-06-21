@@ -215,7 +215,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Custom packages
 	custom_pkg_wiz () {
-		custom_pkg=$(whiptail --separate-output --checklist "" 30 50 22 --title "What custom packages do I want?" 3>&1 1>&2 2>&3 "firefox" "Web Browser" ON "atom" "IDE" ON "weechat" "IRC client" ON "libreoffice" "Office suite" ON "tor" "proxy" ON "deluge" "torrent manager" ON "gimp" "image manipulator" ON "audacity" "audio editor" ON "blender" "3d editor" ON "darktable" "photo editor" ON "inkscape" "vector editor" ON "krita" "drawing editor" ON "steam" "Game client" OFF "playonlinux" "wine manager" OFF "lutris" "wine manager" OFF)
+		custom_pkg=$(whiptail --separate-output --checklist "" 30 50 22 --title "What custom packages do I want?" 3>&1 1>&2 2>&3 "firefox" "Web Browser" OFF "atom" "IDE" OFF "weechat" "IRC client" OFF "libreoffice" "Office suite" OFF "tor" "proxy" OFF "deluge" "torrent manager" OFF "gimp" "image manipulator" OFF "audacity" "audio editor" OFF "blender" "3d editor" OFF "darktable" "photo editor" OFF "inkscape" "vector editor" OFF "krita" "drawing editor" OFF "steam" "Game client" OFF "playonlinux" "wine manager" OFF "lutris" "wine manager" OFF)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			blackarch_tools_wiz
@@ -369,6 +369,8 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	format_drive () {
 		echo "-==Formatting Drives/Partitions==-"
 		parted -sa optimal $drive mklabel $label mkpart primary $filesystem 1MiB 512MiB mkpart primary $filesystem 512MiB 100%
+		mkfs.$filesystem ${drive}1
+		mkfs.$filesystem ${drive}2
 	}
 
 # Mounting drive
@@ -407,7 +409,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		pacman -S --noconfirm pacman-contrib
 		echo "-==backing up old mirrorlist==-"
 		cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-		echo "-==creating list of 5 fastest Mirrors for ${country}this might take a bit==-"
+		echo "-==creating list of 5 fastest Mirrors for $country this might take a bit==-"
 		curl -s "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=https&use_mirror_status=on" | sed -e 's/^#S/S/' | rankmirrors -n 5 - > /etc/pacman.d/mirrorlist
 		echo "-==New Mirrorlist Created==-"
 	}
