@@ -385,7 +385,6 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 			mount ${drive}2 /mnt
 		fi
 		lsblk
-		sleep 1m
 	}
 
 # Add user
