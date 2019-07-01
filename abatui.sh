@@ -215,7 +215,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Custom packages
 	custom_pkg_wiz () {
-		custom_pkg=$(whiptail --separate-output --checklist "" 30 50 22 --title "What custom packages do I want?" 3>&1 1>&2 2>&3 "tor" "proxy" OFF "zsh" "shell" OFF "openssh" "ssh client" OFF "vim" "text editor" OFF "nvim" "text editor" OFF "firefox" "Web Browser" OFF "firefox-developer-edition" "Web Browser" OFF "weechat" "IRC client" OFF "libreoffice" "Office suite" OFF "deluge" "torrent manager" OFF "gimp" "image manipulator" OFF "audacity" "audio editor" OFF "blender" "3d editor" OFF "darktable" "photo editor" OFF "inkscape" "vector editor" OFF "krita" "drawing editor" OFF)
+		custom_pkg=$(whiptail --separate-output --checklist "" 30 50 22 --title "What custom packages do I want?" 3>&1 1>&2 2>&3 "kde-applications-meta" "Kde applications" OFF "tor" "proxy" OFF "zsh" "shell" OFF "openssh" "ssh client" OFF "vim" "text editor" OFF "nvim" "text editor" OFF "firefox" "Web Browser" OFF "firefox-developer-edition" "Web Browser" OFF "weechat" "IRC client" OFF "libreoffice" "Office suite" OFF "deluge" "torrent manager" OFF "gimp" "image manipulator" OFF "audacity" "audio editor" OFF "blender" "3d editor" OFF "darktable" "photo editor" OFF "inkscape" "vector editor" OFF "krita" "drawing editor" OFF)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			blackarch_tools_wiz
@@ -268,7 +268,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 			"gnome" )
 				desktop_env_pkg="baobab cheese eog epiphany evince file-roller gedit gnome-backgrounds gnome-calculator gnome-calendar gnome-characters gnome-clocks gnome-color-manager gnome-contacts gnome-control-center gnome-dictionary gnome-disk-utility gnome-documents gnome-font-viewer gnome-getting-started-docs gnome-keyring gnome-logs gnome-maps gnome-menus gnome-music gnome-photos gnome-remote-desktop gnome-screenshot gnome-session gnome-settings-daemon gnome-shell gnome-shell-extensions gnome-system-monitor gnome-terminal gnome-themes-extra gnome-todo gnome-user-docs gnome-user-share gnome-video-effects grilo-plugins gvfs gvfs-afc gvfs-goa gvfs-google gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb mousetweaks mutter nautilus networkmanager orca rygel sushi totem tracker tracker-miners vino xdg-user-dirs-gtk yelp gnome-boxes gnome-software simple-scan accerciser brasero dconf-editor devhelp evolution five-or-more four-in-a-row gnome-builder gnome-chess gnome-devel-docs gnome-klotski gnome-mahjongg gnome-mines gnome-nettool gnome-nibbles gnome-robots gnome-sound-recorder gnome-sudoku gnome-taquin gnome-tetravex gnome-tweaks gnome-weather hitori iagno lightsoff nautilus-sendto polari quadrapassel swell-foop sysprof tali gedit-code-assistance gnome-code-assistance gnome-multi-writer gnome-recipes gnome-usage";;
 			"kde" )
-				desktop_env_pkg="plasma-meta kde-applications-meta";;
+				desktop_env_pkg="plasma-meta";;
 			"lxde" )
 				desktop_env_pkg="gpicview lxappearance lxappearance-obconf lxde-common lxde-icon-theme lxhotkey lxinput lxlauncher lxmusic lxpanel lxrandr lxsession lxtask lxterminal openbox pcmanfm";;
 			"lxqt" )
@@ -369,12 +369,12 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # Formatting drive
 	format_drive () {
 		echo -e "\e[93m-==Formatting Drives/Partitions==-\e[39m"
-		sgdisk -og $drive
+		#sgdisk -Zog $drive
 		if $efi; then
-			#parted -sa optimal $drive mklabel $label mkpart primary fat32 1MiB 512MiB mkpart primary $filesystem 512MiB 100% set 1 esp on
+			parted -sa optimal $drive mklabel $label mkpart primary fat32 1MiB 512MiB mkpart primary $filesystem 512MiB 100% set 1 esp on
 			#mkfs.vfat -F32 ${drive}1
-			sgdisk -n 1:0:+512M -c 1:"EFI" -t 1:ef00 $drive
-			sgdisk -n 2:0:0 -c 2:"System" -t 2:8300 $drive
+			#sgdisk -n 1:0:+512M -c 1:"EFI" -t 1:ef00 $drive
+			#sgdisk -n 2:0:0 -c 2:"System" -t 2:8300 $drive
 			mkfs.fat -F32 ${drive}1
 			mkfs.$filesystem ${drive}2
 		else
@@ -388,12 +388,12 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # Mounting drive
 	mount_drive () {
 		echo -e "\e[93m-==Mouting Formatted Drive==-\e[39m"
-			mkdir /mnt/boot/
+			mkdir /mnt/boot/efi/
 		if $nvme; then
-			mount ${drive}p1 /mnt/boot
+			mount ${drive}p1 /mnt/boot/efi
 			mount ${drive}p2 /mnt
 		else
-			mount ${drive}1 /mnt/boot
+			mount ${drive}1 /mnt/boot/efi
 			mount ${drive}2 /mnt
 		fi
 		lsblk
@@ -453,11 +453,11 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	install_pkg () {
 		BASE="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vi which xfsprogs"
 		BASE_DEVEL="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
-		pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg $efi_pkg linux-headers mesa xorg-server networkmanager network-manager-applet grub go unzip p7zip unrar curl wget git pulseaudio vlc openvpn networkmanager-openvpn udiskie ntp"
+		pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg efibootmgr linux-headers mesa xorg-server networkmanager network-manager-applet grub go unzip p7zip unrar curl wget git pulseaudio vlc openvpn networkmanager-openvpn udiskie ntp"
 		echo -e "\e[93m-==Installing Packages==-\e[39m"
-		if $efi; then
-			efi_pkg=efibootmgr
-		fi
+		#if $efi; then
+		#	efi_pkg="efibootmgr"
+		#fi
 		if [ "$desktop_env" == "KDE" -a  "$display_mgr" == "$sddm" ]; then
 			pacstrap /mnt $pkgs sddm-kcm
 		else
@@ -519,9 +519,9 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	install_grub () {
 		echo -e "\e[93m-==Installing GRUB==-\e[39m"
 		arch-chroot /mnt mkinitcpio -p linux
-		arch-chroot /mnt grub-install --recheck $(if $efi; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=$bootloader_id"; else echo "--target=i386-pc $drive"; fi)
+		arch-chroot /mnt grub-install --recheck $(if $efi; then echo "--target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=$bootloader_id"; else echo "--target=i386-pc $drive"; fi)
 		git clone https://github.com/fghibellini/arch-silence.git /mnt/home/${username}/GitHub/arch-silence
-		cp -r /mnt/home/${username}/GitHub/arch-silence/theme /mnt/boot/grub/themes/arch-silence
+		cp -r /mnt/home/${username}/GitHub/arch-silence/theme /mnt/boot/efi/grub/themes/arch-silence
 		echo "GRUB_THEME=\"/boot/grub/themes/arch-silence/theme.txt\"" >> /mnt/etc/default/grub
 		arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 	}
