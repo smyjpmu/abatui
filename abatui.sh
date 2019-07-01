@@ -369,6 +369,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # Formatting drive
 	format_drive () {
 		echo -e "\e[93m-==Formatting Drives/Partitions==-\e[39m"
+		sgdisk -og $drive
 		if $efi; then
 			#parted -sa optimal $drive mklabel $label mkpart primary fat32 1MiB 512MiB mkpart primary $filesystem 512MiB 100% set 1 esp on
 			#mkfs.vfat -F32 ${drive}1
@@ -376,12 +377,12 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 			sgdisk -n 2:0:0 -c 2:"System" -t 2:8300 $drive
 			mkfs.fat -F32 ${drive}1
 			mkfs.$filesystem ${drive}2
-
 		else
 			parted -sa optimal $drive mklabel $label mkpart primary $filesystem 1MiB 512MiB mkpart primary $filesystem 512MiB 100% set 1 boot on
 			mkfs.$filesystem ${drive}1
 			mkfs.$filesystem ${drive}2
 		fi
+		sgdisk -p $drive
 	}
 
 # Mounting drive
