@@ -215,7 +215,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Custom packages
 	custom_pkg_wiz () {
-		custom_pkg=$(whiptail --separate-output --checklist "" 30 50 22 --title "What custom packages do I want?" 3>&1 1>&2 2>&3 "tor" "proxy" OFF "zsh" "shell" OFF "openssh" "ssh client" OFF "vim" "text editor" OFF "nvim" "text editor" OFF "firefox" "Web Browser" OFF "weechat" "IRC client" OFF "libreoffice" "Office suite" OFF "deluge" "torrent manager" OFF "gimp" "image manipulator" OFF "audacity" "audio editor" OFF "blender" "3d editor" OFF "darktable" "photo editor" OFF "inkscape" "vector editor" OFF "krita" "drawing editor" OFF "steam" "Game client" OFF "playonlinux" "wine manager" OFF "lutris" "wine manager" OFF)
+		custom_pkg=$(whiptail --separate-output --checklist "" 30 50 22 --title "What custom packages do I want?" 3>&1 1>&2 2>&3 "tor" "proxy" OFF "zsh" "shell" OFF "openssh" "ssh client" OFF "vim" "text editor" OFF "nvim" "text editor" OFF "firefox" "Web Browser" OFF "firefox-developer-edition" "Web Browser" OFF "weechat" "IRC client" OFF "libreoffice" "Office suite" OFF "deluge" "torrent manager" OFF "gimp" "image manipulator" OFF "audacity" "audio editor" OFF "blender" "3d editor" OFF "darktable" "photo editor" OFF "inkscape" "vector editor" OFF "krita" "drawing editor" OFF "steam" "Game client" OFF "playonlinux" "wine manager" OFF "lutris" "wine manager" OFF)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			blackarch_tools_wiz
