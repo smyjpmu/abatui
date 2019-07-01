@@ -372,7 +372,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		if $efi; then
 			parted -sa optimal $drive mklabel $label mkpart primary fat32 1MiB 512MiB mkpart primary $filesystem 512MiB 100%
 			set 1 esp on
-			mkfs.vfat -F 32 ${drive}1
+			mkfs.vfat -F32 ${drive}1
 			mkfs.$filesystem ${drive}2
 		else
 			parted -sa optimal $drive mklabel $label mkpart primary $filesystem 1MiB 512MiB mkpart primary $filesystem 512MiB 100%
