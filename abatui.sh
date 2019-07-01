@@ -372,10 +372,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		#sgdisk -Zog $drive
 		if $efi; then
 			parted -sa optimal $drive mklabel $label mkpart primary fat32 1MiB 512MiB mkpart primary $filesystem 512MiB 100% set 1 esp on
-			#mkfs.vfat -F32 ${drive}1
-			#sgdisk -n 1:0:+512M -c 1:"EFI" -t 1:ef00 $drive
-			#sgdisk -n 2:0:0 -c 2:"System" -t 2:8300 $drive
-			mkfs.fat -F32 ${drive}1
+			mkfs.vfat ${drive}1
 			mkfs.$filesystem ${drive}2
 		else
 			parted -sa optimal $drive mklabel $label mkpart primary $filesystem 1MiB 512MiB mkpart primary $filesystem 512MiB 100% set 1 boot on
@@ -388,13 +385,14 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # Mounting drive
 	mount_drive () {
 		echo -e "\e[93m-==Mouting Formatted Drive==-\e[39m"
-			mkdir /mnt/boot/efi/
 		if $nvme; then
-			mount ${drive}p1 /mnt/boot/efi
 			mount ${drive}p2 /mnt
+			mkdir /mnt/boot
+			mount ${drive}p1 /mnt/boot
 		else
-			mount ${drive}1 /mnt/boot/efi
 			mount ${drive}2 /mnt
+			mkdir /mnt/boot
+			mount ${drive}1 /mnt/boot
 		fi
 		lsblk
 	}
@@ -519,9 +517,9 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	install_grub () {
 		echo -e "\e[93m-==Installing GRUB==-\e[39m"
 		arch-chroot /mnt mkinitcpio -p linux
-		arch-chroot /mnt grub-install --recheck $(if $efi; then echo "--target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=$bootloader_id"; else echo "--target=i386-pc $drive"; fi)
+		arch-chroot /mnt grub-install --recheck $(if $efi; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=$bootloader_id"; else echo "--target=i386-pc $drive"; fi)
 		git clone https://github.com/fghibellini/arch-silence.git /mnt/home/${username}/GitHub/arch-silence
-		cp -r /mnt/home/${username}/GitHub/arch-silence/theme /mnt/boot/efi/grub/themes/arch-silence
+		cp -r /mnt/home/${username}/GitHub/arch-silence/theme /mnt/boot/grub/themes/arch-silence
 		echo "GRUB_THEME=\"/boot/grub/themes/arch-silence/theme.txt\"" >> /mnt/etc/default/grub
 		arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 	}
