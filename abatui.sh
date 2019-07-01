@@ -335,7 +335,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # unmounting drives
 	unmount_drive () {
-		echo "-==Unmounting Drives==-"
+		echo -e "\e[93m-==Unmounting Drives==-"
 		if $nvme; then
 			umount ${drive}p1 /mnt/boot
 			umount ${drive}p2 /mnt
@@ -347,7 +347,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # EFI?
 	system_efi () {
-		echo "-==Checking If System Is Capeable Of EFI==-"
+		echo -e "\e[93m-==Checking If System Is Capeable Of EFI==-"
 		if ls /sys/firmware/efi/efivars > /dev/null 2>&1; then
 			efi=true
 			label=gpt
@@ -360,22 +360,31 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # Erasing drive
 	erase_drive () {
 		if $erase; then
-			echo "-==Erasing ${drive}==-"
+			echo -e "\e[93m-==Erasing ${drive}==-"
+			parted -sa optimal $drive mklabel sun
 			dd if=/dev/zero of=$drive bs=4M status=progress
 		fi
 	}
 
 # Formatting drive
 	format_drive () {
-		echo "-==Formatting Drives/Partitions==-"
-		parted -sa optimal $drive mklabel $label mkpart primary $filesystem 1MiB 512MiB mkpart primary $filesystem 512MiB 100%
-		mkfs.$filesystem ${drive}1
-		mkfs.$filesystem ${drive}2
+		echo -e "\e[93m-==Formatting Drives/Partitions==-"
+		if $efi; then
+			parted -sa optimal $drive mklabel $label mkpart primary fat32 1MiB 512MiB mkpart primary $filesystem 512MiB 100%
+			set 1 esp on
+			mkfs.vfat -F 32 ${drive}1
+			mkfs.$filesystem ${drive}2
+		else
+			parted -sa optimal $drive mklabel $label mkpart primary $filesystem 1MiB 512MiB mkpart primary $filesystem 512MiB 100%
+			set 1 boot on
+			mkfs.$filesystem ${drive}1
+			mkfs.$filesystem ${drive}2
+		fi
 	}
 
 # Mounting drive
 	mount_drive () {
-		echo "-==Mouting Formatted Drive==-"
+		echo -e "\e[93m-==Mouting Formatted Drive==-"
 			mkdir /mnt/boot/
 		if $nvme; then
 			mount ${drive}p1 /mnt/boot
@@ -389,7 +398,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Add user
 	add_user () {
-		echo "-==Adding ${username}==-"
+		echo -e "\e[93m-==Adding ${username}==-"
 		arch-chroot /mnt useradd -m -g users -G wheel -s /bin/bash $username
 		echo "root:$root_pwd" | chpasswd -R /mnt
 		echo "${username}:$user_pwd" | chpasswd -R /mnt
@@ -403,7 +412,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Ranking mirrors
 	rank_mirrors () {
-		echo "-==installing neccesarry packages to rank mirrors==-"
+		echo -e "\e[93m-==installing neccesarry packages to rank mirrors==-"
 		pacman -Sy
 		pacman -S --noconfirm pacman-contrib
 		echo "-==backing up old mirrorlist==-"
@@ -442,7 +451,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		BASE="bash bzip2 coreutils cryptsetup device-mapper dhcpcd diffutils e2fsprogs file filesystem findutils gawk gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils less licenses linux logrotate lvm2 man-db man-pages mdadm nano netctl pacman pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux vi which xfsprogs"
 		BASE_DEVEL="autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo systemd texinfo util-linux which"
 		pkgs="$BASE $BASE_DEVEL $desktop_env_pkg $display_mgr_pkg $nvidia_pkg $amd_pkg $custom_pkg $other_custom_pkg $efi_pkg linux-headers mesa xorg-server networkmanager network-manager-applet grub go unzip p7zip unrar curl wget git pulseaudio vlc openvpn networkmanager-openvpn udiskie ntp"
-		echo "-==Installing Packages==-"
+		echo -e "\e[93m-==Installing Packages==-"
 		if $efi; then
 			efi_pkg=efibootmgr
 		fi
@@ -455,17 +464,17 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Installing yay
 	install_yay () {
-		echo "-==Installing Yay==-"
+		echo -e "\e[93m-==Installing Yay==-"
 		aur_pkg="$aur_desktop_env_pkg $aur_display_mgr_pkg $aur_custom_pkg $aur_other_custom_pkg"
 		git clone https://aur.archlinux.org/yay.git /mnt/home/${username}/GitHub/yay
 		arch-chroot /mnt/home/${username}/GitHub/yay/ makepkg -si
-		echo "-==Installing AUR Packages==-"
+		echo -e "\e[93m-==Installing AUR Packages==-"
 		arch-chroot /mnt su $username -c yay -S --noconfirm $aur_pkg
 	}
 
 # Installing Oh-My-ZSH
 	install_omzsh () {
-		echo "-==Installing Oh-My-ZSH==-"
+		echo -e "\e[93m-==Installing Oh-My-ZSH==-"
 		umask g-w,o-w
 		env git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git /mnt/home/${username}/.oh-my-zsh
 		cp /mnt/home/${username}/.oh-my-zsh/templates/zshrc.zsh-template /mnt/home/${username}/.zshrc
@@ -476,20 +485,20 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Generate fstab
 	gen_fstab () {
-		echo "-==Generating FS Tab==-"
+		echo -e "\e[93m-==Generating FS Tab==-"
 		genfstab -U /mnt >> /mnt/etc/fstab
 	}
 
 # Configure timezone
 	config_timezone () {
-		echo "-==Configuring Time Zone==-"
+		echo -e "\e[93m-==Configuring Time Zone==-"
 		arch-chroot /mnt ln -sf /usr/share/zoneinfo/$timezone /etc/localtime
 		arch-chroot /mnt hwclock --systohc
 	}
 
 # Configure locale
 	config_locale () {
-		echo "-==Configuring Locale==-"
+		echo -e "\e[93m-==Configuring Locale==-"
 		echo "$language" >> /mnt/etc/locale.gen
 		arch-chroot /mnt locale-gen
 		echo "LANG=$(echo $language | cut -d' ' -f1)" >> /mnt/etc/locale.conf
@@ -498,14 +507,14 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Set hostname
 	set_hostname () {
-		echo "-==Setting Hostname==-"
+		echo -e "\e[93m-==Setting Hostname==-"
 		echo "$hostname" > /mnt/etc/hostname
 		echo "127.0.0.1 localhost $hostname" >> /mnt/etc/hosts
 	}
 
 # Install grub
 	install_grub () {
-		echo "-==Installing GRUB==-"
+		echo -e "\e[93m-==Installing GRUB==-"
 		arch-chroot /mnt mkinitcpio -p linux
 		arch-chroot /mnt grub-install --recheck $(if $efi; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=$bootloader_id"; else echo "--target=i386-pc $drive"; fi)
 		git clone https://github.com/fghibellini/arch-silence.git /mnt/home/${username}/GitHub/arch-silence
@@ -516,7 +525,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Enable services
 	enable_services () {
-		echo "-==Enabling Services==-"
+		echo -e "\e[93m-==Enabling Services==-"
 		timedatectl set-ntp true
 		arch-chroot /mnt systemctl enable NetworkManager
 		if [ "$display_mgr" == "tty" ]; then
@@ -565,7 +574,6 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		unmount_drive
 		erase_drive
 		system_efi
-		drive_ssd
 		format_drive
 		mount_drive
 		enable_multilib
@@ -591,4 +599,4 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	wizard
 	confirmation
 	installation
-	echo "-==Arch is ready to use?==-"
+	echo -e "\e[93m-==Arch is ready to use? You may now reboot==-"
