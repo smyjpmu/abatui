@@ -415,11 +415,11 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		echo -e "\e[93m-==installing neccesarry packages to rank mirrors==-\e[39m"
 		pacman -Sy
 		pacman -S --noconfirm pacman-contrib
-		echo "-==backing up old mirrorlist==-\e[39m"
+		echo -e "\e[93m-==backing up old mirrorlist==-\e[39m"
 		cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
-		echo "-==creating list of 5 fastest Mirrors for $country this might take a bit==-\e[39m"
+		echo -e "\e[93m-==creating list of 5 fastest Mirrors for $country this might take a bit==-\e[39m"
 		curl -s "https://www.archlinux.org/mirrorlist/?country=${country}&protocol=https&use_mirror_status=on" | sed -e 's/^#S/S/' | rankmirrors -n 5 - > /etc/pacman.d/mirrorlist
-		echo "-==New Mirrorlist Created==-\e[39m"
+		echo -e "\e[93m-==New Mirrorlist Created==-\e[39m"
 	}
 
 # Enabling multilib repo
