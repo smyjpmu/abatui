@@ -215,7 +215,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Custom packages
 	custom_pkg_wiz () {
-		custom_pkg=$(whiptail --separate-output --checklist "" 30 50 22 --title "What custom packages do I want?" 3>&1 1>&2 2>&3 "tor" "proxy" OFF "zsh" "shell" OFF "openssh" "ssh client" OFF "vim" "text editor" OFF "nvim" "text editor" OFF "firefox" "Web Browser" OFF "firefox-developer-edition" "Web Browser" OFF "weechat" "IRC client" OFF "libreoffice" "Office suite" OFF "deluge" "torrent manager" OFF "gimp" "image manipulator" OFF "audacity" "audio editor" OFF "blender" "3d editor" OFF "darktable" "photo editor" OFF "inkscape" "vector editor" OFF "krita" "drawing editor" OFF "steam" "Game client" OFF "playonlinux" "wine manager" OFF "lutris" "wine manager" OFF)
+		custom_pkg=$(whiptail --separate-output --checklist "" 30 50 22 --title "What custom packages do I want?" 3>&1 1>&2 2>&3 "tor" "proxy" OFF "zsh" "shell" OFF "openssh" "ssh client" OFF "vim" "text editor" OFF "nvim" "text editor" OFF "firefox" "Web Browser" OFF "firefox-developer-edition" "Web Browser" OFF "weechat" "IRC client" OFF "libreoffice" "Office suite" OFF "deluge" "torrent manager" OFF "gimp" "image manipulator" OFF "audacity" "audio editor" OFF "blender" "3d editor" OFF "darktable" "photo editor" OFF "inkscape" "vector editor" OFF "krita" "drawing editor" OFF)
 		exitstatus=$?
 		if [ "$exitstatus" == "1" ]; then
 			blackarch_tools_wiz
@@ -370,13 +370,15 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	format_drive () {
 		echo -e "\e[93m-==Formatting Drives/Partitions==-\e[39m"
 		if $efi; then
-			parted -sa optimal $drive mklabel $label mkpart primary fat32 1MiB 512MiB mkpart primary $filesystem 512MiB 100%
-			parted $drive set 1 esp on
-			mkfs.vfat -F32 ${drive}1
+			#parted -sa optimal $drive mklabel $label mkpart primary fat32 1MiB 512MiB mkpart primary $filesystem 512MiB 100% set 1 esp on
+			#mkfs.vfat -F32 ${drive}1
+			sgdisk -n 1:0:+512M -c 1:"EFI" -t 1:ef00 $drive
+			sgdisk -n 2:0:0 -c 2:"System" -t 2:8300 $drive
+			mkfs.fat -F32 ${drive}1
 			mkfs.$filesystem ${drive}2
+
 		else
-			parted -sa optimal $drive mklabel $label mkpart primary $filesystem 1MiB 512MiB mkpart primary $filesystem 512MiB 100%
-			parted $drive set 1 boot on
+			parted -sa optimal $drive mklabel $label mkpart primary $filesystem 1MiB 512MiB mkpart primary $filesystem 512MiB 100% set 1 boot on
 			mkfs.$filesystem ${drive}1
 			mkfs.$filesystem ${drive}2
 		fi
@@ -398,7 +400,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 
 # Add user
 	add_user () {
-		echo -e "\e[93m-==Adding ${username}==-\e[39m"
+		echo -e "\e[93m-==Adding ${usernamme}==-\e[39m"
 		arch-chroot /mnt useradd -m -g users -G wheel -s /bin/bash $username
 		echo "root:$root_pwd" | chpasswd -R /mnt
 		echo "${username}:$user_pwd" | chpasswd -R /mnt
@@ -576,7 +578,6 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		system_efi
 		format_drive
 		mount_drive
-		enable_multilib
 		desktop_env_pkg
 		display_mgr_pkg
 		nvidia_pkg
@@ -584,6 +585,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		install_pkg
 		add_user
 		#install_yay
+		enable_multilib
 		install_blackarch
 		install_omzsh
 		gen_fstab
