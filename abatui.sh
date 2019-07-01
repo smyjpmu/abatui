@@ -371,12 +371,12 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		echo -e "\e[93m-==Formatting Drives/Partitions==-\e[39m"
 		if $efi; then
 			parted -sa optimal $drive mklabel $label mkpart primary fat32 1MiB 512MiB mkpart primary $filesystem 512MiB 100%
-			parted set 1 esp on
+			parted $drive set 1 esp on
 			mkfs.vfat -F32 ${drive}1
 			mkfs.$filesystem ${drive}2
 		else
 			parted -sa optimal $drive mklabel $label mkpart primary $filesystem 1MiB 512MiB mkpart primary $filesystem 512MiB 100%
-			parted set 1 boot on
+			parted $drive set 1 boot on
 			mkfs.$filesystem ${drive}1
 			mkfs.$filesystem ${drive}2
 		fi
