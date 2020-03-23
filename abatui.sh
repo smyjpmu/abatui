@@ -426,7 +426,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 # Enabling multilib repo
 	enable_multilib () {
 		if $multilib; then
-			echo "[community]" >> /mnt/etc/pacman.conf
+			echo "[multilib]" >> /mnt/etc/pacman.conf
 			echo "Include = /etc/pacman.d/mirrorlist" >> /mnt/etc/pacman.conf
 		fi
 	}
