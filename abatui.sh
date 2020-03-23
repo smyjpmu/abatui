@@ -519,8 +519,8 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		arch-chroot /mnt mkinitcpio -p linux
 		arch-chroot /mnt grub-install --recheck $(if $efi; then echo "--target=x86_64-efi --efi-directory=/boot --bootloader-id=$bootloader_id"; else echo "--target=i386-pc $drive"; fi)
 		arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
-		git clone https://github.com/fghibellini/arch-silence.git
-		cp -TR ./arch-silence/theme /mnt/boot/grub/themes/arch-silence
+		arch-chroot /mnt git clone https://github.com/fghibellini/arch-silence.git /home/${username}/GitHub/arch-silence
+		cp -TR /mnt/home/${username}/GitHub/arch-silence/theme /mnt/boot/grub/themes/arch-silence
 		echo "GRUB_THEME=\"/boot/grub/themes/arch-silence/theme.txt\"" >> /mnt/etc/default/grub
 		arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
 	}
