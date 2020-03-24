@@ -467,7 +467,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 	install_yay () {
 		echo -e "\e[93m-==Installing Yay==-\e[39m"
 		aur_pkg="$aur_desktop_env_pkg $aur_display_mgr_pkg $aur_custom_pkg $aur_other_custom_pkg"
-		git clone https://aur.archlinux.org/yay.git /mnt/home/${username}/GitHub/yay
+		arch-chroot /mnt git clone https://aur.archlinux.org/yay.git /home/${username}/GitHub/yay
 		arch-chroot /mnt/home/${username}/GitHub/yay/ makepkg -si
 		echo -e "\e[93m-==Installing AUR Packages==-\e[39m"
 		arch-chroot /mnt su $username -c yay -S --noconfirm $aur_pkg
@@ -584,14 +584,14 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		amd_pkg
 		install_pkg
 		add_user
-		#install_yay
 		enable_multilib
-		install_blackarch
-		install_omzsh
 		gen_fstab
 		config_timezone
 		config_locale
 		set_hostname
+		#install_blackarch
+		install_yay
+		#install_omzsh
 		install_grub
 		enable_services
 	}
