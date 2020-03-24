@@ -470,7 +470,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		arch-chroot /mnt git clone https://aur.archlinux.org/yay.git /home/${username}/GitHub/yay
 		arch-chroot /mnt/home/${username}/GitHub/yay/ makepkg -si
 		echo -e "\e[93m-==Installing AUR Packages==-\e[39m"
-		arch-chroot /mnt su $username -c yay -S --noconfirm $aur_pkg
+		#arch-chroot /mnt su $username -c yay -S --noconfirm $aur_pkg
 	}
 
 # Installing Oh-My-ZSH
@@ -590,7 +590,7 @@ along with this script.  If not, see <https://www.gnu.org/licenses/>.
 		config_locale
 		set_hostname
 		#install_blackarch
-		install_yay
+		#install_yay
 		#install_omzsh
 		install_grub
 		enable_services
